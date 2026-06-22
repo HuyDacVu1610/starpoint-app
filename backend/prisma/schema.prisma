@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum CompetitionLevel {
+  CENTRAL
+  ACADEMY
+}
+
+enum AchievementCategory {
+  CENTRAL_COMPETITION
+  ACADEMY_COMPETITION
+  ORGANIZATION_PARTICIPATION
+  SPECIAL_ACHIEVEMENT
+}
+
+enum AchievementRank {
+  FIRST
+  SECOND
+  THIRD
+  NONE
+}
+
+enum Grade {
+  EXCELLENT
+  GOOD
+  FAIR
+  AVERAGE
+  WEAK
+  POOR
+}
+
+model User {
+  id                    Int                    @id @default(autoincrement())
+  studentCode           String                 @unique
+  fullName              String
+  email                 String                 @unique
+  phone                 String?
+  password              String
+  avatarUrl             String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+  
+  userRoles             UserRole[]
+  achievements          Achievement[]
+  semesterScores        StudentSemesterScore[]
+  scholarshipCandidates ScholarshipCandidate[]
+  uploadedFiles         UploadedFile[]
+  auditLogs             AuditLog[]
+  resetCodes            PasswordResetCode[]
+
+  @@index([studentCode])
+  @@index([email])
+  @@index([phone])
+}
+
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model Semester {
+  id                    Int                    @id @default(autoincrement())
+  name                  String
+  year                  Int
+  term                  Int
+  startDate             DateTime
+  endDate               DateTime
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  
+  competitions          Competition[]
+  achievements          Achievement[]
+  semesterScores        StudentSemesterScore[]
+  scholarshipCandidates ScholarshipCandidate[]
+}
+
+model Competition {
+  id           Int              @id @default(autoincrement())
+  name         String
+  level        CompetitionLevel
+  organizer    String?
+  eventDate    DateTime
+  semesterId   Int
+  semester     Semester         @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  
+  achievements Achievement[]
+
+  @@index([semesterId])
+}
+
+model Achievement {
+  id             Int                 @id @default(autoincrement())
+  userId         Int
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  competitionId  Int?
+  competition    Competition?        @relation(fields: [competitionId], references: [id], onDelete: SetNull)
+  semesterId     Int
+  semester       Semester            @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  category       AchievementCategory
+  rank           AchievementRank
+  bonusPoint     Float
+  evidence       String?
+  evidenceFileId Int?
+  evidenceFile   UploadedFile?       @relation(fields: [evidenceFileId], references: [id], onDelete: SetNull)
+  note           String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([userId, semesterId])
+  @@index([competitionId])
+  @@index([semesterId])
+  @@index([evidenceFileId])
+}
+
+model UploadedFile {
+  id           Int           @id @default(autoincrement())
+  originalName String
+  storedPath   String
+  mimeType     String
+  sizeBytes    Int
+  uploadedById Int
+  uploadedBy   User          @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  
+  achievements Achievement[]
+
+  @@index([uploadedById])
+}
+
+model StudentSemesterScore {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesterId    Int
+  semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  gpa           Float
+  maxBonusPoint Float    @default(0)
+  extendedGpa   Float
+  conductScore  Float
+  conductGrade  Grade
+  gpaGrade      Grade
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, semesterId])
+  @@index([semesterId])
+}
+
+model ScholarshipCandidate {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesterId      Int
+  semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  extendedGpa     Float
+  conductGrade    Grade
+  gpaGrade        Grade
+  isEligible      Boolean
+  scholarshipTier Grade?
+  note            String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([semesterId])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  module    String
+  detail    String?  @db.Text
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+  @@index([module])
+  @@index([timestamp])
+}
+
+model PasswordResetCode {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, code])
+}

@@ -1,0 +1,33 @@
+export enum CompetitionLevel {
+  CENTRAL = 'CENTRAL',
+  ACADEMY = 'ACADEMY',
+}
+
+export enum AchievementCategory {
+  CENTRAL_COMPETITION = 'CENTRAL_COMPETITION',
+  ACADEMY_COMPETITION = 'ACADEMY_COMPETITION',
+  ORGANIZATION_PARTICIPATION = 'ORGANIZATION_PARTICIPATION',
+  SPECIAL_ACHIEVEMENT = 'SPECIAL_ACHIEVEMENT',
+}
+
+export enum AchievementRank {
+  FIRST = 'FIRST',
+  SECOND = 'SECOND',
+  THIRD = 'THIRD',
+  NONE = 'NONE',
+}
+
+export enum Grade {
+  EXCELLENT = 'EXCELLENT',
+  GOOD = 'GOOD',
+  FAIR = 'FAIR',
+  AVERAGE = 'AVERAGE',
+  WEAK = 'WEAK',
+  POOR = 'POOR',
+}
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  STAFF = 'STAFF',
+  STUDENT = 'STUDENT',
+}

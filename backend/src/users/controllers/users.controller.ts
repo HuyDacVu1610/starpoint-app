@@ -1,0 +1,61 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { UsersService } from '../services/users.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { QueryUserDto } from '../dto/query-user.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
+import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
+
+@Controller('users')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get()
+  @RequirePermissions('VIEW_USER')
+  async findAll(@Query() query: QueryUserDto) {
+    return this.usersService.findAll(query);
+  }
+
+  @Get(':id')
+  @RequirePermissions('VIEW_USER')
+  async findById(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findById(id);
+  }
+
+  @Post()
+  @RequirePermissions('CREATE_USER')
+  async create(@Body() dto: CreateUserDto) {
+    return this.usersService.create(dto);
+  }
+
+  @Patch(':id')
+  @RequirePermissions('UPDATE_USER')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @RequirePermissions('DELETE_USER')
+  @HttpCode(HttpStatus.OK)
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.softDelete(id);
+  }
+}
