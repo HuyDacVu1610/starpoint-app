@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserRole = exports.Grade = exports.AchievementRank = exports.AchievementCategory = exports.CompetitionLevel = void 0;
+exports.AchievementStatus = exports.UserRole = exports.Grade = exports.AchievementRank = exports.AchievementCategory = exports.CompetitionLevel = void 0;
 var CompetitionLevel;
 (function (CompetitionLevel) {
     CompetitionLevel["CENTRAL"] = "CENTRAL";
@@ -35,3 +35,9 @@ var UserRole;
     UserRole["STAFF"] = "STAFF";
     UserRole["STUDENT"] = "STUDENT";
 })(UserRole || (exports.UserRole = UserRole = {}));
+var AchievementStatus;
+(function (AchievementStatus) {
+    AchievementStatus["PENDING"] = "PENDING";
+    AchievementStatus["APPROVED"] = "APPROVED";
+    AchievementStatus["REJECTED"] = "REJECTED";
+})(AchievementStatus || (exports.AchievementStatus = AchievementStatus = {}));

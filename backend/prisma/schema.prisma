@@ -34,6 +34,12 @@ enum Grade {
   POOR
 }
 
+enum AchievementStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id                    Int                    @id @default(autoincrement())
   studentCode           String                 @unique
@@ -125,7 +131,7 @@ model Competition {
   organizer    String?
   eventDate    DateTime
   semesterId   Int
-  semester     Semester         @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  semester     Semester         @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   
@@ -141,13 +147,14 @@ model Achievement {
   competitionId  Int?
   competition    Competition?        @relation(fields: [competitionId], references: [id], onDelete: SetNull)
   semesterId     Int
-  semester       Semester            @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  semester       Semester            @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   category       AchievementCategory
   rank           AchievementRank
   bonusPoint     Float
   evidence       String?
   evidenceFileId Int?
   evidenceFile   UploadedFile?       @relation(fields: [evidenceFileId], references: [id], onDelete: SetNull)
+  status         AchievementStatus   @default(PENDING)
   note           String?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
@@ -178,7 +185,7 @@ model StudentSemesterScore {
   userId        Int
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   semesterId    Int
-  semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   gpa           Float
   maxBonusPoint Float    @default(0)
   extendedGpa   Float
@@ -197,7 +204,7 @@ model ScholarshipCandidate {
   userId          Int
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   semesterId      Int
-  semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   extendedGpa     Float
   conductGrade    Grade
   gpaGrade        Grade

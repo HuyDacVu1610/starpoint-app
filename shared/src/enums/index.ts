@@ -31,3 +31,9 @@ export enum UserRole {
   STAFF = 'STAFF',
   STUDENT = 'STUDENT',
 }
+
+export enum AchievementStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}

@@ -14,6 +14,10 @@ const auth_module_1 = require("./auth/auth.module");
 const roles_module_1 = require("./roles/roles.module");
 const permissions_module_1 = require("./permissions/permissions.module");
 const users_module_1 = require("./users/users.module");
+const upload_module_1 = require("./upload/upload.module");
+const semesters_module_1 = require("./semesters/semesters.module");
+const competitions_module_1 = require("./competitions/competitions.module");
+const achievements_module_1 = require("./achievements/achievements.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 let AppModule = class AppModule {
@@ -30,6 +34,10 @@ exports.AppModule = AppModule = __decorate([
             roles_module_1.RolesModule,
             permissions_module_1.PermissionsModule,
             users_module_1.UsersModule,
+            upload_module_1.UploadModule,
+            semesters_module_1.SemestersModule,
+            competitions_module_1.CompetitionsModule,
+            achievements_module_1.AchievementsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

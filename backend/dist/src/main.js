@@ -8,11 +8,15 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const helmet_1 = __importDefault(require("helmet"));
+const path_1 = require("path");
 const response_interceptor_1 = require("./shared/common/interceptors/response.interceptor");
 const global_exception_filter_1 = require("./shared/common/filters/global-exception.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
+    app.useStaticAssets((0, path_1.join)(process.cwd(), 'uploads'), {
+        prefix: '/uploads/',
+    });
     app.use((0, helmet_1.default)());
     app.enableCors({
         origin: true,

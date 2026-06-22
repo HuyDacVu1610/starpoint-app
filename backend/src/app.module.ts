@@ -5,6 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { UsersModule } from './users/users.module';
+import { UploadModule } from './upload/upload.module';
+import { SemestersModule } from './semesters/semesters.module';
+import { CompetitionsModule } from './competitions/competitions.module';
+import { AchievementsModule } from './achievements/achievements.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -18,6 +22,10 @@ import { AppService } from './app.service';
     RolesModule,
     PermissionsModule,
     UsersModule,
+    UploadModule,
+    SemestersModule,
+    CompetitionsModule,
+    AchievementsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

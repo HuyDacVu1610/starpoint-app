@@ -27,3 +27,8 @@ export declare enum UserRole {
     STAFF = "STAFF",
     STUDENT = "STUDENT"
 }
+export declare enum AchievementStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED"
+}
