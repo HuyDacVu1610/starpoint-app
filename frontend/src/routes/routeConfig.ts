@@ -5,6 +5,7 @@ export const ROUTES = {
   // Admin & Staff Paths
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_STUDENTS: '/admin/students',
+  ADMIN_STUDENT_DETAIL: '/admin/students/:id',
   ADMIN_SEMESTERS: '/admin/semesters',
   ADMIN_COMPETITIONS: '/admin/competitions',
   ADMIN_ACHIEVEMENTS: '/admin/achievements',

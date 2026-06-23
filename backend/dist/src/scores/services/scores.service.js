@@ -389,6 +389,27 @@ let ScoresService = class ScoresService {
         });
         await this.scholarshipsService.reevaluateCandidate(userId, semesterId, prismaClient);
     }
+    async calculateScoresForSemester(semesterId) {
+        const semester = await this.prisma.semester.findUnique({
+            where: { id: semesterId },
+        });
+        if (!semester) {
+            throw new common_1.NotFoundException(`Học kỳ id ${semesterId} không tồn tại`);
+        }
+        const scores = await this.prisma.studentSemesterScore.findMany({
+            where: { semesterId },
+            select: { userId: true },
+        });
+        await this.prisma.$transaction(async (tx) => {
+            for (const score of scores) {
+                await this.recalculateScore(score.userId, semesterId, tx);
+            }
+        });
+        return {
+            success: true,
+            message: `Đã tính toán lại điểm thưởng cho ${scores.length} sinh viên`,
+        };
+    }
 };
 exports.ScoresService = ScoresService;
 exports.ScoresService = ScoresService = __decorate([

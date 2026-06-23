@@ -1,23 +1,451 @@
-import { Card, Result } from 'antd';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Table,
+  Button,
+  Card,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  Popconfirm,
+  Tooltip,
+  Tag,
+  App,
+} from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  UserOutlined,
+  LockOutlined,
+  MailOutlined,
+  PhoneOutlined,
+} from '@ant-design/icons';
+import { usersService } from '../../services/users.service';
+import type { User, Role } from '../../services/users.service';
 import { PageHeader } from '../../components/PageHeader';
-import { UserOutlined } from '@ant-design/icons';
+import { useAuth } from '../../hooks/useAuth';
+
+const { Option } = Select;
+
+const ROLE_COLOR_MAP: Record<string, string> = {
+  ADMIN: 'red',
+  STAFF: 'orange',
+  STUDENT: 'blue',
+};
+
+const ROLE_LABEL_MAP: Record<string, string> = {
+  ADMIN: 'Quản trị viên',
+  STAFF: 'Giáo vụ',
+  STUDENT: 'Sinh viên',
+};
 
 export const StudentListPage = () => {
+  const { message } = App.useApp();
+  const { hasPermission } = useAuth();
+  const [data, setData] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [search, setSearch] = useState('');
+  const [form] = Form.useForm();
+
+  // Action Permissions
+  const canCreate = hasPermission('CREATE_USER');
+  const canUpdate = hasPermission('UPDATE_USER');
+  const canDelete = hasPermission('DELETE_USER');
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await usersService.list({
+        search: search || undefined,
+        limit: 100,
+      });
+      if (res.success && res.data) {
+        const userList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
+        setData(userList);
+      } else {
+        message.error(res.message || 'Lỗi tải danh sách người dùng');
+      }
+    } catch (err: any) {
+      message.error(err.response?.data?.message || 'Có lỗi xảy ra khi tải dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const res = await usersService.listRoles();
+      if (res.success && res.data) {
+        setRoles(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching roles:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchRoles();
+  }, [search]);
+
+  const handleOpenAdd = () => {
+    form.resetFields();
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (record: User) => {
+    setEditingId(record.id);
+    form.setFieldsValue({
+      studentCode: record.studentCode,
+      fullName: record.fullName,
+      email: record.email,
+      phone: record.phone,
+      roleIds: record.userRoles?.map((ur) => ur.roleId) || [],
+      password: '', // Kept empty for edit
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async (id: number) => {
+    try {
+      const res = await usersService.delete(id);
+      if (res.success) {
+        message.success('Xoá tài khoản thành công');
+        fetchUsers();
+      } else {
+        message.error(res.message || 'Không thể xoá tài khoản');
+      }
+    } catch (err: any) {
+      message.error(err.response?.data?.message || 'Lỗi xảy ra khi xoá tài khoản');
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      
+      const payload: any = {
+        studentCode: values.studentCode,
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone || null,
+        roleIds: values.roleIds,
+      };
+
+      if (values.password) {
+        payload.password = values.password;
+      }
+
+      let res;
+      if (editingId) {
+        res = await usersService.update(editingId, payload);
+      } else {
+        res = await usersService.create(payload);
+      }
+
+      if (res.success) {
+        message.success(editingId ? 'Cập nhật tài khoản thành công' : 'Thêm tài khoản thành công');
+        setIsModalOpen(false);
+        fetchUsers();
+      } else {
+        message.error(res.message || 'Đã có lỗi xảy ra');
+      }
+    } catch (err: any) {
+      const responseData = err.response?.data;
+      if (responseData) {
+        if (responseData.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+          message.error(responseData.errors.join(', '));
+        } else if (responseData.message) {
+          message.error(responseData.message);
+        } else {
+          message.error('Đã có lỗi xảy ra');
+        }
+      } else {
+        message.error(err.message || 'Không thể kết nối đến máy chủ');
+      }
+    }
+  };
+
+  const columns = [
+    {
+      title: 'Mã Người Dùng',
+      dataIndex: 'studentCode',
+      key: 'studentCode',
+      className: 'font-semibold text-slate-700',
+      render: (code: string, record: User) => (
+        <Link to={`/admin/students/${record.id}`} className="text-indigo-600 hover:text-indigo-800 transition-colors font-mono">
+          {code}
+        </Link>
+      ),
+    },
+    {
+      title: 'Họ và Tên',
+      dataIndex: 'fullName',
+      key: 'fullName',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Số Điện Thoại',
+      dataIndex: 'phone',
+      key: 'phone',
+      render: (text?: string) => text || 'Chưa cập nhật',
+    },
+    {
+      title: 'Vai Trò',
+      key: 'roles',
+      render: (_: any, record: User) => (
+        <Space size={[0, 4]} wrap>
+          {record.userRoles?.map((ur) => {
+            const roleName = ur.role.name;
+            return (
+              <Tag color={ROLE_COLOR_MAP[roleName] || 'default'} key={roleName} className="font-semibold uppercase">
+                {ROLE_LABEL_MAP[roleName] || roleName}
+              </Tag>
+            );
+          })}
+        </Space>
+      ),
+    },
+    // Future-Proof columns for calculated GPA, conduct, bonus points and scholarship candidates
+    {
+      title: 'GPA',
+      key: 'gpa',
+      width: 100,
+      render: (_: any, record: User) => {
+        const scores = (record as any).studentSemesterScores;
+        if (scores && scores.length > 0) {
+          return <span className="font-semibold text-slate-700">{scores[0].gpa?.toFixed(2)}</span>;
+        }
+        const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
+        return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa nhập</span> : <span className="text-slate-300">-</span>;
+      },
+    },
+    {
+      title: 'ĐRL',
+      key: 'conductScore',
+      width: 100,
+      render: (_: any, record: User) => {
+        const scores = (record as any).studentSemesterScores;
+        if (scores && scores.length > 0) {
+          return <span className="font-semibold text-slate-700">{scores[0].conductScore}</span>;
+        }
+        const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
+        return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa nhập</span> : <span className="text-slate-300">-</span>;
+      },
+    },
+    {
+      title: 'Điểm Thưởng',
+      key: 'bonusPoints',
+      width: 120,
+      render: (_: any, record: User) => {
+        const scores = (record as any).studentSemesterScores;
+        if (scores && scores.length > 0) {
+          return <span className="font-semibold text-emerald-600">+{scores[0].bonusPoint?.toFixed(2)}</span>;
+        }
+        const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
+        return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa nhập</span> : <span className="text-slate-300">-</span>;
+      },
+    },
+    {
+      title: 'Học Bổng',
+      key: 'scholarship',
+      width: 120,
+      render: (_: any, record: User) => {
+        const candidates = (record as any).scholarshipCandidates;
+        if (candidates && candidates.length > 0) {
+          const activeTier = candidates[0].tier;
+          const isEligible = candidates[0].isEligible;
+          if (!isEligible) return <Tag color="default">Không đạt</Tag>;
+          
+          let color = 'blue';
+          let text = 'Khá';
+          if (activeTier === 'EXCELLENT') { color = 'gold'; text = 'Xuất Sắc'; }
+          else if (activeTier === 'GOOD') { color = 'purple'; text = 'Giỏi'; }
+          
+          return <Tag color={color} className="font-bold uppercase text-[10px] px-1.5 py-0.5 rounded-full">{text}</Tag>;
+        }
+        const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
+        return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa xét</span> : <span className="text-slate-300">-</span>;
+      },
+    },
+    {
+      title: 'Hành Động',
+      key: 'action',
+      width: 150,
+      render: (_: any, record: User) => (
+        <Space size="middle">
+          <Tooltip title={canUpdate ? 'Chỉnh sửa tài khoản' : 'Bạn không có quyền thực hiện hành động này'}>
+            <Button
+              type="text"
+              icon={<EditOutlined className={canUpdate ? 'text-blue-500 hover:scale-110 transition-transform' : 'text-slate-300'} />}
+              onClick={() => canUpdate && handleOpenEdit(record)}
+              disabled={!canUpdate}
+            />
+          </Tooltip>
+
+          <Tooltip title={canDelete ? 'Xoá tài khoản' : 'Bạn không có quyền thực hiện hành động này'}>
+            <span>
+              <Popconfirm
+                title="Xác nhận xoá tài khoản này?"
+                description="Hành động này sẽ thực hiện xoá mềm (soft delete) tài khoản người dùng."
+                onConfirm={() => handleConfirmDelete(record.id)}
+                okText="Xoá"
+                cancelText="Huỷ"
+                okButtonProps={{ danger: true }}
+                disabled={!canDelete}
+              >
+                <Button
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined className={canDelete ? 'hover:scale-110 transition-transform' : 'text-slate-300'} />}
+                  disabled={!canDelete}
+                />
+              </Popconfirm>
+            </span>
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
-        title="Danh Sách Sinh Viên"
-        subtitle="Quản lý tài khoản, mã sinh viên, thông tin lớp và vai trò"
-        breadcrumbs={[{ title: 'Quản trị' }, { title: 'Sinh viên' }]}
+        title="Quản Lý Người Dùng & Sinh Viên"
+        subtitle="Quản lý tài khoản, mã sinh viên, thông tin lớp và vai trò phân quyền"
+        breadcrumbs={[{ title: 'Quản trị' }, { title: 'Người dùng' }]}
+        extra={
+          <Tooltip title={canCreate ? 'Thêm tài khoản người dùng mới' : 'Bạn không có quyền thực hiện hành động này'}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleOpenAdd}
+              disabled={!canCreate}
+              className={`border-none rounded-lg shadow-sm ${
+                canCreate ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-200 text-slate-400'
+              }`}
+            >
+              Thêm Người Dùng
+            </Button>
+          </Tooltip>
+        }
       />
-      <Card className="border border-slate-100 rounded-xl shadow-sm">
-        <Result
-          icon={<UserOutlined className="text-indigo-500 text-5xl" />}
-          title="Tính năng Quản lý Sinh viên đang phát triển"
-          subTitle="Module này sẽ hỗ trợ xem danh sách sinh viên, lọc lớp học, thêm tài khoản thủ công và nạp dữ liệu hàng loạt từ file Excel."
+
+      <Card className="border border-slate-100 rounded-xl shadow-sm bg-white/80 backdrop-blur-md overflow-hidden">
+        <div className="mb-6 max-w-sm">
+          <Input
+            placeholder="Tìm theo Mã số, Họ tên, Email..."
+            prefix={<SearchOutlined className="text-slate-400" />}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
+            className="rounded-lg"
+          />
+        </div>
+
+        <Table
+          dataSource={data}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          pagination={{ pageSize: 10, showSizeChanger: true }}
+          scroll={{ x: 1200 }}
         />
       </Card>
+
+      <Modal
+        title={editingId ? 'Cập Nhật Tài Khoản' : 'Tạo Tài Khoản Mới'}
+        open={isModalOpen}
+        onOk={handleSubmit}
+        onCancel={() => setIsModalOpen(false)}
+        okText={editingId ? 'Cập nhật' : 'Tạo mới'}
+        cancelText="Huỷ bỏ"
+        okButtonProps={{ className: 'bg-indigo-600 hover:bg-indigo-700' }}
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" className="mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              name="studentCode"
+              label="Mã Người Dùng / MSSV"
+              rules={[
+                { required: true, message: 'Vui lòng nhập mã sinh viên/người dùng' },
+                { pattern: /^[A-Z0-9_-]+$/i, message: 'Mã chỉ được chứa chữ cái, số, gạch ngang' },
+              ]}
+            >
+              <Input placeholder="Ví dụ: SV006, STAFF002..." prefix={<UserOutlined />} disabled={editingId !== null} />
+            </Form.Item>
+
+            <Form.Item
+              name="fullName"
+              label="Họ và Tên"
+              rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+            >
+              <Input placeholder="Nhập họ và tên..." />
+            </Form.Item>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              name="email"
+              label="Địa Chỉ Email"
+              rules={[
+                { required: true, message: 'Vui lòng nhập email' },
+                { type: 'email', message: 'Địa chỉ email không hợp lệ' },
+              ]}
+            >
+              <Input placeholder="nhap@email.com" prefix={<MailOutlined />} />
+            </Form.Item>
+
+            <Form.Item
+              name="phone"
+              label="Số Điện Thoại (Tuỳ chọn)"
+            >
+              <Input placeholder="Ví dụ: 0987654321" prefix={<PhoneOutlined />} />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            name="password"
+            label="Mật Khẩu"
+            rules={[
+              { required: !editingId, message: 'Vui lòng nhập mật khẩu' },
+              { min: 6, message: 'Mật khẩu phải chứa ít nhất 6 ký tự' },
+            ]}
+            extra={editingId ? <span className="text-slate-400 text-xs">Để trống nếu giữ nguyên mật khẩu cũ</span> : null}
+          >
+            <Input.Password placeholder={editingId ? 'Nhập mật khẩu mới nếu muốn thay đổi...' : 'Nhập mật khẩu...'} prefix={<LockOutlined />} />
+          </Form.Item>
+
+          <Form.Item
+            name="roleIds"
+            label="Vai Trò Phân Quyền"
+            rules={[{ required: true, message: 'Vui lòng chọn ít nhất một vai trò' }]}
+          >
+            <Select mode="multiple" placeholder="Chọn vai trò...">
+              {roles.map((role) => (
+                <Option key={role.id} value={role.id}>
+                  {ROLE_LABEL_MAP[role.name] || role.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
+
 export default StudentListPage;

@@ -34,6 +34,7 @@ export const scholarshipsService = {
     semesterId?: number;
     isEligible?: boolean;
     scholarshipTier?: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'NONE';
+    userId?: number;
   }) => {
     const res = await api.get('/scholarships/candidates', { params });
     return res.data;

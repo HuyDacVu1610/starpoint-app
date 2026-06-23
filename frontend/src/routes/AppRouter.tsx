@@ -12,6 +12,7 @@ import StudentLayout from '../layouts/StudentLayout';
 // Admin / Staff Pages
 import DashboardPage from '../pages/DashboardPage';
 import StudentListPage from '../pages/students/StudentListPage';
+import StudentDetailPage from '../pages/students/StudentDetailPage';
 import SemesterListPage from '../pages/semesters/SemesterListPage';
 import CompetitionListPage from '../pages/competitions/CompetitionListPage';
 import AchievementListPage from '../pages/achievements/AchievementListPage';
@@ -50,7 +51,13 @@ export const AppRouter = () => {
         <Route element={<RoleRoute allowedRoles={['ADMIN', 'STAFF']} />}>
           <Route element={<AdminLayout />}>
             <Route path={ROUTES.ADMIN_DASHBOARD} element={<DashboardPage />} />
-            <Route path={ROUTES.ADMIN_STUDENTS} element={<StudentListPage />} />
+            
+            {/* Only ADMIN role can manage student/user accounts */}
+            <Route element={<RoleRoute allowedRoles={['ADMIN']} />}>
+              <Route path={ROUTES.ADMIN_STUDENTS} element={<StudentListPage />} />
+              <Route path={ROUTES.ADMIN_STUDENT_DETAIL} element={<StudentDetailPage />} />
+            </Route>
+
             <Route path={ROUTES.ADMIN_SEMESTERS} element={<SemesterListPage />} />
             <Route path={ROUTES.ADMIN_COMPETITIONS} element={<CompetitionListPage />} />
             <Route path={ROUTES.ADMIN_ACHIEVEMENTS} element={<AchievementListPage />} />

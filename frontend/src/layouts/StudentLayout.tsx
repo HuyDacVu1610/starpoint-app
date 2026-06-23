@@ -56,24 +56,27 @@ export const StudentLayout = () => {
   const menuItems = [
     {
       key: ROUTES.STUDENT_ACHIEVEMENTS,
-      icon: <TrophyOutlined />,
-      label: <Link to={ROUTES.STUDENT_ACHIEVEMENTS}>Thành tích của tôi</Link>,
+      icon: <TrophyOutlined className="text-base" />,
+      label: 'Thành tích của tôi',
     },
     {
       key: ROUTES.STUDENT_BONUS_POINTS,
-      icon: <CalculatorOutlined />,
-      label: <Link to={ROUTES.STUDENT_BONUS_POINTS}>Điểm thưởng & GPA</Link>,
+      icon: <CalculatorOutlined className="text-base" />,
+      label: 'Điểm thưởng & GPA',
     },
     {
       key: ROUTES.STUDENT_SCHOLARSHIP,
-      icon: <SafetyCertificateOutlined />,
-      label: <Link to={ROUTES.STUDENT_SCHOLARSHIP}>Học bổng</Link>,
+      icon: <SafetyCertificateOutlined className="text-base" />,
+      label: 'Học bổng',
     },
   ];
 
   return (
     <Layout className="min-h-screen bg-slate-50/50">
-      <Header className="bg-white border-b border-slate-200/50 h-16 px-6 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+      <Header
+        style={{ background: '#ffffff', padding: '0 24px' }}
+        className="border-b border-slate-200/60 h-16 flex justify-between items-center sticky top-0 z-10 shadow-sm"
+      >
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
@@ -84,13 +87,25 @@ export const StudentLayout = () => {
             </span>
           </div>
           
-          <Menu
-            mode="horizontal"
-            selectedKeys={[location.pathname]}
-            items={menuItems}
-            className="border-0 hidden md:flex font-medium"
-            style={{ minWidth: 400 }}
-          />
+          <div className="hidden md:flex items-center gap-3">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.key;
+              return (
+                <Link
+                  key={item.key}
+                  to={item.key}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? 'text-indigo-600 bg-indigo-50/60'
+                      : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-50'
+                  }`}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
@@ -104,7 +119,7 @@ export const StudentLayout = () => {
               </Avatar>
               <div className="flex flex-col text-left leading-none">
                 <span className="text-xs text-slate-800 font-bold">{user?.fullName}</span>
-                <span className="text-[10px] text-slate-400 font-medium">Sinh viên</span>
+                <span className="text-[10px] text-slate-400 font-medium mt-0.5">Sinh viên</span>
               </div>
             </div>
           </Dropdown>
@@ -112,13 +127,24 @@ export const StudentLayout = () => {
       </Header>
 
       {/* Mobile navigation */}
-      <div className="md:hidden bg-white border-b border-slate-100 px-4">
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          className="border-0 flex justify-around w-full"
-        />
+      <div className="md:hidden bg-white border-b border-slate-200/50 px-4 py-2.5 flex justify-around items-center">
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.key;
+          return (
+            <Link
+              key={item.key}
+              to={item.key}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 ${
+                isActive 
+                  ? 'text-indigo-600 bg-indigo-50/50' 
+                  : 'text-slate-500 hover:text-indigo-600'
+              }`}
+            >
+              <span className="text-sm">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
 
       <Content className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">

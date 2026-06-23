@@ -45,6 +45,7 @@ export const achievementsService = {
     semesterId?: number;
     category?: string;
     status?: string;
+    userId?: number;
   }) => {
     const res = await api.get('/achievements', { params });
     return res.data;

@@ -258,4 +258,23 @@ describe('Scores Module (e2e)', () => {
       expect(response.body.data.conductGrade).toBe('GOOD'); // 89 is GOOD
     });
   });
+
+  describe('POST /api/v1/scores/calculate/:semesterId', () => {
+    it('should block STUDENT from triggering bulk calculation', async () => {
+      await request(app.getHttpServer())
+        .post(`/api/v1/scores/calculate/${testSemesterId}`)
+        .set('Authorization', `Bearer ${studentToken}`)
+        .expect(HttpStatus.FORBIDDEN);
+    });
+
+    it('should allow STAFF to trigger bulk calculation successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .post(`/api/v1/scores/calculate/${testSemesterId}`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .expect(HttpStatus.CREATED);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body).toHaveProperty('message');
+    });
+  });
 });

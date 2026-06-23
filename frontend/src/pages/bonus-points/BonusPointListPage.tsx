@@ -1,22 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Card, Modal, Form, Input, InputNumber, Select, Alert, Tooltip, message, Row, Col } from 'antd';
-import { SearchOutlined, EditOutlined, FileExcelOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Card, Modal, Form, Input, InputNumber, Select, Alert, Tooltip, App, Row, Col } from 'antd';
+import { SearchOutlined, EditOutlined, FileExcelOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { scoresService } from '../../services/scores.service';
 import type { Score } from '../../services/scores.service';
 import { semestersService } from '../../services/semesters.service';
 import type { Semester } from '../../services/semesters.service';
 import { PageHeader } from '../../components/PageHeader';
 import { useAuth } from '../../hooks/useAuth';
+import DataTable from '../../components/DataTable';
+import FileUploader from '../../components/FileUploader';
+import GradeTag from '../../components/GradeTag';
+import BonusPointBadge from '../../components/BonusPointBadge';
 
 const { Option } = Select;
 
 export const BonusPointListPage = () => {
+  const { message } = App.useApp();
   const { hasPermission } = useAuth();
   const [data, setData] = useState<Score[]>([]);
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [calculateLoading, setCalculateLoading] = useState(false);
   
   // Selected student for quick patch
   const [selectedScore, setSelectedScore] = useState<Score | null>(null);
@@ -61,7 +67,6 @@ export const BonusPointListPage = () => {
         limit: 200,
       });
       if (res.success && res.data) {
-        // Handle paginated envelope
         const scoreList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setData(scoreList);
       } else {
@@ -113,13 +118,6 @@ export const BonusPointListPage = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setImportFile(e.target.files[0]);
-      setImportErrors([]);
-    }
-  };
-
   const handleImportSubmit = async () => {
     if (!importSemesterId) {
       message.warning('Vui lòng chọn học kỳ nhập điểm');
@@ -145,7 +143,6 @@ export const BonusPointListPage = () => {
     } catch (err: any) {
       const responseData = err.response?.data;
       if (responseData) {
-        // NestJS errors could be in responseData.message or responseData.errors
         const errorMsg = responseData.message;
         if (Array.isArray(errorMsg)) {
           setImportErrors(errorMsg);
@@ -161,6 +158,36 @@ export const BonusPointListPage = () => {
     } finally {
       setImportLoading(false);
     }
+  };
+
+  const handleCalculateScores = async () => {
+    if (!selectedSemester) {
+      message.warning('Vui lòng chọn học kỳ');
+      return;
+    }
+    Modal.confirm({
+      title: 'Xác nhận tính điểm thưởng học kỳ?',
+      content: 'Hệ thống sẽ quét và cập nhật lại điểm cộng thưởng lớn nhất (max bonus) cũng như điểm GPA sau quy đổi cho toàn bộ sinh viên trong học kỳ này.',
+      okText: 'Tính điểm',
+      cancelText: 'Huỷ',
+      okButtonProps: { className: 'bg-indigo-600 hover:bg-indigo-700' },
+      onOk: async () => {
+        setCalculateLoading(true);
+        try {
+          const res = await scoresService.calculate(selectedSemester);
+          if (res.success) {
+            message.success(res.message || 'Tính điểm thưởng thành công!');
+            fetchScores();
+          } else {
+            message.error(res.message || 'Lỗi tính toán điểm thưởng');
+          }
+        } catch (err: any) {
+          message.error(err.response?.data?.message || 'Có lỗi xảy ra khi tính điểm');
+        } finally {
+          setCalculateLoading(false);
+        }
+      }
+    });
   };
 
   const columns = [
@@ -185,7 +212,7 @@ export const BonusPointListPage = () => {
       title: 'Điểm Cộng Thêm',
       dataIndex: 'bonusPoint',
       key: 'bonusPoint',
-      render: (val: number) => `+${val.toFixed(2)}`,
+      render: (val: number) => <BonusPointBadge points={val} />,
     },
     {
       title: 'GPA Sau Quy Đổi',
@@ -195,10 +222,22 @@ export const BonusPointListPage = () => {
       render: (val: number) => val.toFixed(2),
     },
     {
+      title: 'Xếp Loại GPA',
+      dataIndex: 'gpaGrade',
+      key: 'gpaGrade',
+      render: (grade: string) => <GradeTag grade={grade} />,
+    },
+    {
       title: 'Điểm Rèn Luyện',
       dataIndex: 'conductScore',
       key: 'conductScore',
       className: 'font-semibold text-slate-700',
+    },
+    {
+      title: 'Xếp Loại RL',
+      dataIndex: 'conductGrade',
+      key: 'conductGrade',
+      render: (grade: string) => <GradeTag grade={grade} />,
     },
     ...(canManage
       ? [
@@ -228,18 +267,28 @@ export const BonusPointListPage = () => {
         breadcrumbs={[{ title: 'Quản trị' }, { title: 'Quản lý điểm số' }]}
         extra={
           canManage && (
-            <Button
-              type="primary"
-              icon={<FileExcelOutlined />}
-              onClick={() => {
-                setImportErrors([]);
-                setImportFile(null);
-                setIsImportModalOpen(true);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700 border-none rounded-lg shadow-sm"
-            >
-              Nhập Điểm Từ Excel
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button
+                icon={<ThunderboltOutlined />}
+                loading={calculateLoading}
+                onClick={handleCalculateScores}
+                className="bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-lg shadow-sm font-semibold flex items-center gap-1.5"
+              >
+                Tính Điểm Thưởng
+              </Button>
+              <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={() => {
+                  setImportErrors([]);
+                  setImportFile(null);
+                  setIsImportModalOpen(true);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 border-none rounded-lg shadow-sm flex items-center gap-1.5 font-semibold"
+              >
+                Nhập Điểm Từ Excel
+              </Button>
+            </div>
           )
         }
       />
@@ -272,13 +321,18 @@ export const BonusPointListPage = () => {
           </Col>
         </Row>
 
-        <Table
+        <DataTable
           dataSource={data}
           columns={columns}
           rowKey="id"
           loading={loading}
-          pagination={{ pageSize: 15, showSizeChanger: true }}
-          scroll={{ x: 850 }}
+          pageSize={15}
+          rowClassName={(record: Score) => {
+            const isEligible = record.extendedGpa >= 2.5 && record.conductScore >= 70;
+            return isEligible 
+              ? 'bg-emerald-50/30 hover:bg-emerald-100/40 transition-colors font-medium' 
+              : 'hover:bg-slate-50/50 transition-colors';
+          }}
         />
       </Card>
 
@@ -375,28 +429,11 @@ export const BonusPointListPage = () => {
               </Select>
             </Form.Item>
 
-            <Form.Item label="Tải lên file Excel mẫu chứa điểm GPA và Điểm rèn luyện" required>
-              <div className="flex items-center gap-4">
-                <Button
-                  icon={<UploadOutlined />}
-                  onClick={() => document.getElementById('excelFileInput')?.click()}
-                  className="rounded-lg border-indigo-400 text-indigo-600 hover:text-indigo-700"
-                >
-                  {importFile ? 'Chọn file khác' : 'Chọn file Excel'}
-                </Button>
-                <input
-                  id="excelFileInput"
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                {importFile && (
-                  <span className="text-slate-600 text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-dashed border-emerald-200">
-                    {importFile.name} ({(importFile.size / 1024).toFixed(1)} KB)
-                  </span>
-                )}
-              </div>
+            <Form.Item label="Tải lên file Excel chứa điểm GPA và Điểm rèn luyện" required>
+              <FileUploader
+                onFileSelect={setImportFile}
+                selectedFile={importFile}
+              />
             </Form.Item>
           </Form>
 

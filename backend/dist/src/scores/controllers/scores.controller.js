@@ -38,6 +38,9 @@ let ScoresController = class ScoresController {
         }
         return this.scoresService.importScores(semesterId, file.buffer);
     }
+    async calculateScores(semesterId) {
+        return this.scoresService.calculateScoresForSemester(semesterId);
+    }
 };
 exports.ScoresController = ScoresController;
 __decorate([
@@ -68,6 +71,15 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ScoresController.prototype, "importScores", null);
+__decorate([
+    (0, common_1.Post)('calculate/:semesterId'),
+    (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
+    (0, permissions_decorator_1.RequirePermissions)('MANAGE_BONUS'),
+    __param(0, (0, common_1.Param)('semesterId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ScoresController.prototype, "calculateScores", null);
 exports.ScoresController = ScoresController = __decorate([
     (0, common_1.Controller)('scores'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

@@ -24,7 +24,7 @@ export interface Score {
 }
 
 export const scoresService = {
-  list: async (params?: { page?: number; limit?: number; search?: string; semesterId?: number }) => {
+  list: async (params?: { page?: number; limit?: number; search?: string; semesterId?: number; userId?: number }) => {
     const res = await api.get('/scores', { params });
     return res.data;
   },
@@ -52,6 +52,11 @@ export const scoresService = {
     data: { gpa?: number; conductScore?: number }
   ) => {
     const res = await api.patch(`/semesters/${semesterId}/students/${studentCode}`, data);
+    return res.data;
+  },
+
+  calculate: async (semesterId: number) => {
+    const res = await api.post(`/scores/calculate/${semesterId}`);
     return res.data;
   },
 };

@@ -11,9 +11,9 @@ export declare class SemestersController {
         total: number;
         data: {
             id: number;
-            name: string;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             year: number;
             term: number;
             startDate: Date;
@@ -22,9 +22,9 @@ export declare class SemestersController {
     }>;
     findById(id: number): Promise<{
         id: number;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         year: number;
         term: number;
         startDate: Date;
@@ -32,9 +32,9 @@ export declare class SemestersController {
     }>;
     create(dto: CreateSemesterDto): Promise<{
         id: number;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         year: number;
         term: number;
         startDate: Date;
@@ -42,9 +42,9 @@ export declare class SemestersController {
     }>;
     update(id: number, dto: UpdateSemesterDto): Promise<{
         id: number;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         year: number;
         term: number;
         startDate: Date;
@@ -52,9 +52,9 @@ export declare class SemestersController {
     }>;
     delete(id: number): Promise<{
         id: number;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         year: number;
         term: number;
         startDate: Date;
@@ -65,8 +65,6 @@ export declare class SemestersController {
         conductScore?: number;
     }): Promise<{
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -75,5 +73,7 @@ export declare class SemestersController {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
 }

@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   Request as NestRequest,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ScoresService } from '../services/scores.service';
@@ -64,5 +65,12 @@ export class ScoresController {
       throw new BadRequestException('Vui lòng tải lên file Excel');
     }
     return this.scoresService.importScores(semesterId, file.buffer);
+  }
+
+  @Post('calculate/:semesterId')
+  @UseGuards(PermissionsGuard)
+  @RequirePermissions('MANAGE_BONUS')
+  async calculateScores(@Param('semesterId', ParseIntPipe) semesterId: number) {
+    return this.scoresService.calculateScoresForSemester(semesterId);
   }
 }

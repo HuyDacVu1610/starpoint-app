@@ -125,36 +125,41 @@ export const AdminLayout = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        theme="light"
-        className="border-r border-slate-200/50 shadow-sm"
+        theme="dark"
+        className="shadow-md border-r border-slate-800"
         width={250}
         style={{
           position: 'sticky',
           top: 0,
           height: '100vh',
+          background: '#0f172a',
         }}
       >
-        <div className="h-16 flex items-center justify-center border-b border-slate-100 px-4 gap-2 overflow-hidden">
+        <div className="h-16 flex items-center justify-center px-4 gap-2 overflow-hidden" style={{ background: '#090d16', borderBottom: '1px solid #1e293b' }}>
           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
             SP
           </div>
           {!collapsed && (
-            <span className="font-extrabold text-slate-800 text-lg tracking-tight select-none">
-              StarPoint<span className="text-indigo-600">App</span>
+            <span className="font-extrabold text-white text-lg tracking-tight select-none">
+              StarPoint<span className="text-indigo-400">App</span>
             </span>
           )}
         </div>
         <Menu
           mode="inline"
+          theme="dark"
           selectedKeys={[location.pathname]}
           items={menuItems}
           className="border-0 pt-4"
-          style={{ height: 'calc(100vh - 64px)' }}
+          style={{ height: 'calc(100vh - 64px)', background: '#0f172a' }}
         />
       </Sider>
       
       <Layout>
-        <Header className="bg-white border-b border-slate-200/50 h-16 px-6 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+        <Header 
+          style={{ background: '#ffffff', padding: '0 24px' }}
+          className="border-b border-slate-200/50 h-16 flex justify-between items-center sticky top-0 z-10 shadow-sm"
+        >
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}

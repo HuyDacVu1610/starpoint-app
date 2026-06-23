@@ -11,6 +11,7 @@ import { CompetitionsModule } from './competitions/competitions.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { ScoresModule } from './scores/scores.module';
 import { ScholarshipsModule } from './scholarships/scholarships.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -30,6 +31,7 @@ import { AppService } from './app.service';
     AchievementsModule,
     ScoresModule,
     ScholarshipsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

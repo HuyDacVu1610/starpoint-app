@@ -16,15 +16,15 @@ export declare class ScoresService {
             user: {
                 id: number;
                 studentCode: string;
-                email: string;
                 fullName: string;
+                email: string;
                 avatarUrl: string | null;
             };
             semester: {
                 id: number;
-                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
@@ -32,8 +32,6 @@ export declare class ScoresService {
             };
         } & {
             id: number;
-            createdAt: Date;
-            updatedAt: Date;
             userId: number;
             semesterId: number;
             gpa: number;
@@ -42,20 +40,22 @@ export declare class ScoresService {
             conductScore: number;
             conductGrade: import("@prisma/client").$Enums.Grade;
             gpaGrade: import("@prisma/client").$Enums.Grade;
+            createdAt: Date;
+            updatedAt: Date;
         })[];
     }>;
     findById(id: number): Promise<{
         user: {
             id: number;
             studentCode: string;
-            email: string;
             fullName: string;
+            email: string;
         };
         semester: {
             id: number;
-            name: string;
             createdAt: Date;
             updatedAt: Date;
+            name: string;
             year: number;
             term: number;
             startDate: Date;
@@ -63,8 +63,6 @@ export declare class ScoresService {
         };
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -73,11 +71,11 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     findByUserAndSemester(userId: number, semesterId: number): Promise<{
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -86,6 +84,8 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
+        createdAt: Date;
+        updatedAt: Date;
     } | null>;
     importScores(semesterId: number, fileBuffer: Buffer): Promise<{
         success: boolean;
@@ -96,8 +96,6 @@ export declare class ScoresService {
         conductScore?: number;
     }): Promise<{
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -106,6 +104,12 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     recalculateScore(userId: number, semesterId: number, tx?: Prisma.TransactionClient): Promise<void>;
+    calculateScoresForSemester(semesterId: number): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }
