@@ -3,6 +3,8 @@ import {
   BadRequestException,
   NotFoundException,
   ForbiddenException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { AchievementsRepository } from '../repositories/achievements.repository';
 import { SemestersService } from '../../semesters/services/semesters.service';
@@ -14,6 +16,7 @@ import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 import { QueryAchievementDto } from '../dto/query-achievement.dto';
 import { BONUS_POINT_MAP } from '../constants/bonus-point-map';
 import { AchievementCategory, AchievementStatus } from '@starpointapp/shared';
+import { ScoresService } from '../../scores/services/scores.service';
 
 @Injectable()
 export class AchievementsService {
@@ -23,6 +26,8 @@ export class AchievementsService {
     private readonly competitionsService: CompetitionsService,
     private readonly usersService: UsersService,
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ScoresService))
+    private readonly scoresService: ScoresService,
   ) {}
 
   async findAll(query: QueryAchievementDto) {
@@ -109,7 +114,7 @@ export class AchievementsService {
       status = dto.status || AchievementStatus.APPROVED;
     }
 
-    return this.achievementsRepository.create({
+    const result = await this.achievementsRepository.create({
       userId: targetUserId,
       competitionId: dto.competitionId || null,
       semesterId: dto.semesterId,
@@ -120,6 +125,15 @@ export class AchievementsService {
       note: dto.note || null,
       status,
     });
+
+    if ((result.status as string) === (AchievementStatus.APPROVED as string)) {
+      await this.scoresService.recalculateScore(
+        result.userId,
+        result.semesterId,
+      );
+    }
+
+    return result;
   }
 
   async update(
@@ -224,7 +238,7 @@ export class AchievementsService {
       finalStatus = dto.status;
     }
 
-    return this.achievementsRepository.update(id, {
+    const result = await this.achievementsRepository.update(id, {
       userId: finalUserId,
       competitionId: finalCompetitionId || null,
       semesterId: finalSemesterId,
@@ -235,6 +249,27 @@ export class AchievementsService {
       note: dto.note !== undefined ? dto.note : current.note,
       status: finalStatus,
     });
+
+    if (
+      (result.status as string) === (AchievementStatus.APPROVED as string) ||
+      (current.status as string) === (AchievementStatus.APPROVED as string)
+    ) {
+      await this.scoresService.recalculateScore(
+        result.userId,
+        result.semesterId,
+      );
+      if (
+        result.userId !== current.userId ||
+        result.semesterId !== current.semesterId
+      ) {
+        await this.scoresService.recalculateScore(
+          current.userId,
+          current.semesterId,
+        );
+      }
+    }
+
+    return result;
   }
 
   async delete(id: number, reqUser: { id: number; roles: string[] }) {
@@ -258,7 +293,14 @@ export class AchievementsService {
       }
     }
 
-    return this.achievementsRepository.delete(id);
+    const result = await this.achievementsRepository.delete(id);
+    if ((current.status as string) === (AchievementStatus.APPROVED as string)) {
+      await this.scoresService.recalculateScore(
+        current.userId,
+        current.semesterId,
+      );
+    }
+    return result;
   }
 
   async review(id: number, status: AchievementStatus) {
@@ -266,6 +308,8 @@ export class AchievementsService {
     if (!current) {
       throw new NotFoundException('Thành tích không tồn tại');
     }
-    return this.achievementsRepository.update(id, { status });
+    const result = await this.achievementsRepository.update(id, { status });
+    await this.scoresService.recalculateScore(result.userId, result.semesterId);
+    return result;
   }
 }

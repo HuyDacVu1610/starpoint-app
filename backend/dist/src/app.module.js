@@ -18,6 +18,8 @@ const upload_module_1 = require("./upload/upload.module");
 const semesters_module_1 = require("./semesters/semesters.module");
 const competitions_module_1 = require("./competitions/competitions.module");
 const achievements_module_1 = require("./achievements/achievements.module");
+const scores_module_1 = require("./scores/scores.module");
+const scholarships_module_1 = require("./scholarships/scholarships.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 let AppModule = class AppModule {
@@ -38,6 +40,8 @@ exports.AppModule = AppModule = __decorate([
             semesters_module_1.SemestersModule,
             competitions_module_1.CompetitionsModule,
             achievements_module_1.AchievementsModule,
+            scores_module_1.ScoresModule,
+            scholarships_module_1.ScholarshipsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

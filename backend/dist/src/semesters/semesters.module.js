@@ -11,11 +11,13 @@ const common_1 = require("@nestjs/common");
 const semesters_service_1 = require("./services/semesters.service");
 const semesters_controller_1 = require("./controllers/semesters.controller");
 const semesters_repository_1 = require("./repositories/semesters.repository");
+const scores_module_1 = require("../scores/scores.module");
 let SemestersModule = class SemestersModule {
 };
 exports.SemestersModule = SemestersModule;
 exports.SemestersModule = SemestersModule = __decorate([
     (0, common_1.Module)({
+        imports: [scores_module_1.ScoresModule],
         controllers: [semesters_controller_1.SemestersController],
         providers: [semesters_service_1.SemestersService, semesters_repository_1.SemestersRepository],
         exports: [semesters_service_1.SemestersService],

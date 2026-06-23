@@ -7,13 +7,15 @@ import { CreateAchievementDto } from '../dto/create-achievement.dto';
 import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 import { QueryAchievementDto } from '../dto/query-achievement.dto';
 import { AchievementStatus } from '@starpointapp/shared';
+import { ScoresService } from '../../scores/services/scores.service';
 export declare class AchievementsService {
     private readonly achievementsRepository;
     private readonly semestersService;
     private readonly competitionsService;
     private readonly usersService;
     private readonly prisma;
-    constructor(achievementsRepository: AchievementsRepository, semestersService: SemestersService, competitionsService: CompetitionsService, usersService: UsersService, prisma: PrismaService);
+    private readonly scoresService;
+    constructor(achievementsRepository: AchievementsRepository, semestersService: SemestersService, competitionsService: CompetitionsService, usersService: UsersService, prisma: PrismaService, scoresService: ScoresService);
     findAll(query: QueryAchievementDto): Promise<{
         total: number;
         data: ({

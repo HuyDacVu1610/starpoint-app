@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AchievementsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,18 +21,21 @@ const users_service_1 = require("../../users/services/users.service");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bonus_point_map_1 = require("../constants/bonus-point-map");
 const shared_1 = require("@starpointapp/shared");
+const scores_service_1 = require("../../scores/services/scores.service");
 let AchievementsService = class AchievementsService {
     achievementsRepository;
     semestersService;
     competitionsService;
     usersService;
     prisma;
-    constructor(achievementsRepository, semestersService, competitionsService, usersService, prisma) {
+    scoresService;
+    constructor(achievementsRepository, semestersService, competitionsService, usersService, prisma, scoresService) {
         this.achievementsRepository = achievementsRepository;
         this.semestersService = semestersService;
         this.competitionsService = competitionsService;
         this.usersService = usersService;
         this.prisma = prisma;
+        this.scoresService = scoresService;
     }
     async findAll(query) {
         return this.achievementsRepository.findAll(query);
@@ -84,7 +90,7 @@ let AchievementsService = class AchievementsService {
         if (!isStudent) {
             status = dto.status || shared_1.AchievementStatus.APPROVED;
         }
-        return this.achievementsRepository.create({
+        const result = await this.achievementsRepository.create({
             userId: targetUserId,
             competitionId: dto.competitionId || null,
             semesterId: dto.semesterId,
@@ -95,6 +101,10 @@ let AchievementsService = class AchievementsService {
             note: dto.note || null,
             status,
         });
+        if (result.status === shared_1.AchievementStatus.APPROVED) {
+            await this.scoresService.recalculateScore(result.userId, result.semesterId);
+        }
+        return result;
     }
     async update(id, dto, reqUser) {
         const current = await this.achievementsRepository.findById(id);
@@ -161,7 +171,7 @@ let AchievementsService = class AchievementsService {
         else if (dto.status !== undefined) {
             finalStatus = dto.status;
         }
-        return this.achievementsRepository.update(id, {
+        const result = await this.achievementsRepository.update(id, {
             userId: finalUserId,
             competitionId: finalCompetitionId || null,
             semesterId: finalSemesterId,
@@ -172,6 +182,15 @@ let AchievementsService = class AchievementsService {
             note: dto.note !== undefined ? dto.note : current.note,
             status: finalStatus,
         });
+        if (result.status === shared_1.AchievementStatus.APPROVED ||
+            current.status === shared_1.AchievementStatus.APPROVED) {
+            await this.scoresService.recalculateScore(result.userId, result.semesterId);
+            if (result.userId !== current.userId ||
+                result.semesterId !== current.semesterId) {
+                await this.scoresService.recalculateScore(current.userId, current.semesterId);
+            }
+        }
+        return result;
     }
     async delete(id, reqUser) {
         const current = await this.achievementsRepository.findById(id);
@@ -187,23 +206,31 @@ let AchievementsService = class AchievementsService {
                 throw new common_1.BadRequestException('Không thể xoá thành tích đã được xử lý (APPROVED/REJECTED)');
             }
         }
-        return this.achievementsRepository.delete(id);
+        const result = await this.achievementsRepository.delete(id);
+        if (current.status === shared_1.AchievementStatus.APPROVED) {
+            await this.scoresService.recalculateScore(current.userId, current.semesterId);
+        }
+        return result;
     }
     async review(id, status) {
         const current = await this.achievementsRepository.findById(id);
         if (!current) {
             throw new common_1.NotFoundException('Thành tích không tồn tại');
         }
-        return this.achievementsRepository.update(id, { status });
+        const result = await this.achievementsRepository.update(id, { status });
+        await this.scoresService.recalculateScore(result.userId, result.semesterId);
+        return result;
     }
 };
 exports.AchievementsService = AchievementsService;
 exports.AchievementsService = AchievementsService = __decorate([
     (0, common_1.Injectable)(),
+    __param(5, (0, common_1.Inject)((0, common_1.forwardRef)(() => scores_service_1.ScoresService))),
     __metadata("design:paramtypes", [achievements_repository_1.AchievementsRepository,
         semesters_service_1.SemestersService,
         competitions_service_1.CompetitionsService,
         users_service_1.UsersService,
-        prisma_service_1.PrismaService])
+        prisma_service_1.PrismaService,
+        scores_service_1.ScoresService])
 ], AchievementsService);
 //# sourceMappingURL=achievements.service.js.map

@@ -15,12 +15,19 @@ const semesters_module_1 = require("../semesters/semesters.module");
 const competitions_module_1 = require("../competitions/competitions.module");
 const users_module_1 = require("../users/users.module");
 const prisma_module_1 = require("../prisma/prisma.module");
+const scores_module_1 = require("../scores/scores.module");
 let AchievementsModule = class AchievementsModule {
 };
 exports.AchievementsModule = AchievementsModule;
 exports.AchievementsModule = AchievementsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, semesters_module_1.SemestersModule, competitions_module_1.CompetitionsModule, users_module_1.UsersModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            semesters_module_1.SemestersModule,
+            competitions_module_1.CompetitionsModule,
+            users_module_1.UsersModule,
+            (0, common_1.forwardRef)(() => scores_module_1.ScoresModule),
+        ],
         controllers: [achievements_controller_1.AchievementsController],
         providers: [achievements_service_1.AchievementsService, achievements_repository_1.AchievementsRepository],
         exports: [achievements_service_1.AchievementsService],

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SemestersController = void 0;
 const common_1 = require("@nestjs/common");
 const semesters_service_1 = require("../services/semesters.service");
+const scores_service_1 = require("../../scores/services/scores.service");
 const create_semester_dto_1 = require("../dto/create-semester.dto");
 const update_semester_dto_1 = require("../dto/update-semester.dto");
 const pagination_query_dto_1 = require("../../shared/common/dto/pagination-query.dto");
@@ -23,8 +24,10 @@ const permissions_guard_1 = require("../../auth/guards/permissions.guard");
 const permissions_decorator_1 = require("../../shared/common/decorators/permissions.decorator");
 let SemestersController = class SemestersController {
     semestersService;
-    constructor(semestersService) {
+    scoresService;
+    constructor(semestersService, scoresService) {
         this.semestersService = semestersService;
+        this.scoresService = scoresService;
     }
     async findAll(query) {
         return this.semestersService.findAll(query);
@@ -40,6 +43,9 @@ let SemestersController = class SemestersController {
     }
     async delete(id) {
         return this.semestersService.delete(id);
+    }
+    async updateStudentScore(semesterId, studentCode, dto) {
+        return this.scoresService.updateManualScore(semesterId, studentCode, dto);
     }
 };
 exports.SemestersController = SemestersController;
@@ -85,9 +91,21 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], SemestersController.prototype, "delete", null);
+__decorate([
+    (0, common_1.Patch)(':semesterId/students/:studentCode'),
+    (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
+    (0, permissions_decorator_1.RequirePermissions)('MANAGE_BONUS'),
+    __param(0, (0, common_1.Param)('semesterId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('studentCode')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], SemestersController.prototype, "updateStudentScore", null);
 exports.SemestersController = SemestersController = __decorate([
     (0, common_1.Controller)('semesters'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __metadata("design:paramtypes", [semesters_service_1.SemestersService])
+    __metadata("design:paramtypes", [semesters_service_1.SemestersService,
+        scores_service_1.ScoresService])
 ], SemestersController);
 //# sourceMappingURL=semesters.controller.js.map
