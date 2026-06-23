@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App as AntdApp } from 'antd';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from './features/auth/authSlice';
@@ -35,9 +35,11 @@ function App() {
         },
       }}
     >
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <AntdApp>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AntdApp>
     </ConfigProvider>
   );
 }

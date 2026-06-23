@@ -1,4 +1,4 @@
-import { Layout, Menu, Avatar, Dropdown } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, App } from 'antd';
 import {
   TrophyOutlined,
   CalculatorOutlined,
@@ -12,13 +12,24 @@ import { ROUTES } from '../routes/routeConfig';
 const { Header, Content, Footer } = Layout;
 
 export const StudentLayout = () => {
+  const { modal } = App.useApp();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate(ROUTES.LOGIN);
+    modal.confirm({
+      title: 'Xác nhận đăng xuất',
+      content: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?',
+      okText: 'Đăng xuất',
+      cancelText: 'Huỷ bỏ',
+      okButtonProps: { danger: true, className: 'bg-red-600 hover:bg-red-700' },
+      cancelButtonProps: { className: 'hover:border-slate-300' },
+      onOk: () => {
+        logout();
+        navigate(ROUTES.LOGIN);
+      },
+    });
   };
 
   const userMenu = (

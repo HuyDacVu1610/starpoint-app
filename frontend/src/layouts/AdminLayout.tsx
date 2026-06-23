@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
+import { Layout, Menu, Button, Avatar, Dropdown, App } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -21,13 +21,24 @@ const { Header, Sider, Content } = Layout;
 
 export const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { modal } = App.useApp();
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate(ROUTES.LOGIN);
+    modal.confirm({
+      title: 'Xác nhận đăng xuất',
+      content: 'Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?',
+      okText: 'Đăng xuất',
+      cancelText: 'Huỷ bỏ',
+      okButtonProps: { danger: true, className: 'bg-red-600 hover:bg-red-700' },
+      cancelButtonProps: { className: 'hover:border-slate-300' },
+      onOk: () => {
+        logout();
+        navigate(ROUTES.LOGIN);
+      },
+    });
   };
 
   const userMenu = (
