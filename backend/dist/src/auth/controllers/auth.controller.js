@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const throttler_1 = require("@nestjs/throttler");
 const auth_service_1 = require("../services/auth.service");
 const password_reset_service_1 = require("../services/password-reset.service");
 const login_dto_1 = require("../dto/login.dto");
@@ -57,6 +58,15 @@ let AuthController = class AuthController {
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, throttler_1.Throttle)({
+        default: {
+            limit: process.env.NODE_ENV === 'test' &&
+                process.env.TEST_RATE_LIMIT !== 'true'
+                ? 10000
+                : 5,
+            ttl: 60000,
+        },
+    }),
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),

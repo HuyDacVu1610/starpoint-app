@@ -8,16 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardService = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const prisma_service_1 = require("../../prisma/prisma.service");
 let DashboardService = class DashboardService {
     prisma;
-    constructor(prisma) {
+    cacheManager;
+    constructor(prisma, cacheManager) {
         this.prisma = prisma;
+        this.cacheManager = cacheManager;
     }
     async getStats(semesterId) {
+        const cacheKey = `dashboard:stats:${semesterId}`;
+        const cached = await this.cacheManager.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
         const [totalStudents, totalCompetitions, totalAchievements, eligibleScholarships] = await Promise.all([
             this.prisma.user.count({
                 where: {
@@ -41,14 +52,21 @@ let DashboardService = class DashboardService {
                 where: { semesterId, isEligible: true },
             }),
         ]);
-        return {
+        const result = {
             totalStudents,
             totalCompetitions,
             totalAchievements,
             eligibleScholarships,
         };
+        await this.cacheManager.set(cacheKey, result, 300 * 1000);
+        return result;
     }
     async getCharts(semesterId) {
+        const cacheKey = `dashboard:charts:${semesterId}`;
+        const cached = await this.cacheManager.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
         const [achievementsByCategory, gpaGradeDistribution] = await Promise.all([
             this.prisma.achievement.groupBy({
                 by: ['category'],
@@ -73,15 +91,24 @@ let DashboardService = class DashboardService {
             grade: item.gpaGrade,
             count: item._count.id,
         }));
-        return {
+        const result = {
             categoryData,
             gradeData,
         };
+        await this.cacheManager.set(cacheKey, result, 300 * 1000);
+        return result;
+    }
+    async clearCache(semesterId) {
+        const keys = [`dashboard:stats:${semesterId}`, `dashboard:charts:${semesterId}`];
+        for (const key of keys) {
+            await this.cacheManager.del(key);
+        }
     }
 };
 exports.DashboardService = DashboardService;
 exports.DashboardService = DashboardService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, Object])
 ], DashboardService);
 //# sourceMappingURL=dashboard.service.js.map

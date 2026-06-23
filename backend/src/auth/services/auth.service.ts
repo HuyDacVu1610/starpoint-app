@@ -27,7 +27,6 @@ export class AuthService {
     const user = await this.prisma.user.findFirst({
       where: {
         studentCode: dto.studentCode,
-        deletedAt: null,
       },
       include: {
         userRoles: {
@@ -47,12 +46,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Mã sinh viên không tồn tại');
+      throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Mật khẩu không đúng');
+      throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
     }
 
     // Extract roles and permissions
@@ -107,7 +106,7 @@ export class AuthService {
     }
 
     const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
+      where: { id: userId },
       include: {
         userRoles: {
           include: {
@@ -157,7 +156,7 @@ export class AuthService {
 
   async getMe(userId: number) {
     const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
+      where: { id: userId },
       include: {
         userRoles: {
           include: {
@@ -202,7 +201,7 @@ export class AuthService {
 
   async changePassword(userId: number, dto: ChangePasswordDto) {
     const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
+      where: { id: userId },
     });
 
     if (!user) {

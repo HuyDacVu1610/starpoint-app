@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardModule = void 0;
 const common_1 = require("@nestjs/common");
 const dashboard_controller_1 = require("./controllers/dashboard.controller");
+const dashboard_message_controller_1 = require("./controllers/dashboard-message.controller");
 const dashboard_service_1 = require("./services/dashboard.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 let DashboardModule = class DashboardModule {
@@ -17,7 +18,7 @@ exports.DashboardModule = DashboardModule;
 exports.DashboardModule = DashboardModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule],
-        controllers: [dashboard_controller_1.DashboardController],
+        controllers: [dashboard_controller_1.DashboardController, dashboard_message_controller_1.DashboardMessageController],
         providers: [dashboard_service_1.DashboardService],
         exports: [dashboard_service_1.DashboardService],
     })

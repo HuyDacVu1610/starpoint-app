@@ -8,18 +8,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SemestersService = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const client_1 = require("@prisma/client");
 const semesters_repository_1 = require("../repositories/semesters.repository");
 let SemestersService = class SemestersService {
     semestersRepository;
-    constructor(semestersRepository) {
+    cacheManager;
+    constructor(semestersRepository, cacheManager) {
         this.semestersRepository = semestersRepository;
+        this.cacheManager = cacheManager;
     }
     async findAll(query) {
-        return this.semestersRepository.findAll(query);
+        const cacheKey = `semesters:all:${JSON.stringify(query)}`;
+        const cached = await this.cacheManager.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        const result = await this.semestersRepository.findAll(query);
+        await this.cacheManager.set(cacheKey, result, 1800 * 1000);
+        return result;
     }
     async findById(id) {
         const semester = await this.semestersRepository.findById(id);
@@ -36,7 +49,9 @@ let SemestersService = class SemestersService {
         if (existing) {
             throw new common_1.BadRequestException(`Học kỳ cho năm học ${dto.year} kỳ ${dto.term} đã tồn tại`);
         }
-        return this.semestersRepository.create(dto);
+        const result = await this.semestersRepository.create(dto);
+        await this.cacheManager.clear();
+        return result;
     }
     async update(id, dto) {
         const current = await this.findById(id);
@@ -53,12 +68,16 @@ let SemestersService = class SemestersService {
                 throw new common_1.BadRequestException(`Học kỳ cho năm học ${finalYear} kỳ ${finalTerm} đã tồn tại`);
             }
         }
-        return this.semestersRepository.update(id, dto);
+        const result = await this.semestersRepository.update(id, dto);
+        await this.cacheManager.clear();
+        return result;
     }
     async delete(id) {
         await this.findById(id);
         try {
-            return await this.semestersRepository.delete(id);
+            const result = await this.semestersRepository.delete(id);
+            await this.cacheManager.clear();
+            return result;
         }
         catch (error) {
             if (error instanceof client_1.Prisma.PrismaClientKnownRequestError &&
@@ -72,6 +91,7 @@ let SemestersService = class SemestersService {
 exports.SemestersService = SemestersService;
 exports.SemestersService = SemestersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [semesters_repository_1.SemestersRepository])
+    __param(1, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [semesters_repository_1.SemestersRepository, Object])
 ], SemestersService);
 //# sourceMappingURL=semesters.service.js.map

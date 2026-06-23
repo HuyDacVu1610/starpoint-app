@@ -30,10 +30,10 @@ export declare class AuthController {
                     rolePermissions: ({
                         permission: {
                             id: number;
-                            name: string;
-                            description: string | null;
                             createdAt: Date;
                             updatedAt: Date;
+                            name: string;
+                            description: string | null;
                         };
                     } & {
                         roleId: number;
@@ -41,24 +41,24 @@ export declare class AuthController {
                     })[];
                 } & {
                     id: number;
-                    name: string;
-                    description: string | null;
                     createdAt: Date;
                     updatedAt: Date;
+                    name: string;
+                    description: string | null;
                 };
             } & {
-                roleId: number;
                 userId: number;
+                roleId: number;
             })[] | undefined;
-            id?: number | undefined;
-            createdAt?: Date | undefined;
-            updatedAt?: Date | undefined;
             studentCode?: string | undefined;
             email?: string | undefined;
+            id?: number | undefined;
             fullName?: string | undefined;
             phone?: string | null | undefined;
             password?: string | undefined;
             avatarUrl?: string | null | undefined;
+            createdAt?: Date | undefined;
+            updatedAt?: Date | undefined;
             deletedAt?: Date | null | undefined;
         };
         accessToken: string;
@@ -81,10 +81,10 @@ export declare class AuthController {
                     rolePermissions: ({
                         permission: {
                             id: number;
-                            name: string;
-                            description: string | null;
                             createdAt: Date;
                             updatedAt: Date;
+                            name: string;
+                            description: string | null;
                         };
                     } & {
                         roleId: number;
@@ -92,24 +92,24 @@ export declare class AuthController {
                     })[];
                 } & {
                     id: number;
-                    name: string;
-                    description: string | null;
                     createdAt: Date;
                     updatedAt: Date;
+                    name: string;
+                    description: string | null;
                 };
             } & {
-                roleId: number;
                 userId: number;
+                roleId: number;
             })[] | undefined;
-            id?: number | undefined;
-            createdAt?: Date | undefined;
-            updatedAt?: Date | undefined;
             studentCode?: string | undefined;
             email?: string | undefined;
+            id?: number | undefined;
             fullName?: string | undefined;
             phone?: string | null | undefined;
             password?: string | undefined;
             avatarUrl?: string | null | undefined;
+            createdAt?: Date | undefined;
+            updatedAt?: Date | undefined;
             deletedAt?: Date | null | undefined;
         };
     }>;

@@ -1,3 +1,4 @@
+import { ClientProxy } from '@nestjs/microservices';
 import { Prisma, Grade } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScoresRepository } from '../repositories/scores.repository';
@@ -9,22 +10,23 @@ export declare class ScoresService {
     private readonly prisma;
     private readonly scoresRepository;
     private readonly scholarshipsService;
-    constructor(prisma: PrismaService, scoresRepository: ScoresRepository, scholarshipsService: ScholarshipsService);
+    private readonly rabbitClient;
+    constructor(prisma: PrismaService, scoresRepository: ScoresRepository, scholarshipsService: ScholarshipsService, rabbitClient: ClientProxy);
     findAll(query: QueryScoreDto): Promise<{
         total: number;
         data: ({
             user: {
                 id: number;
                 studentCode: string;
-                fullName: string;
                 email: string;
+                fullName: string;
                 avatarUrl: string | null;
             };
             semester: {
                 id: number;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
@@ -32,6 +34,8 @@ export declare class ScoresService {
             };
         } & {
             id: number;
+            createdAt: Date;
+            updatedAt: Date;
             userId: number;
             semesterId: number;
             gpa: number;
@@ -40,22 +44,20 @@ export declare class ScoresService {
             conductScore: number;
             conductGrade: import("@prisma/client").$Enums.Grade;
             gpaGrade: import("@prisma/client").$Enums.Grade;
-            createdAt: Date;
-            updatedAt: Date;
         })[];
     }>;
     findById(id: number): Promise<{
         user: {
             id: number;
             studentCode: string;
-            fullName: string;
             email: string;
+            fullName: string;
         };
         semester: {
             id: number;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
             year: number;
             term: number;
             startDate: Date;
@@ -63,6 +65,8 @@ export declare class ScoresService {
         };
     } & {
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -71,11 +75,11 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     findByUserAndSemester(userId: number, semesterId: number): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -84,8 +88,6 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
-        createdAt: Date;
-        updatedAt: Date;
     } | null>;
     importScores(semesterId: number, fileBuffer: Buffer): Promise<{
         success: boolean;
@@ -96,6 +98,8 @@ export declare class ScoresService {
         conductScore?: number;
     }): Promise<{
         id: number;
+        createdAt: Date;
+        updatedAt: Date;
         userId: number;
         semesterId: number;
         gpa: number;
@@ -104,8 +108,6 @@ export declare class ScoresService {
         conductScore: number;
         conductGrade: import("@prisma/client").$Enums.Grade;
         gpaGrade: import("@prisma/client").$Enums.Grade;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     recalculateScore(userId: number, semesterId: number, tx?: Prisma.TransactionClient): Promise<void>;
     calculateScoresForSemester(semesterId: number): Promise<{

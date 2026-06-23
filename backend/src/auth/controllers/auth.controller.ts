@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { PasswordResetService } from '../services/password-reset.service';
@@ -40,6 +41,16 @@ export class AuthController {
     private readonly passwordResetService: PasswordResetService,
   ) {}
 
+  @Throttle({
+    default: {
+      limit:
+        process.env.NODE_ENV === 'test' &&
+        process.env.TEST_RATE_LIMIT !== 'true'
+          ? 10000
+          : 5,
+      ttl: 60000,
+    },
+  })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {

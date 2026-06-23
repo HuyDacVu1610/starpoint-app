@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
 import { Request } from 'express';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 interface UserPayload {
   id: number;
@@ -57,6 +58,7 @@ export class ScoresController {
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_BONUS')
   @UseInterceptors(FileInterceptor('file'))
+  @LogAction('IMPORT', 'SCORE')
   async importScores(
     @Body('semesterId', ParseIntPipe) semesterId: number,
     @UploadedFile() file: Express.Multer.File,
@@ -70,7 +72,9 @@ export class ScoresController {
   @Post('calculate/:semesterId')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_BONUS')
+  @LogAction('CALCULATE', 'SCORE')
   async calculateScores(@Param('semesterId', ParseIntPipe) semesterId: number) {
     return this.scoresService.calculateScoresForSemester(semesterId);
   }
 }
+

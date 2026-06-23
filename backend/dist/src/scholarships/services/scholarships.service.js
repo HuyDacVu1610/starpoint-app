@@ -8,10 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScholarshipsService = void 0;
 exports.calculateScholarship = calculateScholarship;
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
 const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const scholarships_repository_1 = require("../repositories/scholarships.repository");
@@ -54,9 +58,11 @@ function calculateScholarship(gpaGrade, conductGrade) {
 let ScholarshipsService = class ScholarshipsService {
     prisma;
     scholarshipsRepository;
-    constructor(prisma, scholarshipsRepository) {
+    rabbitClient;
+    constructor(prisma, scholarshipsRepository, rabbitClient) {
         this.prisma = prisma;
         this.scholarshipsRepository = scholarshipsRepository;
+        this.rabbitClient = rabbitClient;
     }
     async findAll(query) {
         return this.scholarshipsRepository.findAll(query);
@@ -101,6 +107,12 @@ let ScholarshipsService = class ScholarshipsService {
                 }
             }
         });
+        this.rabbitClient.emit('scholarship.evaluated', {
+            semesterId,
+            evaluatedCount,
+            eligibleCount,
+            tierCounts,
+        });
         return {
             evaluatedCount,
             eligibleCount,
@@ -139,7 +151,9 @@ let ScholarshipsService = class ScholarshipsService {
 exports.ScholarshipsService = ScholarshipsService;
 exports.ScholarshipsService = ScholarshipsService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, common_1.Inject)('RABBITMQ_CLIENT')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        scholarships_repository_1.ScholarshipsRepository])
+        scholarships_repository_1.ScholarshipsRepository,
+        microservices_1.ClientProxy])
 ], ScholarshipsService);
 //# sourceMappingURL=scholarships.service.js.map

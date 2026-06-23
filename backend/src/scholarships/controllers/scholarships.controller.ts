@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
 import { Request } from 'express';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 interface UserPayload {
   id: number;
@@ -52,7 +53,9 @@ export class ScholarshipsController {
   @Post('evaluate')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_SCHOLARSHIP')
+  @LogAction('EVALUATE', 'SCHOLARSHIP')
   async evaluate(@Body() dto: EvaluateScholarshipDto) {
     return this.scholarshipsService.evaluateScholarships(dto.semesterId);
   }
 }
+

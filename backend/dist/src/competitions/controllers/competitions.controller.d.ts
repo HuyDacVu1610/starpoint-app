@@ -5,30 +5,7 @@ import { QueryCompetitionDto } from '../dto/query-competition.dto';
 export declare class CompetitionsController {
     private readonly competitionsService;
     constructor(competitionsService: CompetitionsService);
-    findAll(query: QueryCompetitionDto): Promise<{
-        total: number;
-        data: ({
-            semester: {
-                id: number;
-                name: string;
-                createdAt: Date;
-                updatedAt: Date;
-                year: number;
-                term: number;
-                startDate: Date;
-                endDate: Date;
-            };
-        } & {
-            id: number;
-            name: string;
-            createdAt: Date;
-            updatedAt: Date;
-            semesterId: number;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        })[];
-    }>;
+    findAll(query: QueryCompetitionDto): Promise<any>;
     findById(id: number): Promise<{
         semester: {
             id: number;

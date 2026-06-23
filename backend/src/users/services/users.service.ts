@@ -19,7 +19,6 @@ export class UsersService {
     const formattedUsers = data.map((user) => {
       const userWithoutPassword = { ...user } as Partial<typeof user>;
       delete userWithoutPassword.password;
-      delete userWithoutPassword.userRoles;
       return {
         ...userWithoutPassword,
         roles: user.userRoles.map((ur) => ur.role.name),
@@ -44,7 +43,6 @@ export class UsersService {
 
     const userWithoutPassword = { ...user } as Partial<typeof user>;
     delete userWithoutPassword.password;
-    delete userWithoutPassword.userRoles;
 
     return {
       ...userWithoutPassword,
@@ -84,7 +82,6 @@ export class UsersService {
 
     const userWithoutPassword = { ...user } as Partial<typeof user>;
     delete userWithoutPassword.password;
-    delete userWithoutPassword.userRoles;
 
     return {
       ...userWithoutPassword,
@@ -141,7 +138,6 @@ export class UsersService {
       typeof updatedUser
     >;
     delete userWithoutPassword.password;
-    delete userWithoutPassword.userRoles;
 
     return {
       ...userWithoutPassword,
@@ -149,9 +145,9 @@ export class UsersService {
     };
   }
 
-  async softDelete(id: number) {
+  async delete(id: number) {
     await this.findById(id); // Throws NotFoundException if doesn't exist
-    await this.usersRepository.softDelete(id);
+    await this.usersRepository.delete(id);
     return {
       success: true,
       message: 'Xoá người dùng thành công',

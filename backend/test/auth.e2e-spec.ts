@@ -64,7 +64,7 @@ describe('AuthController (e2e)', () => {
         .expect(HttpStatus.UNAUTHORIZED);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Mật khẩu không đúng');
+      expect(response.body.message).toBe('Tên đăng nhập hoặc mật khẩu không chính xác');
     });
 
     it('should succeed with valid student credentials', async () => {

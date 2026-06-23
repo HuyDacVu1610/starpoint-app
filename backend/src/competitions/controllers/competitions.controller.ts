@@ -17,6 +17,7 @@ import { QueryCompetitionDto } from '../dto/query-competition.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 @Controller('competitions')
 @UseGuards(JwtAuthGuard)
@@ -36,6 +37,7 @@ export class CompetitionsController {
   @Post()
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_COMPETITION')
+  @LogAction('CREATE', 'COMPETITION')
   async create(@Body() dto: CreateCompetitionDto) {
     return this.competitionsService.create(dto);
   }
@@ -43,6 +45,7 @@ export class CompetitionsController {
   @Patch(':id')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_COMPETITION')
+  @LogAction('UPDATE', 'COMPETITION')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCompetitionDto,
@@ -53,7 +56,9 @@ export class CompetitionsController {
   @Delete(':id')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_COMPETITION')
+  @LogAction('DELETE', 'COMPETITION')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.competitionsService.delete(id);
   }
 }
+

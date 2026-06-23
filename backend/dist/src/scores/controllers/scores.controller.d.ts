@@ -20,15 +20,15 @@ export declare class ScoresController {
             user: {
                 id: number;
                 studentCode: string;
-                fullName: string;
                 email: string;
+                fullName: string;
                 avatarUrl: string | null;
             };
             semester: {
                 id: number;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
@@ -36,6 +36,8 @@ export declare class ScoresController {
             };
         } & {
             id: number;
+            createdAt: Date;
+            updatedAt: Date;
             userId: number;
             semesterId: number;
             gpa: number;
@@ -44,8 +46,6 @@ export declare class ScoresController {
             conductScore: number;
             conductGrade: import("@prisma/client").$Enums.Grade;
             gpaGrade: import("@prisma/client").$Enums.Grade;
-            createdAt: Date;
-            updatedAt: Date;
         })[];
     }>;
     findMy(query: QueryScoreDto, req: AuthenticatedRequest): Promise<{
@@ -54,15 +54,15 @@ export declare class ScoresController {
             user: {
                 id: number;
                 studentCode: string;
-                fullName: string;
                 email: string;
+                fullName: string;
                 avatarUrl: string | null;
             };
             semester: {
                 id: number;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
@@ -70,6 +70,8 @@ export declare class ScoresController {
             };
         } & {
             id: number;
+            createdAt: Date;
+            updatedAt: Date;
             userId: number;
             semesterId: number;
             gpa: number;
@@ -78,8 +80,6 @@ export declare class ScoresController {
             conductScore: number;
             conductGrade: import("@prisma/client").$Enums.Grade;
             gpaGrade: import("@prisma/client").$Enums.Grade;
-            createdAt: Date;
-            updatedAt: Date;
         })[];
     }>;
     importScores(semesterId: number, file: Express.Multer.File): Promise<{

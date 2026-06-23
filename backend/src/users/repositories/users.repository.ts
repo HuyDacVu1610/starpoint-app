@@ -12,7 +12,7 @@ export class UsersRepository {
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.UserWhereInput = { deletedAt: null };
+    const where: Prisma.UserWhereInput = {};
 
     if (query.search) {
       where.OR = [
@@ -54,8 +54,8 @@ export class UsersRepository {
   }
 
   async findById(id: number) {
-    return this.prisma.user.findFirst({
-      where: { id, deletedAt: null },
+    return this.prisma.user.findUnique({
+      where: { id },
       include: {
         userRoles: {
           include: {
@@ -68,7 +68,7 @@ export class UsersRepository {
 
   async findByStudentCode(studentCode: string) {
     return this.prisma.user.findFirst({
-      where: { studentCode, deletedAt: null },
+      where: { studentCode },
       include: {
         userRoles: {
           include: {
@@ -81,7 +81,7 @@ export class UsersRepository {
 
   async findByEmail(email: string) {
     return this.prisma.user.findFirst({
-      where: { email, deletedAt: null },
+      where: { email },
       include: {
         userRoles: {
           include: {
@@ -153,10 +153,9 @@ export class UsersRepository {
     });
   }
 
-  async softDelete(id: number) {
-    return this.prisma.user.update({
+  async delete(id: number) {
+    return this.prisma.user.delete({
       where: { id },
-      data: { deletedAt: new Date() },
     });
   }
 }

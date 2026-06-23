@@ -20,6 +20,7 @@ const query_score_dto_1 = require("../dto/query-score.dto");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../../auth/guards/permissions.guard");
 const permissions_decorator_1 = require("../../shared/common/decorators/permissions.decorator");
+const log_action_decorator_1 = require("../../shared/common/decorators/log-action.decorator");
 let ScoresController = class ScoresController {
     scoresService;
     constructor(scoresService) {
@@ -65,6 +66,7 @@ __decorate([
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_BONUS'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, log_action_decorator_1.LogAction)('IMPORT', 'SCORE'),
     __param(0, (0, common_1.Body)('semesterId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
@@ -75,6 +77,7 @@ __decorate([
     (0, common_1.Post)('calculate/:semesterId'),
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_BONUS'),
+    (0, log_action_decorator_1.LogAction)('CALCULATE', 'SCORE'),
     __param(0, (0, common_1.Param)('semesterId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

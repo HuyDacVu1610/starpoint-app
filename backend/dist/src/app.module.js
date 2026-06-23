@@ -9,6 +9,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const cache_manager_1 = require("@nestjs/cache-manager");
+const core_1 = require("@nestjs/core");
+const throttler_1 = require("@nestjs/throttler");
+const redis_config_1 = require("./shared/config/redis.config");
+const rabbitmq_module_1 = require("./shared/rabbitmq/rabbitmq.module");
 const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
 const roles_module_1 = require("./roles/roles.module");
@@ -21,8 +26,10 @@ const achievements_module_1 = require("./achievements/achievements.module");
 const scores_module_1 = require("./scores/scores.module");
 const scholarships_module_1 = require("./scholarships/scholarships.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
+const audit_log_module_1 = require("./audit-log/audit-log.module");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const audit_log_interceptor_1 = require("./shared/common/interceptors/audit-log.interceptor");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,6 +39,18 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
+            cache_manager_1.CacheModule.registerAsync(redis_config_1.redisCacheConfig),
+            rabbitmq_module_1.RabbitMQModule,
+            throttler_1.ThrottlerModule.forRoot([
+                {
+                    name: 'default',
+                    ttl: 60000,
+                    limit: process.env.NODE_ENV === 'test' &&
+                        process.env.TEST_RATE_LIMIT !== 'true'
+                        ? 10000
+                        : 60,
+                },
+            ]),
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
             roles_module_1.RolesModule,
@@ -44,9 +63,20 @@ exports.AppModule = AppModule = __decorate([
             scores_module_1.ScoresModule,
             scholarships_module_1.ScholarshipsModule,
             dashboard_module_1.DashboardModule,
+            audit_log_module_1.AuditLogModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [
+            app_service_1.AppService,
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: audit_log_interceptor_1.AuditLogInterceptor,
+            },
+            {
+                provide: core_1.APP_GUARD,
+                useClass: throttler_1.ThrottlerGuard,
+            },
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

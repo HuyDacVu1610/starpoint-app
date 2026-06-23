@@ -219,7 +219,7 @@ describe('RBAC & Users CRUD (e2e)', () => {
       expect(response.body.data.fullName).toBe('Nguyễn Văn Sáu Đã Đổi Tên');
     });
 
-    it('DELETE /users/:id - should soft delete user successfully', async () => {
+    it('DELETE /users/:id - should delete user successfully', async () => {
       const response = await request(app.getHttpServer())
         .delete(`/api/v1/users/${newUserId}`)
         .set('Authorization', `Bearer ${adminToken}`)

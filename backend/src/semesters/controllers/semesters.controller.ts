@@ -18,6 +18,7 @@ import { PaginationQueryDto } from '../../shared/common/dto/pagination-query.dto
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 @Controller('semesters')
 @UseGuards(JwtAuthGuard)
@@ -40,6 +41,7 @@ export class SemestersController {
   @Post()
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_SEMESTER')
+  @LogAction('CREATE', 'SEMESTER')
   async create(@Body() dto: CreateSemesterDto) {
     return this.semestersService.create(dto);
   }
@@ -47,6 +49,7 @@ export class SemestersController {
   @Patch(':id')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_SEMESTER')
+  @LogAction('UPDATE', 'SEMESTER')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateSemesterDto,
@@ -57,6 +60,7 @@ export class SemestersController {
   @Delete(':id')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_SEMESTER')
+  @LogAction('DELETE', 'SEMESTER')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.semestersService.delete(id);
   }
@@ -64,6 +68,7 @@ export class SemestersController {
   @Patch(':semesterId/students/:studentCode')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_BONUS')
+  @LogAction('UPDATE', 'SCORE')
   async updateStudentScore(
     @Param('semesterId', ParseIntPipe) semesterId: number,
     @Param('studentCode') studentCode: string,
@@ -72,3 +77,4 @@ export class SemestersController {
     return this.scoresService.updateManualScore(semesterId, studentCode, dto);
   }
 }
+

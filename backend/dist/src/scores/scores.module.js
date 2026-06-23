@@ -12,6 +12,7 @@ const prisma_module_1 = require("../prisma/prisma.module");
 const scores_repository_1 = require("./repositories/scores.repository");
 const scores_service_1 = require("./services/scores.service");
 const scores_controller_1 = require("./controllers/scores.controller");
+const scores_message_controller_1 = require("./controllers/scores-message.controller");
 const scholarships_module_1 = require("../scholarships/scholarships.module");
 let ScoresModule = class ScoresModule {
 };
@@ -19,7 +20,7 @@ exports.ScoresModule = ScoresModule;
 exports.ScoresModule = ScoresModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule, (0, common_1.forwardRef)(() => scholarships_module_1.ScholarshipsModule)],
-        controllers: [scores_controller_1.ScoresController],
+        controllers: [scores_controller_1.ScoresController, scores_message_controller_1.ScoresMessageController],
         providers: [scores_service_1.ScoresService, scores_repository_1.ScoresRepository],
         exports: [scores_service_1.ScoresService],
     })

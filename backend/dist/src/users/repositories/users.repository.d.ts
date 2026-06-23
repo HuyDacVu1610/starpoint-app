@@ -10,25 +10,25 @@ export declare class UsersRepository {
             userRoles: ({
                 role: {
                     id: number;
-                    name: string;
-                    description: string | null;
                     createdAt: Date;
                     updatedAt: Date;
+                    name: string;
+                    description: string | null;
                 };
             } & {
-                roleId: number;
                 userId: number;
+                roleId: number;
             })[];
         } & {
             id: number;
-            createdAt: Date;
-            updatedAt: Date;
             studentCode: string;
-            email: string;
             fullName: string;
+            email: string;
             phone: string | null;
             password: string;
             avatarUrl: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             deletedAt: Date | null;
         })[];
     }>;
@@ -36,137 +36,137 @@ export declare class UsersRepository {
         userRoles: ({
             role: {
                 id: number;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                description: string | null;
             };
         } & {
-            roleId: number;
             userId: number;
+            roleId: number;
         })[];
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }) | null>;
     findByStudentCode(studentCode: string): Promise<({
         userRoles: ({
             role: {
                 id: number;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                description: string | null;
             };
         } & {
-            roleId: number;
             userId: number;
+            roleId: number;
         })[];
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }) | null>;
     findByEmail(email: string): Promise<({
         userRoles: ({
             role: {
                 id: number;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                description: string | null;
             };
         } & {
-            roleId: number;
             userId: number;
+            roleId: number;
         })[];
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }) | null>;
     create(data: Prisma.UserCreateInput, roleIds: number[]): Promise<{
         userRoles: ({
             role: {
                 id: number;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                description: string | null;
             };
         } & {
-            roleId: number;
             userId: number;
+            roleId: number;
         })[];
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }>;
     update(id: number, data: Prisma.UserUpdateInput, roleIds?: number[]): Promise<{
         userRoles: ({
             role: {
                 id: number;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                description: string | null;
             };
         } & {
-            roleId: number;
             userId: number;
+            roleId: number;
         })[];
     } & {
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }>;
-    softDelete(id: number): Promise<{
+    delete(id: number): Promise<{
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
         studentCode: string;
-        email: string;
         fullName: string;
+        email: string;
         phone: string | null;
         password: string;
         avatarUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         deletedAt: Date | null;
     }>;
 }

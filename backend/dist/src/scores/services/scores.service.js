@@ -49,6 +49,7 @@ exports.ScoresService = void 0;
 exports.getGpaGrade = getGpaGrade;
 exports.getConductGrade = getConductGrade;
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
 const client_1 = require("@prisma/client");
 const xlsx = __importStar(require("xlsx"));
 const prisma_service_1 = require("../../prisma/prisma.service");
@@ -84,10 +85,12 @@ let ScoresService = class ScoresService {
     prisma;
     scoresRepository;
     scholarshipsService;
-    constructor(prisma, scoresRepository, scholarshipsService) {
+    rabbitClient;
+    constructor(prisma, scoresRepository, scholarshipsService, rabbitClient) {
         this.prisma = prisma;
         this.scoresRepository = scoresRepository;
         this.scholarshipsService = scholarshipsService;
+        this.rabbitClient = rabbitClient;
     }
     async findAll(query) {
         return this.scoresRepository.findAll(query);
@@ -292,6 +295,7 @@ let ScoresService = class ScoresService {
                 await this.scholarshipsService.reevaluateCandidate(userId, semesterId, tx);
             }
         });
+        this.rabbitClient.emit('bonus.calculated', { semesterId });
         return {
             success: true,
             message: `Đã import thành công bảng điểm cho ${validParsedRows.length} sinh viên`,
@@ -318,7 +322,7 @@ let ScoresService = class ScoresService {
         if (newConductScore < 0 || newConductScore > 100) {
             throw new common_1.BadRequestException('Điểm rèn luyện phải nằm trong khoảng [0, 100]');
         }
-        return this.prisma.$transaction(async (tx) => {
+        const result = await this.prisma.$transaction(async (tx) => {
             const achievements = await tx.achievement.findMany({
                 where: {
                     userId: user.id,
@@ -351,6 +355,8 @@ let ScoresService = class ScoresService {
             await this.scholarshipsService.reevaluateCandidate(user.id, semesterId, tx);
             return updatedScore;
         });
+        this.rabbitClient.emit('bonus.calculated', { semesterId });
+        return result;
     }
     async recalculateScore(userId, semesterId, tx) {
         const prismaClient = tx || this.prisma;
@@ -388,6 +394,7 @@ let ScoresService = class ScoresService {
             },
         });
         await this.scholarshipsService.reevaluateCandidate(userId, semesterId, prismaClient);
+        this.rabbitClient.emit('bonus.calculated', { semesterId });
     }
     async calculateScoresForSemester(semesterId) {
         const semester = await this.prisma.semester.findUnique({
@@ -405,6 +412,7 @@ let ScoresService = class ScoresService {
                 await this.recalculateScore(score.userId, semesterId, tx);
             }
         });
+        this.rabbitClient.emit('bonus.calculated', { semesterId });
         return {
             success: true,
             message: `Đã tính toán lại điểm thưởng cho ${scores.length} sinh viên`,
@@ -415,8 +423,10 @@ exports.ScoresService = ScoresService;
 exports.ScoresService = ScoresService = __decorate([
     (0, common_1.Injectable)(),
     __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => scholarships_service_1.ScholarshipsService))),
+    __param(3, (0, common_1.Inject)('RABBITMQ_CLIENT')),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         scores_repository_1.ScoresRepository,
-        scholarships_service_1.ScholarshipsService])
+        scholarships_service_1.ScholarshipsService,
+        microservices_1.ClientProxy])
 ], ScoresService);
 //# sourceMappingURL=scores.service.js.map

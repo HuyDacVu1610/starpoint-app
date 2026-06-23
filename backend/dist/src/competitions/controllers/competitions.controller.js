@@ -21,6 +21,7 @@ const query_competition_dto_1 = require("../dto/query-competition.dto");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../../auth/guards/permissions.guard");
 const permissions_decorator_1 = require("../../shared/common/decorators/permissions.decorator");
+const log_action_decorator_1 = require("../../shared/common/decorators/log-action.decorator");
 let CompetitionsController = class CompetitionsController {
     competitionsService;
     constructor(competitionsService) {
@@ -61,6 +62,7 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_COMPETITION'),
+    (0, log_action_decorator_1.LogAction)('CREATE', 'COMPETITION'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_competition_dto_1.CreateCompetitionDto]),
@@ -70,6 +72,7 @@ __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_COMPETITION'),
+    (0, log_action_decorator_1.LogAction)('UPDATE', 'COMPETITION'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -80,6 +83,7 @@ __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_COMPETITION'),
+    (0, log_action_decorator_1.LogAction)('DELETE', 'COMPETITION'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

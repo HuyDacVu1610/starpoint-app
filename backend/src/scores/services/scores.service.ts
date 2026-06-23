@@ -5,6 +5,7 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { Prisma, Grade } from '@prisma/client';
 import * as xlsx from 'xlsx';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -37,6 +38,8 @@ export class ScoresService {
     private readonly scoresRepository: ScoresRepository,
     @Inject(forwardRef(() => ScholarshipsService))
     private readonly scholarshipsService: ScholarshipsService,
+    @Inject('RABBITMQ_CLIENT')
+    private readonly rabbitClient: ClientProxy,
   ) {}
 
   async findAll(query: QueryScoreDto) {
@@ -314,6 +317,8 @@ export class ScoresService {
       }
     });
 
+    this.rabbitClient.emit('bonus.calculated', { semesterId });
+
     return {
       success: true,
       message: `Đã import thành công bảng điểm cho ${validParsedRows.length} sinh viên`,
@@ -362,7 +367,7 @@ export class ScoresService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       // Re-query approved achievements in this semester
       const achievements = await tx.achievement.findMany({
         where: {
@@ -407,6 +412,9 @@ export class ScoresService {
 
       return updatedScore;
     });
+
+    this.rabbitClient.emit('bonus.calculated', { semesterId });
+    return result;
   }
 
   async recalculateScore(
@@ -464,6 +472,8 @@ export class ScoresService {
       semesterId,
       prismaClient,
     );
+
+    this.rabbitClient.emit('bonus.calculated', { semesterId });
   }
 
   async calculateScoresForSemester(semesterId: number) {
@@ -484,6 +494,8 @@ export class ScoresService {
         await this.recalculateScore(score.userId, semesterId, tx);
       }
     });
+
+    this.rabbitClient.emit('bonus.calculated', { semesterId });
 
     return {
       success: true,

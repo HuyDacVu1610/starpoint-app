@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { ConfigProvider, App as AntdApp } from 'antd';
+import { ConfigProvider, App as AntdApp, theme as AntdTheme } from 'antd';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from './features/auth/authSlice';
 import AppRouter from './routes/AppRouter';
+import type { RootState } from './store/store';
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -25,9 +26,21 @@ function AppContent() {
 }
 
 function App() {
+  const mode = useSelector((state: RootState) => state.theme.mode);
+  const isDark = mode === 'dark';
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
   return (
     <ConfigProvider
       theme={{
+        algorithm: isDark ? AntdTheme.darkAlgorithm : AntdTheme.defaultAlgorithm,
         token: {
           fontFamily: 'Plus Jakarta Sans, sans-serif',
           colorPrimary: '#4f46e5',

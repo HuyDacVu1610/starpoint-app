@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AchievementsService = void 0;
 const common_1 = require("@nestjs/common");
+const microservices_1 = require("@nestjs/microservices");
 const achievements_repository_1 = require("../repositories/achievements.repository");
 const semesters_service_1 = require("../../semesters/services/semesters.service");
 const competitions_service_1 = require("../../competitions/services/competitions.service");
@@ -29,13 +30,15 @@ let AchievementsService = class AchievementsService {
     usersService;
     prisma;
     scoresService;
-    constructor(achievementsRepository, semestersService, competitionsService, usersService, prisma, scoresService) {
+    rabbitClient;
+    constructor(achievementsRepository, semestersService, competitionsService, usersService, prisma, scoresService, rabbitClient) {
         this.achievementsRepository = achievementsRepository;
         this.semestersService = semestersService;
         this.competitionsService = competitionsService;
         this.usersService = usersService;
         this.prisma = prisma;
         this.scoresService = scoresService;
+        this.rabbitClient = rabbitClient;
     }
     async findAll(query) {
         return this.achievementsRepository.findAll(query);
@@ -104,6 +107,10 @@ let AchievementsService = class AchievementsService {
         if (result.status === shared_1.AchievementStatus.APPROVED) {
             await this.scoresService.recalculateScore(result.userId, result.semesterId);
         }
+        this.rabbitClient.emit('achievement.created', {
+            userId: result.userId,
+            semesterId: result.semesterId,
+        });
         return result;
     }
     async update(id, dto, reqUser) {
@@ -190,6 +197,17 @@ let AchievementsService = class AchievementsService {
                 await this.scoresService.recalculateScore(current.userId, current.semesterId);
             }
         }
+        this.rabbitClient.emit('achievement.created', {
+            userId: result.userId,
+            semesterId: result.semesterId,
+        });
+        if (result.userId !== current.userId ||
+            result.semesterId !== current.semesterId) {
+            this.rabbitClient.emit('achievement.created', {
+                userId: current.userId,
+                semesterId: current.semesterId,
+            });
+        }
         return result;
     }
     async delete(id, reqUser) {
@@ -210,6 +228,10 @@ let AchievementsService = class AchievementsService {
         if (current.status === shared_1.AchievementStatus.APPROVED) {
             await this.scoresService.recalculateScore(current.userId, current.semesterId);
         }
+        this.rabbitClient.emit('achievement.created', {
+            userId: current.userId,
+            semesterId: current.semesterId,
+        });
         return result;
     }
     async review(id, status) {
@@ -219,6 +241,10 @@ let AchievementsService = class AchievementsService {
         }
         const result = await this.achievementsRepository.update(id, { status });
         await this.scoresService.recalculateScore(result.userId, result.semesterId);
+        this.rabbitClient.emit('achievement.created', {
+            userId: result.userId,
+            semesterId: result.semesterId,
+        });
         return result;
     }
 };
@@ -226,11 +252,13 @@ exports.AchievementsService = AchievementsService;
 exports.AchievementsService = AchievementsService = __decorate([
     (0, common_1.Injectable)(),
     __param(5, (0, common_1.Inject)((0, common_1.forwardRef)(() => scores_service_1.ScoresService))),
+    __param(6, (0, common_1.Inject)('RABBITMQ_CLIENT')),
     __metadata("design:paramtypes", [achievements_repository_1.AchievementsRepository,
         semesters_service_1.SemestersService,
         competitions_service_1.CompetitionsService,
         users_service_1.UsersService,
         prisma_service_1.PrismaService,
-        scores_service_1.ScoresService])
+        scores_service_1.ScoresService,
+        microservices_1.ClientProxy])
 ], AchievementsService);
 //# sourceMappingURL=achievements.service.js.map

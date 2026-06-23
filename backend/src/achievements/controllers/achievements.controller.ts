@@ -22,6 +22,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
 import { AchievementStatus } from '@starpointapp/shared';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 interface UserPayload {
   id: number;
@@ -66,6 +67,7 @@ export class AchievementsController {
   }
 
   @Post()
+  @LogAction('CREATE', 'ACHIEVEMENT')
   async create(
     @Body() dto: CreateAchievementDto,
     @NestRequest() req: AuthenticatedRequest,
@@ -81,6 +83,7 @@ export class AchievementsController {
   }
 
   @Patch(':id')
+  @LogAction('UPDATE', 'ACHIEVEMENT')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateAchievementDto,
@@ -97,6 +100,7 @@ export class AchievementsController {
   }
 
   @Delete(':id')
+  @LogAction('DELETE', 'ACHIEVEMENT')
   async delete(
     @Param('id', ParseIntPipe) id: number,
     @NestRequest() req: AuthenticatedRequest,
@@ -114,6 +118,7 @@ export class AchievementsController {
   @Patch(':id/review')
   @UseGuards(PermissionsGuard)
   @RequirePermissions('MANAGE_ACHIEVEMENT')
+  @LogAction('REVIEW', 'ACHIEVEMENT')
   async review(
     @Param('id', ParseIntPipe) id: number,
     @Body('status') status: AchievementStatus,
@@ -124,3 +129,4 @@ export class AchievementsController {
     return this.achievementsService.review(id, status);
   }
 }
+

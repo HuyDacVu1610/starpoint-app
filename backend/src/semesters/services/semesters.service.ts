@@ -2,7 +2,10 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { Prisma } from '@prisma/client';
 import { SemestersRepository } from '../repositories/semesters.repository';
 import { CreateSemesterDto } from '../dto/create-semester.dto';
@@ -11,10 +14,21 @@ import { PaginationQueryDto } from '../../shared/common/dto/pagination-query.dto
 
 @Injectable()
 export class SemestersService {
-  constructor(private readonly semestersRepository: SemestersRepository) {}
+  constructor(
+    private readonly semestersRepository: SemestersRepository,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   async findAll(query: PaginationQueryDto) {
-    return this.semestersRepository.findAll(query);
+    const cacheKey = `semesters:all:${JSON.stringify(query)}`;
+    const cached = await this.cacheManager.get<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const result = await this.semestersRepository.findAll(query);
+    await this.cacheManager.set(cacheKey, result, 1800 * 1000); // 30 minutes in ms
+    return result;
   }
 
   async findById(id: number) {
@@ -40,7 +54,9 @@ export class SemestersService {
       );
     }
 
-    return this.semestersRepository.create(dto);
+    const result = await this.semestersRepository.create(dto);
+    await this.cacheManager.clear(); // Clear cache to invalidate list
+    return result;
   }
 
   async update(id: number, dto: UpdateSemesterDto) {
@@ -70,14 +86,18 @@ export class SemestersService {
       }
     }
 
-    return this.semestersRepository.update(id, dto);
+    const result = await this.semestersRepository.update(id, dto);
+    await this.cacheManager.clear(); // Clear cache to invalidate list
+    return result;
   }
 
   async delete(id: number) {
     await this.findById(id);
 
     try {
-      return await this.semestersRepository.delete(id);
+      const result = await this.semestersRepository.delete(id);
+      await this.cacheManager.clear(); // Clear cache to invalidate list
+      return result;
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -91,3 +111,4 @@ export class SemestersService {
     }
   }
 }
+

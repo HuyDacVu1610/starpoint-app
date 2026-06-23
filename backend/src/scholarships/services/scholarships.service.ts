@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { Prisma, Grade } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScholarshipsRepository } from '../repositories/scholarships.repository';
@@ -61,6 +62,8 @@ export class ScholarshipsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly scholarshipsRepository: ScholarshipsRepository,
+    @Inject('RABBITMQ_CLIENT')
+    private readonly rabbitClient: ClientProxy,
   ) {}
 
   async findAll(query: QueryCandidateDto) {
@@ -129,6 +132,14 @@ export class ScholarshipsService {
       }
     });
 
+    // Emit RabbitMQ Event
+    this.rabbitClient.emit('scholarship.evaluated', {
+      semesterId,
+      evaluatedCount,
+      eligibleCount,
+      tierCounts,
+    });
+
     return {
       evaluatedCount,
       eligibleCount,
@@ -180,3 +191,4 @@ export class ScholarshipsService {
     );
   }
 }
+

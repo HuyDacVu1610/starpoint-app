@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Select, Spin, App, Button } from 'antd';
+import { Card, Row, Col, Select, Spin, App } from 'antd';
 import {
   UserOutlined,
   TrophyOutlined,
   CalendarOutlined,
   FileProtectOutlined,
-  FileExcelOutlined,
-  StarOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+
 import { PageHeader } from '../components/PageHeader';
 import { dashboardService } from '../services/dashboard.service';
 import { semestersService } from '../services/semesters.service';
@@ -45,7 +42,6 @@ const GRADE_LABELS: Record<string, string> = {
 
 export const DashboardPage = () => {
   const { message } = App.useApp();
-  const navigate = useNavigate();
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | undefined>(undefined);
@@ -305,54 +301,7 @@ export const DashboardPage = () => {
             </Col>
           </Row>
 
-          {/* Quick Actions Row */}
-          <Card
-            title={<span className="font-extrabold text-slate-800 text-sm">Phím Tắt Nghiệp Vụ Nhanh</span>}
-            className="border border-slate-100 rounded-xl shadow-sm overflow-hidden"
-          >
-            <Row gutter={[16, 16]}>
-              <Col xs={12} sm={6}>
-                <Button
-                  block
-                  icon={<FileExcelOutlined />}
-                  onClick={() => navigate('/admin/bonus-points')}
-                  className="h-16 rounded-xl flex flex-col items-center justify-center border-emerald-100 text-emerald-700 hover:border-emerald-300 bg-emerald-50/20 hover:bg-emerald-50/50 shadow-sm transition-colors text-xs font-bold"
-                >
-                  Nhập Điểm Excel
-                </Button>
-              </Col>
-              <Col xs={12} sm={6}>
-                <Button
-                  block
-                  icon={<StarOutlined />}
-                  onClick={() => navigate('/admin/scholarships')}
-                  className="h-16 rounded-xl flex flex-col items-center justify-center border-indigo-100 text-indigo-700 hover:border-indigo-300 bg-indigo-50/20 hover:bg-indigo-50/50 shadow-sm transition-colors text-xs font-bold"
-                >
-                  Chạy Xét Học Bổng
-                </Button>
-              </Col>
-              <Col xs={12} sm={6}>
-                <Button
-                  block
-                  icon={<TrophyOutlined />}
-                  onClick={() => navigate('/admin/achievements')}
-                  className="h-16 rounded-xl flex flex-col items-center justify-center border-amber-100 text-amber-700 hover:border-amber-300 bg-amber-50/20 hover:bg-amber-50/50 shadow-sm transition-colors text-xs font-bold"
-                >
-                  Duyệt Thành Tích
-                </Button>
-              </Col>
-              <Col xs={12} sm={6}>
-                <Button
-                  block
-                  icon={<SettingOutlined />}
-                  onClick={() => navigate('/admin/semesters')}
-                  className="h-16 rounded-xl flex flex-col items-center justify-center border-slate-200 text-slate-700 hover:border-slate-300 bg-slate-50 hover:bg-slate-100 shadow-sm transition-colors text-xs font-bold"
-                >
-                  Quản Lý Học Kỳ
-                </Button>
-              </Col>
-            </Row>
-          </Card>
+
         </>
       )}
     </div>

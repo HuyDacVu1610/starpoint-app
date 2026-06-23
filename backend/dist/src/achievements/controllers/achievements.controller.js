@@ -22,6 +22,7 @@ const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../../auth/guards/permissions.guard");
 const permissions_decorator_1 = require("../../shared/common/decorators/permissions.decorator");
 const shared_1 = require("@starpointapp/shared");
+const log_action_decorator_1 = require("../../shared/common/decorators/log-action.decorator");
 let AchievementsController = class AchievementsController {
     achievementsService;
     constructor(achievementsService) {
@@ -96,6 +97,7 @@ __decorate([
 ], AchievementsController.prototype, "findById", null);
 __decorate([
     (0, common_1.Post)(),
+    (0, log_action_decorator_1.LogAction)('CREATE', 'ACHIEVEMENT'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -104,6 +106,7 @@ __decorate([
 ], AchievementsController.prototype, "create", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, log_action_decorator_1.LogAction)('UPDATE', 'ACHIEVEMENT'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
@@ -113,6 +116,7 @@ __decorate([
 ], AchievementsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, log_action_decorator_1.LogAction)('DELETE', 'ACHIEVEMENT'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -123,6 +127,7 @@ __decorate([
     (0, common_1.Patch)(':id/review'),
     (0, common_1.UseGuards)(permissions_guard_1.PermissionsGuard),
     (0, permissions_decorator_1.RequirePermissions)('MANAGE_ACHIEVEMENT'),
+    (0, log_action_decorator_1.LogAction)('REVIEW', 'ACHIEVEMENT'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)('status')),
     __metadata("design:type", Function),

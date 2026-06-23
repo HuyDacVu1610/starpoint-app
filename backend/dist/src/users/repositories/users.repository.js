@@ -21,7 +21,7 @@ let UsersRepository = class UsersRepository {
         const page = query.page || 1;
         const limit = query.limit || 10;
         const skip = (page - 1) * limit;
-        const where = { deletedAt: null };
+        const where = {};
         if (query.search) {
             where.OR = [
                 { studentCode: { contains: query.search } },
@@ -56,8 +56,8 @@ let UsersRepository = class UsersRepository {
         };
     }
     async findById(id) {
-        return this.prisma.user.findFirst({
-            where: { id, deletedAt: null },
+        return this.prisma.user.findUnique({
+            where: { id },
             include: {
                 userRoles: {
                     include: {
@@ -69,7 +69,7 @@ let UsersRepository = class UsersRepository {
     }
     async findByStudentCode(studentCode) {
         return this.prisma.user.findFirst({
-            where: { studentCode, deletedAt: null },
+            where: { studentCode },
             include: {
                 userRoles: {
                     include: {
@@ -81,7 +81,7 @@ let UsersRepository = class UsersRepository {
     }
     async findByEmail(email) {
         return this.prisma.user.findFirst({
-            where: { email, deletedAt: null },
+            where: { email },
             include: {
                 userRoles: {
                     include: {
@@ -148,10 +148,9 @@ let UsersRepository = class UsersRepository {
             },
         });
     }
-    async softDelete(id) {
-        return this.prisma.user.update({
+    async delete(id) {
+        return this.prisma.user.delete({
             where: { id },
-            data: { deletedAt: new Date() },
         });
     }
 };

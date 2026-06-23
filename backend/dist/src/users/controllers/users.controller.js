@@ -21,6 +21,7 @@ const query_user_dto_1 = require("../dto/query-user.dto");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../../auth/guards/permissions.guard");
 const permissions_decorator_1 = require("../../shared/common/decorators/permissions.decorator");
+const log_action_decorator_1 = require("../../shared/common/decorators/log-action.decorator");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -38,8 +39,8 @@ let UsersController = class UsersController {
     async update(id, dto) {
         return this.usersService.update(id, dto);
     }
-    async softDelete(id) {
-        return this.usersService.softDelete(id);
+    async delete(id) {
+        return this.usersService.delete(id);
     }
 };
 exports.UsersController = UsersController;
@@ -62,6 +63,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, permissions_decorator_1.RequirePermissions)('CREATE_USER'),
+    (0, log_action_decorator_1.LogAction)('CREATE', 'USER'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
@@ -70,6 +72,7 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, permissions_decorator_1.RequirePermissions)('UPDATE_USER'),
+    (0, log_action_decorator_1.LogAction)('UPDATE', 'USER'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -80,11 +83,12 @@ __decorate([
     (0, common_1.Delete)(':id'),
     (0, permissions_decorator_1.RequirePermissions)('DELETE_USER'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, log_action_decorator_1.LogAction)('DELETE', 'USER'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], UsersController.prototype, "softDelete", null);
+], UsersController.prototype, "delete", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),

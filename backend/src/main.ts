@@ -7,10 +7,15 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ResponseInterceptor } from './shared/common/interceptors/response.interceptor';
 import { GlobalExceptionFilter } from './shared/common/filters/global-exception.filter';
+import { rabbitMQListenerConfig } from './shared/config/rabbitmq.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  // Connect and start RabbitMQ microservice
+  app.connectMicroservice(rabbitMQListenerConfig);
+  await app.startAllMicroservices();
 
   // Serve static uploads
   app.useStaticAssets(join(process.cwd(), 'uploads'), {

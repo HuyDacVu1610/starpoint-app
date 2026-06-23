@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layout, Menu, Button, Avatar, Dropdown, App } from 'antd';
+import { Layout, Menu, Button, Avatar, Dropdown, App, Breadcrumb } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -12,12 +12,20 @@ import {
   SafetyCertificateOutlined,
   LogoutOutlined,
   FlagOutlined,
+  SunOutlined,
+  MoonOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '../hooks/useAuth';
 import { ROUTES } from '../routes/routeConfig';
+import { toggleTheme } from '../features/theme/themeSlice';
+import type { RootState } from '../store/store';
+import { ScrollToTop } from '../components/ScrollToTop';
+import { AppFooter } from '../components/AppFooter';
 
 const { Header, Sider, Content } = Layout;
+
 
 export const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -25,6 +33,36 @@ export const AdminLayout = () => {
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const mode = useSelector((state: RootState) => state.theme.mode);
+  const isDark = mode === 'dark';
+
+  const pathnames = location.pathname.split('/').filter((x) => x);
+  const breadcrumbItems = [
+    {
+      title: <Link to="/">Trang chủ</Link>,
+    },
+    ...pathnames.map((value, index) => {
+      const url = `/${pathnames.slice(0, index + 1).join('/')}`;
+      const isLast = index === pathnames.length - 1;
+      let title: string = value;
+      if (value === 'admin') title = 'Quản trị';
+      else if (value === 'students') title = 'Sinh viên';
+      else if (value === 'dashboard') title = 'Bảng điều khiển';
+      else if (value === 'semesters') title = 'Học kỳ';
+      else if (value === 'competitions') title = 'Cuộc thi';
+      else if (value === 'achievements') title = 'Thành tích';
+      else if (value === 'bonus-points') title = 'Điểm thưởng';
+      else if (value === 'scholarships') title = 'Học bổng';
+      else if (value === 'my') title = 'Cá nhân';
+      if (title === value) {
+        title = value.charAt(0).toUpperCase() + value.slice(1);
+      }
+      return {
+        title: isLast ? <span>{title}</span> : <Link to={url}>{title}</Link>,
+      };
+    }),
+  ];
 
   const handleLogout = () => {
     modal.confirm({
@@ -120,7 +158,7 @@ export const AdminLayout = () => {
   }
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="min-h-screen bg-slate-50 dark:bg-zinc-950">
       <Sider
         trigger={null}
         collapsible
@@ -155,10 +193,10 @@ export const AdminLayout = () => {
         />
       </Sider>
       
-      <Layout>
+      <Layout className="bg-slate-50 dark:bg-zinc-950 flex flex-col" style={{ minHeight: '100vh' }}>
         <Header 
-          style={{ background: '#ffffff', padding: '0 24px' }}
-          className="border-b border-slate-200/50 h-16 flex justify-between items-center sticky top-0 z-10 shadow-sm"
+          style={{ background: isDark ? '#141414' : '#ffffff', padding: '0 24px' }}
+          className="border-b border-slate-200/50 dark:border-zinc-800 h-16 flex justify-between items-center sticky top-0 z-10 shadow-sm"
         >
           <Button
             type="text"
@@ -168,11 +206,17 @@ export const AdminLayout = () => {
           />
 
           <div className="flex items-center gap-4">
-            <span className="text-slate-500 text-sm hidden sm:inline-block">
-              Xin chào, <span className="font-semibold text-slate-800">{user?.fullName}</span>
+            <Button
+              type="text"
+              icon={isDark ? <SunOutlined className="text-yellow-500 text-lg" /> : <MoonOutlined className="text-slate-600 text-lg" />}
+              onClick={() => dispatch(toggleTheme())}
+              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800"
+            />
+            <span className="text-slate-500 dark:text-zinc-400 text-sm hidden sm:inline-block">
+              Xin chào, <span className="font-semibold text-slate-800 dark:text-zinc-200">{user?.fullName}</span>
             </span>
             <Dropdown overlay={userMenu} placement="bottomRight" trigger={['click']}>
-              <div className="cursor-pointer flex items-center gap-2 hover:bg-slate-50 p-1 px-2 rounded-lg transition-colors">
+              <div className="cursor-pointer flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-zinc-800 p-1 px-2 rounded-lg transition-colors">
                 <Avatar style={{ backgroundColor: '#4f46e5', verticalAlign: 'middle' }} size="default">
                   {user?.fullName.charAt(0).toUpperCase()}
                 </Avatar>
@@ -184,9 +228,14 @@ export const AdminLayout = () => {
           </div>
         </Header>
         
-        <Content className="p-6 md:p-8 bg-slate-50/50 overflow-y-auto" style={{ minHeight: 280 }}>
-          <Outlet />
+        <Content className="p-6 md:p-8 bg-slate-50 dark:bg-zinc-950 overflow-y-auto flex-grow" style={{ minHeight: 280 }}>
+          <Breadcrumb items={breadcrumbItems} className="mb-4" />
+          <div key={location.pathname} className="animate-fade-in">
+            <Outlet />
+          </div>
+          <ScrollToTop />
         </Content>
+        <AppFooter />
       </Layout>
     </Layout>
   );

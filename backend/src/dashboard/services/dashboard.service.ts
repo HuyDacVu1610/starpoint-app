@@ -1,11 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
 
   async getStats(semesterId: number) {
+    const cacheKey = `dashboard:stats:${semesterId}`;
+    const cached = await this.cacheManager.get<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const [totalStudents, totalCompetitions, totalAchievements, eligibleScholarships] = await Promise.all([
       // Count total non-deleted student accounts
       this.prisma.user.count({
@@ -37,15 +48,24 @@ export class DashboardService {
       }),
     ]);
 
-    return {
+    const result = {
       totalStudents,
       totalCompetitions,
       totalAchievements,
       eligibleScholarships,
     };
+
+    await this.cacheManager.set(cacheKey, result, 300 * 1000); // 5 minutes in ms
+    return result;
   }
 
   async getCharts(semesterId: number) {
+    const cacheKey = `dashboard:charts:${semesterId}`;
+    const cached = await this.cacheManager.get<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const [achievementsByCategory, gpaGradeDistribution] = await Promise.all([
       // Group approved achievements by category
       this.prisma.achievement.groupBy({
@@ -78,9 +98,20 @@ export class DashboardService {
       count: item._count.id,
     }));
 
-    return {
+    const result = {
       categoryData,
       gradeData,
     };
+
+    await this.cacheManager.set(cacheKey, result, 300 * 1000); // 5 minutes in ms
+    return result;
+  }
+
+  async clearCache(semesterId: number) {
+    const keys = [`dashboard:stats:${semesterId}`, `dashboard:charts:${semesterId}`];
+    for (const key of keys) {
+      await this.cacheManager.del(key);
+    }
   }
 }
+

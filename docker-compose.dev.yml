@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      - ./backend/src:/usr/src/app/backend/src
+      - ./backend/prisma:/usr/src/app/backend/prisma
+      - ./shared/src:/usr/src/app/shared/src
+    command: npm run start:dev -w backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/usr/src/app/frontend/src
+      - ./frontend/index.html:/usr/src/app/frontend/index.html
+      - ./shared/src:/usr/src/app/shared/src
+    command: npm run dev -w frontend -- --host 0.0.0.0

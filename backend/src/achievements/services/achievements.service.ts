@@ -6,6 +6,7 @@ import {
   Inject,
   forwardRef,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { AchievementsRepository } from '../repositories/achievements.repository';
 import { SemestersService } from '../../semesters/services/semesters.service';
 import { CompetitionsService } from '../../competitions/services/competitions.service';
@@ -28,6 +29,8 @@ export class AchievementsService {
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => ScoresService))
     private readonly scoresService: ScoresService,
+    @Inject('RABBITMQ_CLIENT')
+    private readonly rabbitClient: ClientProxy,
   ) {}
 
   async findAll(query: QueryAchievementDto) {
@@ -132,6 +135,12 @@ export class AchievementsService {
         result.semesterId,
       );
     }
+
+    // Emit RabbitMQ Event
+    this.rabbitClient.emit('achievement.created', {
+      userId: result.userId,
+      semesterId: result.semesterId,
+    });
 
     return result;
   }
@@ -269,6 +278,21 @@ export class AchievementsService {
       }
     }
 
+    // Emit RabbitMQ Event
+    this.rabbitClient.emit('achievement.created', {
+      userId: result.userId,
+      semesterId: result.semesterId,
+    });
+    if (
+      result.userId !== current.userId ||
+      result.semesterId !== current.semesterId
+    ) {
+      this.rabbitClient.emit('achievement.created', {
+        userId: current.userId,
+        semesterId: current.semesterId,
+      });
+    }
+
     return result;
   }
 
@@ -300,6 +324,13 @@ export class AchievementsService {
         current.semesterId,
       );
     }
+
+    // Emit RabbitMQ Event
+    this.rabbitClient.emit('achievement.created', {
+      userId: current.userId,
+      semesterId: current.semesterId,
+    });
+
     return result;
   }
 
@@ -310,6 +341,13 @@ export class AchievementsService {
     }
     const result = await this.achievementsRepository.update(id, { status });
     await this.scoresService.recalculateScore(result.userId, result.semesterId);
+
+    // Emit RabbitMQ Event
+    this.rabbitClient.emit('achievement.created', {
+      userId: result.userId,
+      semesterId: result.semesterId,
+    });
+
     return result;
   }
 }

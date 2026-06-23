@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { CompetitionsRepository } from '../repositories/competitions.repository';
 import { SemestersService } from '../../semesters/services/semesters.service';
 import { CreateCompetitionDto } from '../dto/create-competition.dto';
@@ -10,10 +12,19 @@ export class CompetitionsService {
   constructor(
     private readonly competitionsRepository: CompetitionsRepository,
     private readonly semestersService: SemestersService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async findAll(query: QueryCompetitionDto) {
-    return this.competitionsRepository.findAll(query);
+    const cacheKey = `competitions:all:${JSON.stringify(query)}`;
+    const cached = await this.cacheManager.get<any>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const result = await this.competitionsRepository.findAll(query);
+    await this.cacheManager.set(cacheKey, result, 600 * 1000); // 10 minutes in ms
+    return result;
   }
 
   async findById(id: number) {
@@ -28,7 +39,9 @@ export class CompetitionsService {
     // Validate that the semester exists
     await this.semestersService.findById(dto.semesterId);
 
-    return this.competitionsRepository.create(dto);
+    const result = await this.competitionsRepository.create(dto);
+    await this.cacheManager.clear(); // Clear cache to invalidate list
+    return result;
   }
 
   async update(id: number, dto: UpdateCompetitionDto) {
@@ -39,11 +52,16 @@ export class CompetitionsService {
       await this.semestersService.findById(dto.semesterId);
     }
 
-    return this.competitionsRepository.update(id, dto);
+    const result = await this.competitionsRepository.update(id, dto);
+    await this.cacheManager.clear(); // Clear cache to invalidate list
+    return result;
   }
 
   async delete(id: number) {
     await this.findById(id);
-    return this.competitionsRepository.delete(id);
+    const result = await this.competitionsRepository.delete(id);
+    await this.cacheManager.clear(); // Clear cache to invalidate list
+    return result;
   }
 }
+

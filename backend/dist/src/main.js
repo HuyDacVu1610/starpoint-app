@@ -11,9 +11,12 @@ const helmet_1 = __importDefault(require("helmet"));
 const path_1 = require("path");
 const response_interceptor_1 = require("./shared/common/interceptors/response.interceptor");
 const global_exception_filter_1 = require("./shared/common/filters/global-exception.filter");
+const rabbitmq_config_1 = require("./shared/config/rabbitmq.config");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const configService = app.get(config_1.ConfigService);
+    app.connectMicroservice(rabbitmq_config_1.rabbitMQListenerConfig);
+    await app.startAllMicroservices();
     app.useStaticAssets((0, path_1.join)(process.cwd(), 'uploads'), {
         prefix: '/uploads/',
     });

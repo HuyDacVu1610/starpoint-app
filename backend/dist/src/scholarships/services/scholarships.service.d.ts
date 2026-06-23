@@ -1,3 +1,4 @@
+import { ClientProxy } from '@nestjs/microservices';
 import { Prisma, Grade } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScholarshipsRepository } from '../repositories/scholarships.repository';
@@ -10,7 +11,8 @@ export declare function calculateScholarship(gpaGrade: Grade, conductGrade: Grad
 export declare class ScholarshipsService {
     private readonly prisma;
     private readonly scholarshipsRepository;
-    constructor(prisma: PrismaService, scholarshipsRepository: ScholarshipsRepository);
+    private readonly rabbitClient;
+    constructor(prisma: PrismaService, scholarshipsRepository: ScholarshipsRepository, rabbitClient: ClientProxy);
     findAll(query: QueryCandidateDto): Promise<{
         total: number;
         data: ({

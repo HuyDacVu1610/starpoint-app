@@ -1,3 +1,4 @@
+import { ClientProxy } from '@nestjs/microservices';
 import { AchievementsRepository } from '../repositories/achievements.repository';
 import { SemestersService } from '../../semesters/services/semesters.service';
 import { CompetitionsService } from '../../competitions/services/competitions.service';
@@ -15,7 +16,8 @@ export declare class AchievementsService {
     private readonly usersService;
     private readonly prisma;
     private readonly scoresService;
-    constructor(achievementsRepository: AchievementsRepository, semestersService: SemestersService, competitionsService: CompetitionsService, usersService: UsersService, prisma: PrismaService, scoresService: ScoresService);
+    private readonly rabbitClient;
+    constructor(achievementsRepository: AchievementsRepository, semestersService: SemestersService, competitionsService: CompetitionsService, usersService: UsersService, prisma: PrismaService, scoresService: ScoresService, rabbitClient: ClientProxy);
     findAll(query: QueryAchievementDto): Promise<{
         total: number;
         data: ({
@@ -26,6 +28,16 @@ export declare class AchievementsService {
                 email: string;
                 avatarUrl: string | null;
             };
+            competition: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                semesterId: number;
+                level: import("@prisma/client").$Enums.CompetitionLevel;
+                organizer: string | null;
+                eventDate: Date;
+            } | null;
             semester: {
                 id: number;
                 createdAt: Date;
@@ -36,16 +48,6 @@ export declare class AchievementsService {
                 startDate: Date;
                 endDate: Date;
             };
-            competition: {
-                id: number;
-                semesterId: number;
-                createdAt: Date;
-                updatedAt: Date;
-                name: string;
-                level: import("@prisma/client").$Enums.CompetitionLevel;
-                organizer: string | null;
-                eventDate: Date;
-            } | null;
             evidenceFile: {
                 id: number;
                 createdAt: Date;
@@ -57,18 +59,18 @@ export declare class AchievementsService {
             } | null;
         } & {
             id: number;
-            userId: number;
-            semesterId: number;
             createdAt: Date;
             updatedAt: Date;
-            competitionId: number | null;
+            userId: number;
             category: import("@prisma/client").$Enums.AchievementCategory;
             rank: import("@prisma/client").$Enums.AchievementRank;
             bonusPoint: number;
             evidence: string | null;
-            evidenceFileId: number | null;
             status: import("@prisma/client").$Enums.AchievementStatus;
             note: string | null;
+            competitionId: number | null;
+            semesterId: number;
+            evidenceFileId: number | null;
         })[];
     }>;
     findById(id: number, reqUser: {
@@ -82,6 +84,16 @@ export declare class AchievementsService {
             email: string;
             avatarUrl: string | null;
         };
+        competition: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         semester: {
             id: number;
             createdAt: Date;
@@ -92,16 +104,6 @@ export declare class AchievementsService {
             startDate: Date;
             endDate: Date;
         };
-        competition: {
-            id: number;
-            semesterId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -113,18 +115,18 @@ export declare class AchievementsService {
         } | null;
     } & {
         id: number;
-        userId: number;
-        semesterId: number;
         createdAt: Date;
         updatedAt: Date;
-        competitionId: number | null;
+        userId: number;
         category: import("@prisma/client").$Enums.AchievementCategory;
         rank: import("@prisma/client").$Enums.AchievementRank;
         bonusPoint: number;
         evidence: string | null;
-        evidenceFileId: number | null;
         status: import("@prisma/client").$Enums.AchievementStatus;
         note: string | null;
+        competitionId: number | null;
+        semesterId: number;
+        evidenceFileId: number | null;
     }>;
     create(dto: CreateAchievementDto, reqUser: {
         id: number;
@@ -137,6 +139,16 @@ export declare class AchievementsService {
             email: string;
             avatarUrl: string | null;
         };
+        competition: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         semester: {
             id: number;
             createdAt: Date;
@@ -147,16 +159,6 @@ export declare class AchievementsService {
             startDate: Date;
             endDate: Date;
         };
-        competition: {
-            id: number;
-            semesterId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -168,18 +170,18 @@ export declare class AchievementsService {
         } | null;
     } & {
         id: number;
-        userId: number;
-        semesterId: number;
         createdAt: Date;
         updatedAt: Date;
-        competitionId: number | null;
+        userId: number;
         category: import("@prisma/client").$Enums.AchievementCategory;
         rank: import("@prisma/client").$Enums.AchievementRank;
         bonusPoint: number;
         evidence: string | null;
-        evidenceFileId: number | null;
         status: import("@prisma/client").$Enums.AchievementStatus;
         note: string | null;
+        competitionId: number | null;
+        semesterId: number;
+        evidenceFileId: number | null;
     }>;
     update(id: number, dto: UpdateAchievementDto, reqUser: {
         id: number;
@@ -192,6 +194,16 @@ export declare class AchievementsService {
             email: string;
             avatarUrl: string | null;
         };
+        competition: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         semester: {
             id: number;
             createdAt: Date;
@@ -202,16 +214,6 @@ export declare class AchievementsService {
             startDate: Date;
             endDate: Date;
         };
-        competition: {
-            id: number;
-            semesterId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -223,36 +225,36 @@ export declare class AchievementsService {
         } | null;
     } & {
         id: number;
-        userId: number;
-        semesterId: number;
         createdAt: Date;
         updatedAt: Date;
-        competitionId: number | null;
+        userId: number;
         category: import("@prisma/client").$Enums.AchievementCategory;
         rank: import("@prisma/client").$Enums.AchievementRank;
         bonusPoint: number;
         evidence: string | null;
-        evidenceFileId: number | null;
         status: import("@prisma/client").$Enums.AchievementStatus;
         note: string | null;
+        competitionId: number | null;
+        semesterId: number;
+        evidenceFileId: number | null;
     }>;
     delete(id: number, reqUser: {
         id: number;
         roles: string[];
     }): Promise<{
         id: number;
-        userId: number;
-        semesterId: number;
         createdAt: Date;
         updatedAt: Date;
-        competitionId: number | null;
+        userId: number;
         category: import("@prisma/client").$Enums.AchievementCategory;
         rank: import("@prisma/client").$Enums.AchievementRank;
         bonusPoint: number;
         evidence: string | null;
-        evidenceFileId: number | null;
         status: import("@prisma/client").$Enums.AchievementStatus;
         note: string | null;
+        competitionId: number | null;
+        semesterId: number;
+        evidenceFileId: number | null;
     }>;
     review(id: number, status: AchievementStatus): Promise<{
         user: {
@@ -262,6 +264,16 @@ export declare class AchievementsService {
             email: string;
             avatarUrl: string | null;
         };
+        competition: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         semester: {
             id: number;
             createdAt: Date;
@@ -272,16 +284,6 @@ export declare class AchievementsService {
             startDate: Date;
             endDate: Date;
         };
-        competition: {
-            id: number;
-            semesterId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -293,17 +295,17 @@ export declare class AchievementsService {
         } | null;
     } & {
         id: number;
-        userId: number;
-        semesterId: number;
         createdAt: Date;
         updatedAt: Date;
-        competitionId: number | null;
+        userId: number;
         category: import("@prisma/client").$Enums.AchievementCategory;
         rank: import("@prisma/client").$Enums.AchievementRank;
         bonusPoint: number;
         evidence: string | null;
-        evidenceFileId: number | null;
         status: import("@prisma/client").$Enums.AchievementStatus;
         note: string | null;
+        competitionId: number | null;
+        semesterId: number;
+        evidenceFileId: number | null;
     }>;
 }

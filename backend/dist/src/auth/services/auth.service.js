@@ -62,7 +62,6 @@ let AuthService = class AuthService {
         const user = await this.prisma.user.findFirst({
             where: {
                 studentCode: dto.studentCode,
-                deletedAt: null,
             },
             include: {
                 userRoles: {
@@ -81,11 +80,11 @@ let AuthService = class AuthService {
             },
         });
         if (!user) {
-            throw new common_1.UnauthorizedException('Mã sinh viên không tồn tại');
+            throw new common_1.UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
         }
         const isPasswordValid = await bcrypt.compare(dto.password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Mật khẩu không đúng');
+            throw new common_1.UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
         }
         const roles = user.userRoles.map((ur) => ur.role.name);
         const permissions = Array.from(new Set(user.userRoles.flatMap((ur) => ur.role.rolePermissions.map((rp) => rp.permission.name))));
@@ -115,7 +114,7 @@ let AuthService = class AuthService {
             throw new common_1.ForbiddenException('Yêu cầu bị từ chối: Phiên làm việc không hợp lệ');
         }
         const user = await this.prisma.user.findFirst({
-            where: { id: userId, deletedAt: null },
+            where: { id: userId },
             include: {
                 userRoles: {
                     include: {
@@ -146,7 +145,7 @@ let AuthService = class AuthService {
     }
     async getMe(userId) {
         const user = await this.prisma.user.findFirst({
-            where: { id: userId, deletedAt: null },
+            where: { id: userId },
             include: {
                 userRoles: {
                     include: {
@@ -180,7 +179,7 @@ let AuthService = class AuthService {
     }
     async changePassword(userId, dto) {
         const user = await this.prisma.user.findFirst({
-            where: { id: userId, deletedAt: null },
+            where: { id: userId },
         });
         if (!user) {
             throw new common_1.UnauthorizedException('Người dùng không hợp lệ');

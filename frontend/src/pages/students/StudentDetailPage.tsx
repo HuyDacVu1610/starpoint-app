@@ -205,7 +205,7 @@ export const StudentDetailPage = () => {
       render: (file: any) =>
         file ? (
           <a
-            href={`http://localhost:3000${file.storedPath}`}
+            href={`/uploads/${file.storedPath}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-indigo-600 hover:text-indigo-800 font-semibold"

@@ -8,20 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompetitionsService = void 0;
 const common_1 = require("@nestjs/common");
+const cache_manager_1 = require("@nestjs/cache-manager");
 const competitions_repository_1 = require("../repositories/competitions.repository");
 const semesters_service_1 = require("../../semesters/services/semesters.service");
 let CompetitionsService = class CompetitionsService {
     competitionsRepository;
     semestersService;
-    constructor(competitionsRepository, semestersService) {
+    cacheManager;
+    constructor(competitionsRepository, semestersService, cacheManager) {
         this.competitionsRepository = competitionsRepository;
         this.semestersService = semestersService;
+        this.cacheManager = cacheManager;
     }
     async findAll(query) {
-        return this.competitionsRepository.findAll(query);
+        const cacheKey = `competitions:all:${JSON.stringify(query)}`;
+        const cached = await this.cacheManager.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        const result = await this.competitionsRepository.findAll(query);
+        await this.cacheManager.set(cacheKey, result, 600 * 1000);
+        return result;
     }
     async findById(id) {
         const competition = await this.competitionsRepository.findById(id);
@@ -32,24 +45,31 @@ let CompetitionsService = class CompetitionsService {
     }
     async create(dto) {
         await this.semestersService.findById(dto.semesterId);
-        return this.competitionsRepository.create(dto);
+        const result = await this.competitionsRepository.create(dto);
+        await this.cacheManager.clear();
+        return result;
     }
     async update(id, dto) {
         await this.findById(id);
         if (dto.semesterId !== undefined) {
             await this.semestersService.findById(dto.semesterId);
         }
-        return this.competitionsRepository.update(id, dto);
+        const result = await this.competitionsRepository.update(id, dto);
+        await this.cacheManager.clear();
+        return result;
     }
     async delete(id) {
         await this.findById(id);
-        return this.competitionsRepository.delete(id);
+        const result = await this.competitionsRepository.delete(id);
+        await this.cacheManager.clear();
+        return result;
     }
 };
 exports.CompetitionsService = CompetitionsService;
 exports.CompetitionsService = CompetitionsService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [competitions_repository_1.CompetitionsRepository,
-        semesters_service_1.SemestersService])
+        semesters_service_1.SemestersService, Object])
 ], CompetitionsService);
 //# sourceMappingURL=competitions.service.js.map

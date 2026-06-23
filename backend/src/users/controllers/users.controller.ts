@@ -19,6 +19,7 @@ import { QueryUserDto } from '../dto/query-user.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
+import { LogAction } from '../../shared/common/decorators/log-action.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -39,12 +40,14 @@ export class UsersController {
 
   @Post()
   @RequirePermissions('CREATE_USER')
+  @LogAction('CREATE', 'USER')
   async create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
 
   @Patch(':id')
   @RequirePermissions('UPDATE_USER')
+  @LogAction('UPDATE', 'USER')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
@@ -55,7 +58,9 @@ export class UsersController {
   @Delete(':id')
   @RequirePermissions('DELETE_USER')
   @HttpCode(HttpStatus.OK)
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.softDelete(id);
+  @LogAction('DELETE', 'USER')
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.delete(id);
   }
 }
+

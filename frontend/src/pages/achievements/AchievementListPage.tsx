@@ -103,7 +103,7 @@ export const AchievementListPage = () => {
 
   const getEvidenceUrl = (record: Achievement) => {
     if (record.evidenceFile?.storedPath) {
-      const base = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
+      const base = (import.meta.env.VITE_API_URL || '').replace('/api/v1', '');
       return `${base}/uploads/${record.evidenceFile.storedPath}`;
     }
     return record.evidence || '';

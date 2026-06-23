@@ -56,7 +56,6 @@ let UsersService = class UsersService {
         const formattedUsers = data.map((user) => {
             const userWithoutPassword = { ...user };
             delete userWithoutPassword.password;
-            delete userWithoutPassword.userRoles;
             return {
                 ...userWithoutPassword,
                 roles: user.userRoles.map((ur) => ur.role.name),
@@ -78,7 +77,6 @@ let UsersService = class UsersService {
         }
         const userWithoutPassword = { ...user };
         delete userWithoutPassword.password;
-        delete userWithoutPassword.userRoles;
         return {
             ...userWithoutPassword,
             roles: user.userRoles.map((ur) => ur.role.name),
@@ -103,7 +101,6 @@ let UsersService = class UsersService {
         }, dto.roleIds);
         const userWithoutPassword = { ...user };
         delete userWithoutPassword.password;
-        delete userWithoutPassword.userRoles;
         return {
             ...userWithoutPassword,
             roles: user.userRoles.map((ur) => ur.role.name),
@@ -136,15 +133,14 @@ let UsersService = class UsersService {
         const updatedUser = await this.usersRepository.update(id, updateData, dto.roleIds);
         const userWithoutPassword = { ...updatedUser };
         delete userWithoutPassword.password;
-        delete userWithoutPassword.userRoles;
         return {
             ...userWithoutPassword,
             roles: updatedUser.userRoles.map((ur) => ur.role.name),
         };
     }
-    async softDelete(id) {
+    async delete(id) {
         await this.findById(id);
-        await this.usersRepository.softDelete(id);
+        await this.usersRepository.delete(id);
         return {
             success: true,
             message: 'Xoá người dùng thành công',
