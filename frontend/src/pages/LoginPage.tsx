@@ -1,13 +1,23 @@
-import { Form, Input, Button, Card, App } from 'antd';
-import { UserOutlined, LockOutlined, TrophyOutlined } from '@ant-design/icons';
+import { Form, Input, Button, App } from 'antd';
+import {
+  UserOutlined,
+  LockOutlined,
+  TrophyOutlined,
+  SunOutlined,
+  MoonOutlined,
+  ArrowRightOutlined
+} from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { AxiosError } from 'axios';
 import { useAuth } from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { setCredentials } from '../features/auth/authSlice';
 import { ROUTES } from '../routes/routeConfig';
+import { toggleTheme } from '../features/theme/themeSlice';
+import type { RootState } from '../store/store';
 import { useState, useEffect } from 'react';
+import { AuthVisualPanel } from '../components/AuthVisualPanel';
 
 interface LoginValues {
   studentCode: string;
@@ -20,6 +30,13 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useAuth();
+
+  const mode = useSelector((state: RootState) => state.theme.mode);
+  const isDark = mode === 'dark';
+
+  const handleToggleTheme = () => {
+    dispatch(toggleTheme());
+  };
 
   // If already logged in, redirect immediately
   useEffect(() => {
@@ -43,7 +60,7 @@ export const LoginPage = () => {
 
       if (response.success) {
         message.success('Đăng nhập thành công!');
-        
+
         // dispatch action
         dispatch(setCredentials({
           user: response.data.user,
@@ -71,29 +88,105 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center items-center p-4 relative overflow-hidden select-none">
-      {/* Decorative blurred backgrounds */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
+    <div className="min-h-screen w-full flex flex-col md:flex-row select-none overflow-hidden bg-[#f8fafc] dark:bg-[#0a0915] transition-colors duration-300">
 
-      <div className="w-full max-w-md space-y-6 z-10 animate-fade-in">
-        <div className="text-center space-y-2">
-          <div className="inline-flex justify-center items-center w-14 h-14 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 mb-2">
-            <TrophyOutlined style={{ fontSize: '26px' }} />
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white select-none">
-            StarPoint<span className="text-indigo-400">App</span>
-          </h1>
-          <p className="text-slate-400 text-xs select-none">
-            Hệ thống Quản lý Điểm thưởng & Xét Học bổng Khuyến khích Học tập
-          </p>
+      <style>{`
+        .ant-form-item-label > label {
+          font-size: 10px !important;
+          font-weight: 800 !important;
+          color: #94a3b8 !important;
+          letter-spacing: 0.05em !important;
+        }
+        .dark .ant-form-item-label > label {
+          color: #64748b !important;
+        }
+        .login-input-custom {
+          background-color: #f1f5f9 !important;
+          border: 1px solid #e2e8f0 !important;
+          border-radius: 12px !important;
+          color: #0f172a !important;
+          height: 48px !important;
+          font-weight: 500 !important;
+          transition: all 0.3s ease !important;
+        }
+        .login-input-custom:hover, .login-input-custom:focus {
+          border-color: #6366f1 !important;
+          background-color: #f8fafc !important;
+        }
+        .dark .login-input-custom {
+          background-color: #191829 !important;
+          border: 1px solid #292742 !important;
+          color: #ffffff !important;
+        }
+        .dark .login-input-custom:hover, .dark .login-input-custom:focus {
+          border-color: #8b5cf6 !important;
+          background-color: #1e1d32 !important;
+        }
+        .login-input-custom input {
+          background: transparent !important;
+          color: inherit !important;
+        }
+        .login-input-custom input::placeholder {
+          color: #94a3b8 !important;
+        }
+        .dark .login-input-custom input::placeholder {
+          color: #4b5563 !important;
+        }
+        .login-submit-btn {
+          background: linear-gradient(135deg, #6366f1 0%, #3b82f6 50%, #06b6d4 100%) !important;
+          border: none !important;
+          border-radius: 9999px !important;
+          height: 48px !important;
+          font-weight: 700 !important;
+          font-size: 15px !important;
+          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+          transition: all 0.3s ease !important;
+          color: #ffffff !important;
+        }
+        .login-submit-btn:hover {
+          opacity: 0.95 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45) !important;
+        }
+      `}</style>
+
+      {/* LEFT COLUMN: Visual Panel */}
+      <AuthVisualPanel
+        title={<>Chinh phục <span className="text-yellow-300 bg-gradient-to-r from-yellow-300 via-amber-300 to-orange-400 bg-clip-text text-transparent">đỉnh cao</span> học thuật</>}
+        subtitle="Ghi nhận thành tích thi đấu, tích lũy điểm thưởng và mở ra cơ hội học bổng xứng đáng với nỗ lực của bạn."
+      />
+
+      {/* RIGHT COLUMN: Login Form and Controls */}
+      <div className="w-full md:w-[35%] min-h-screen flex flex-col justify-between p-8 sm:p-12 relative bg-[#f8fafc] dark:bg-[#0a0915] transition-colors duration-300">
+
+        {/* Toggle Theme Switch at Top-Right */}
+        <div className="absolute top-6 right-6 z-20">
+          <Button
+            shape="circle"
+            icon={isDark ? <SunOutlined className="text-yellow-400 text-base" /> : <MoonOutlined className="text-slate-700 text-base" />}
+            onClick={handleToggleTheme}
+            className="border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm hover:scale-105 transition-transform"
+          />
         </div>
 
-        <Card className="bg-slate-800/40 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl p-4 sm:p-6">
-          <h2 className="text-xl font-bold text-slate-100 mb-6 text-center select-none">
-            Đăng Nhập Tài Khoản
-          </h2>
+        {/* Center Content Form */}
+        <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto space-y-8 py-12 z-10">
 
+          {/* Logo Header */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#2563eb] flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20">
+              <TrophyOutlined />
+            </div>
+            <span className="text-xl font-black text-slate-900 dark:text-white">StarPointApp</span>
+          </div>
+
+          {/* Heading greeting */}
+          <div className="space-y-1">
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Chào mừng trở lại</h2>
+            <p className="text-slate-400 dark:text-slate-500 text-xs font-bold">Đăng nhập để quản lý điểm thưởng của bạn</p>
+          </div>
+
+          {/* Login Form */}
           <Form
             name="login_form"
             initialValues={{ remember: true }}
@@ -103,49 +196,66 @@ export const LoginPage = () => {
           >
             <Form.Item
               name="studentCode"
-              rules={[{ required: true, message: 'Vui lòng nhập mã số sinh viên/mã người dùng!' }]}
+              label="TÊN ĐĂNG NHẬP"
+              rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
             >
-              <Input 
-                prefix={<UserOutlined className="text-slate-400" />} 
-                placeholder="Nhập mã số sinh viên (MSSV)" 
-                className="bg-slate-900/50 border-slate-700 text-slate-200 placeholder:text-slate-500 hover:border-indigo-500 focus:border-indigo-500"
+              <Input
+                prefix={<UserOutlined className="text-slate-400 dark:text-slate-600 mr-1.5" />}
+                placeholder="VD: N23DCCN094"
+                className="login-input-custom"
               />
             </Form.Item>
 
             <Form.Item
               name="password"
+              label="MẬT KHẨU"
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu!' },
                 { min: 6, message: 'Mật khẩu phải dài tối thiểu 6 ký tự!' }
               ]}
             >
               <Input.Password
-                prefix={<LockOutlined className="text-slate-400" />}
-                placeholder="Mật khẩu"
-                className="bg-slate-900/50 border-slate-700 text-slate-200 placeholder:text-slate-500 hover:border-indigo-500 focus:border-indigo-500"
+                prefix={<LockOutlined className="text-slate-400 dark:text-slate-600 mr-1.5" />}
+                placeholder="••••••••"
+                className="login-input-custom"
               />
             </Form.Item>
 
-            <div className="flex justify-end items-center mb-6">
-              <Link to={ROUTES.FORGOT_PASSWORD} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+            {/* Forgot password link */}
+            <div className="flex justify-end mb-6">
+              <Link to={ROUTES.FORGOT_PASSWORD} className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-bold transition-colors">
                 Quên mật khẩu?
               </Link>
             </div>
 
+            {/* Submit button */}
             <Form.Item className="mb-0">
-              <Button 
-                type="primary" 
-                htmlType="submit" 
+              <Button
+                type="primary"
+                htmlType="submit"
                 loading={loading}
-                className="w-full bg-indigo-600 border-indigo-600 hover:bg-indigo-500 hover:border-indigo-500 font-bold h-11"
+                className="login-submit-btn w-full"
               >
-                Đăng nhập
+                <span className="flex items-center justify-center gap-2">
+                  Đăng nhập <ArrowRightOutlined />
+                </span>
               </Button>
             </Form.Item>
           </Form>
-        </Card>
+        </div>
+
+        {/* Footer text */}
+        <div className="text-center space-y-1.5 z-10">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold select-none">
+            Hệ thống dành cho sinh viên & cán bộ
+          </p>
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 select-none font-medium">
+            <strong className="text-slate-600 dark:text-slate-300 font-extrabold">Trường Đại học</strong> — Phòng Công tác Sinh viên
+          </p>
+        </div>
       </div>
     </div>
   );
 };
+
 export default LoginPage;
