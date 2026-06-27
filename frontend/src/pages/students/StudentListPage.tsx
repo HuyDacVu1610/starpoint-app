@@ -224,7 +224,7 @@ export const StudentListPage = () => {
       key: 'gpa',
       width: 100,
       render: (_: any, record: User) => {
-        const scores = (record as any).studentSemesterScores;
+        const scores = (record as any).semesterScores;
         if (scores && scores.length > 0) {
           return <span className="font-semibold text-slate-700">{scores[0].gpa?.toFixed(2)}</span>;
         }
@@ -237,7 +237,7 @@ export const StudentListPage = () => {
       key: 'conductScore',
       width: 100,
       render: (_: any, record: User) => {
-        const scores = (record as any).studentSemesterScores;
+        const scores = (record as any).semesterScores;
         if (scores && scores.length > 0) {
           return <span className="font-semibold text-slate-700">{scores[0].conductScore}</span>;
         }
@@ -250,9 +250,9 @@ export const StudentListPage = () => {
       key: 'bonusPoints',
       width: 120,
       render: (_: any, record: User) => {
-        const scores = (record as any).studentSemesterScores;
+        const scores = (record as any).semesterScores;
         if (scores && scores.length > 0) {
-          return <span className="font-semibold text-emerald-600">+{scores[0].bonusPoint?.toFixed(2)}</span>;
+          return <span className="font-semibold text-emerald-600">+{scores[0].maxBonusPoint?.toFixed(2)}</span>;
         }
         const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
         return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa nhập</span> : <span className="text-slate-300">-</span>;
@@ -265,7 +265,7 @@ export const StudentListPage = () => {
       render: (_: any, record: User) => {
         const candidates = (record as any).scholarshipCandidates;
         if (candidates && candidates.length > 0) {
-          const activeTier = candidates[0].tier;
+          const activeTier = candidates[0].scholarshipTier;
           const isEligible = candidates[0].isEligible;
           if (!isEligible) return <Tag color="default">Không đạt</Tag>;
           

@@ -254,7 +254,7 @@ describe('AuthController (e2e)', () => {
         .expect(HttpStatus.BAD_REQUEST);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Mã số sinh viên và email không khớp');
+      expect(response.body.message).toBe('Mã số sinh viên hoặc email không tồn tại trên hệ thống');
     });
 
     it('should send email reset code, verify code, and reset password successfully', async () => {

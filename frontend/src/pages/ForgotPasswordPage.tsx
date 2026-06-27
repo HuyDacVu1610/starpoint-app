@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, Steps, message } from 'antd';
+import { Form, Input, Button, Steps, App } from 'antd';
 import {
   UserOutlined,
   MailOutlined,
@@ -33,6 +33,7 @@ interface Step3Values {
 }
 
 export const ForgotPasswordPage = () => {
+  const { message } = App.useApp();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -81,23 +82,28 @@ export const ForgotPasswordPage = () => {
   const onFinishStep1 = async (values: Step1Values) => {
     setLoading(true);
     try {
+      const trimmedStudentCode = values.studentCode.trim().toUpperCase();
+      const trimmedEmail = values.email.trim();
       const res = await authService.forgotPassword({
-        studentCode: values.studentCode,
-        email: values.email,
+        studentCode: trimmedStudentCode,
+        email: trimmedEmail,
       });
 
       if (res.success) {
         message.success('Mã xác nhận đã được gửi!');
-        setStudentCode(values.studentCode);
-        setEmail(values.email);
+        setStudentCode(trimmedStudentCode);
+        setEmail(trimmedEmail);
         setCurrentStep(1);
         setCooldown(60);
       } else {
         message.error(res.message || 'Yêu cầu thất bại.');
       }
     } catch (err) {
-      const axiosError = err as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || 'Có lỗi xảy ra.';
+      const axiosError = err as AxiosError<{ message?: string; errors?: string[] }>;
+      const errors = axiosError.response?.data?.errors;
+      const errorMsg = (errors && errors.length > 0)
+        ? errors[0]
+        : (axiosError.response?.data?.message || 'Có lỗi xảy ra.');
       message.error(errorMsg);
     } finally {
       setLoading(false);
@@ -108,21 +114,25 @@ export const ForgotPasswordPage = () => {
   const onFinishStep2 = async (values: Step2Values) => {
     setLoading(true);
     try {
+      const trimmedCode = values.code.trim();
       const res = await authService.verifyResetCode({
-        studentCode,
-        code: values.code,
+        studentCode: studentCode.trim().toUpperCase(),
+        code: trimmedCode,
       });
 
       if (res.success) {
         message.success('Xác nhận thành công!');
-        setCode(values.code);
+        setCode(trimmedCode);
         setCurrentStep(2);
       } else {
         message.error(res.message || 'Mã xác nhận không đúng.');
       }
     } catch (err) {
-      const axiosError = err as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || 'Có lỗi xảy ra.';
+      const axiosError = err as AxiosError<{ message?: string; errors?: string[] }>;
+      const errors = axiosError.response?.data?.errors;
+      const errorMsg = (errors && errors.length > 0)
+        ? errors[0]
+        : (axiosError.response?.data?.message || 'Có lỗi xảy ra.');
       message.error(errorMsg);
     } finally {
       setLoading(false);
@@ -134,8 +144,8 @@ export const ForgotPasswordPage = () => {
     setLoading(true);
     try {
       const res = await authService.resetPassword({
-        studentCode,
-        code,
+        studentCode: studentCode.trim().toUpperCase(),
+        code: code.trim(),
         newPassword: values.newPassword,
       });
 
@@ -146,8 +156,11 @@ export const ForgotPasswordPage = () => {
         message.error(res.message || 'Đặt lại mật khẩu thất bại.');
       }
     } catch (err) {
-      const axiosError = err as AxiosError<{ message?: string }>;
-      const errorMsg = axiosError.response?.data?.message || 'Có lỗi xảy ra.';
+      const axiosError = err as AxiosError<{ message?: string; errors?: string[] }>;
+      const errors = axiosError.response?.data?.errors;
+      const errorMsg = (errors && errors.length > 0)
+        ? errors[0]
+        : (axiosError.response?.data?.message || 'Có lỗi xảy ra.');
       message.error(errorMsg);
     } finally {
       setLoading(false);

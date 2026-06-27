@@ -25,19 +25,21 @@ export class PasswordResetService {
     });
 
     if (!user) {
-      throw new NotFoundException(
-        'Mã số sinh viên không tồn tại trên hệ thống',
+      throw new BadRequestException(
+        'Mã số sinh viên hoặc email không tồn tại trên hệ thống',
       );
     }
 
     if (user.email.toLowerCase() !== dto.email.toLowerCase()) {
-      throw new BadRequestException('Mã số sinh viên và email không khớp');
+      throw new BadRequestException(
+        'Mã số sinh viên hoặc email không tồn tại trên hệ thống',
+      );
     }
 
     // Generate random 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minutes expiry
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15); // 15 minutes expiry
 
     // Delete previous codes for this user to avoid duplication/spam
     await this.prisma.passwordResetCode.deleteMany({

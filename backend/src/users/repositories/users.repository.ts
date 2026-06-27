@@ -43,6 +43,26 @@ export class UsersRepository {
               role: true,
             },
           },
+          semesterScores: {
+            include: {
+              semester: true,
+            },
+            orderBy: {
+              semester: {
+                id: 'desc',
+              },
+            },
+          },
+          scholarshipCandidates: {
+            include: {
+              semester: true,
+            },
+            orderBy: {
+              semester: {
+                id: 'desc',
+              },
+            },
+          },
         },
       }),
     ]);

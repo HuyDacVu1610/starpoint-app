@@ -13,6 +13,7 @@ import GradeTag from '../../components/GradeTag';
 import BonusPointBadge from '../../components/BonusPointBadge';
 import { competitionsService } from '../../services/competitions.service';
 import type { Competition } from '../../services/competitions.service';
+import { usersService } from '../../services/users.service';
 
 const { Option } = Select;
 
@@ -388,9 +389,32 @@ export const BonusPointListPage = () => {
             <Form.Item
               name="studentCode"
               label="Mã Sinh Viên / MSSV"
+              validateTrigger="onBlur"
+              hasFeedback
               rules={[
                 { required: true, message: 'Vui lòng nhập mã sinh viên' },
                 { pattern: /^[A-Z0-9_-]+$/i, message: 'Mã sinh viên chỉ được chứa chữ cái, số, gạch ngang' },
+                {
+                  validator: async (_, value) => {
+                    if (!value) return Promise.resolve();
+                    const trimmed = value.trim();
+                    try {
+                      const res = await usersService.list({ search: trimmed, limit: 10 });
+                      if (res.success && res.data) {
+                        const items = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
+                        const exists = items.some(
+                          (item: any) => item.studentCode.toLowerCase() === trimmed.toLowerCase()
+                        );
+                        if (exists) {
+                          return Promise.resolve();
+                        }
+                      }
+                      return Promise.reject(new Error('Mã sinh viên không tồn tại trên hệ thống'));
+                    } catch (err) {
+                      return Promise.resolve();
+                    }
+                  }
+                }
               ]}
             >
               <Input placeholder="Ví dụ: SV001..." />

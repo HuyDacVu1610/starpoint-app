@@ -130,7 +130,11 @@ export const AchievementListPage = () => {
       title: 'Hoạt Động / Cuộc Thi',
       key: 'competitionName',
       render: (_: any, record: Achievement) => {
-        return record.competition ? record.competition.name : 'Hoạt động tự do / Tự lập';
+        if (record.competition) return record.competition.name;
+        if (record.note && record.note.startsWith('Được tạo tự động')) {
+          return <span className="italic text-slate-500 font-medium">Nhập trực tiếp bởi Giáo vụ</span>;
+        }
+        return record.note || 'Hoạt động tự do / Tự lập';
       },
     },
     {
@@ -150,6 +154,12 @@ export const AchievementListPage = () => {
       key: 'evidence',
       width: 120,
       render: (_: any, record: Achievement) => {
+        if (record.note === 'Được tạo tự động khi cập nhật điểm thủ công') {
+          return <Tag color="blue" className="rounded-md font-semibold text-[10px]">Giáo vụ nhập</Tag>;
+        }
+        if (record.note === 'Được tạo tự động khi import từ file Excel') {
+          return <Tag color="cyan" className="rounded-md font-semibold text-[10px]">Từ Excel</Tag>;
+        }
         const url = getEvidenceUrl(record);
         if (!url) return <span className="text-slate-400">Không có</span>;
         return (

@@ -232,8 +232,8 @@ export const StudentDetailPage = () => {
     },
     {
       title: 'Điểm Cộng Thưởng',
-      dataIndex: 'bonusPoint',
-      key: 'bonusPoint',
+      dataIndex: 'maxBonusPoint',
+      key: 'maxBonusPoint',
       render: (val: number) => <BonusPointBadge points={val} />,
     },
     {

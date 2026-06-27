@@ -17,7 +17,7 @@ export class MailService {
           <div style="background-color: #f1f5f9; padding: 16px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #1e293b; border-radius: 6px; margin: 24px 0;">
             ${code}
           </div>
-          <p>Mã này có hiệu lực trong vòng <strong>10 phút</strong>. Nếu bạn không yêu cầu thay đổi này, bạn có thể an tâm bỏ qua email này.</p>
+          <p>Mã này có hiệu lực trong vòng <strong>15 phút</strong>. Nếu bạn không yêu cầu thay đổi này, bạn có thể an tâm bỏ qua email này.</p>
           <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
           <p style="font-size: 12px; color: #64748b; text-align: center;">Đây là thư tự động từ hệ thống StarPoint. Vui lòng không phản hồi lại thư này.</p>
         </div>
