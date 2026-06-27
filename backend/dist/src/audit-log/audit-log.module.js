@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const audit_log_service_1 = require("./services/audit-log.service");
 const audit_log_controller_1 = require("./controllers/audit-log.controller");
 const audit_log_message_controller_1 = require("./controllers/audit-log-message.controller");
-const audit_log_repository_1 = require("./repositories/audit-log.repository");
 const prisma_module_1 = require("../prisma/prisma.module");
 let AuditLogModule = class AuditLogModule {
 };
@@ -20,7 +19,7 @@ exports.AuditLogModule = AuditLogModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule],
         controllers: [audit_log_controller_1.AuditLogController, audit_log_message_controller_1.AuditLogMessageController],
-        providers: [audit_log_service_1.AuditLogService, audit_log_repository_1.AuditLogRepository],
+        providers: [audit_log_service_1.AuditLogService],
         exports: [audit_log_service_1.AuditLogService],
     })
 ], AuditLogModule);

@@ -11,27 +11,91 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuditLogService = void 0;
 const common_1 = require("@nestjs/common");
-const audit_log_repository_1 = require("../repositories/audit-log.repository");
+const prisma_service_1 = require("../../prisma/prisma.service");
 let AuditLogService = class AuditLogService {
-    auditLogRepository;
-    constructor(auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
     async log(data) {
         try {
-            return await this.auditLogRepository.create(data);
+            return await this.prisma.auditLog.create({
+                data: {
+                    userId: data.userId || null,
+                    action: data.action,
+                    module: data.module,
+                    detail: data.detail || null,
+                },
+            });
         }
         catch (err) {
             console.error('Failed to create audit log:', err);
         }
     }
     async findAll(query) {
-        return this.auditLogRepository.findAll(query);
+        const page = Number(query.page) || 1;
+        const limit = Number(query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const where = {};
+        if (query.action) {
+            where.action = query.action;
+        }
+        if (query.module) {
+            where.module = query.module;
+        }
+        if (query.search) {
+            where.OR = [
+                { module: { contains: query.search } },
+                { action: { contains: query.search } },
+                { detail: { contains: query.search } },
+                {
+                    user: {
+                        fullName: { contains: query.search },
+                    },
+                },
+            ];
+        }
+        if (query.startDate || query.endDate) {
+            where.timestamp = {};
+            if (query.startDate) {
+                where.timestamp.gte = new Date(query.startDate);
+            }
+            if (query.endDate) {
+                where.timestamp.lte = new Date(query.endDate);
+            }
+        }
+        const [items, total] = await Promise.all([
+            this.prisma.auditLog.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { timestamp: 'desc' },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            studentCode: true,
+                            fullName: true,
+                        },
+                    },
+                },
+            }),
+            this.prisma.auditLog.count({ where }),
+        ]);
+        return {
+            items,
+            meta: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
     }
 };
 exports.AuditLogService = AuditLogService;
 exports.AuditLogService = AuditLogService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [audit_log_repository_1.AuditLogRepository])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], AuditLogService);
 //# sourceMappingURL=audit-log.service.js.map

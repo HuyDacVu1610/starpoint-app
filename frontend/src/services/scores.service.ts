@@ -18,6 +18,7 @@ export interface Score {
   gpa: number;
   conductScore: number;
   bonusPoint: number;
+  maxBonusPoint?: number;
   extendedGpa: number;
   createdAt?: string;
   updatedAt?: string;
@@ -49,7 +50,7 @@ export const scoresService = {
   updateManualScore: async (
     semesterId: number,
     studentCode: string,
-    data: { gpa?: number; conductScore?: number }
+    data: { gpa?: number; conductScore?: number; competitionId?: number | null; rank?: string | null; category?: string | null }
   ) => {
     const res = await api.patch(`/semesters/${semesterId}/students/${studentCode}`, data);
     return res.data;

@@ -22,6 +22,10 @@ export declare class ScholarshipsService {
                 email: string;
                 fullName: string;
                 avatarUrl: string | null;
+                semesterScores: {
+                    gpa: number;
+                    conductScore: number;
+                }[];
             };
             semester: {
                 id: number;

@@ -24,6 +24,10 @@ export declare class ScholarshipsController {
                 email: string;
                 fullName: string;
                 avatarUrl: string | null;
+                semesterScores: {
+                    gpa: number;
+                    conductScore: number;
+                }[];
             };
             semester: {
                 id: number;
@@ -58,6 +62,10 @@ export declare class ScholarshipsController {
                 email: string;
                 fullName: string;
                 avatarUrl: string | null;
+                semesterScores: {
+                    gpa: number;
+                    conductScore: number;
+                }[];
             };
             semester: {
                 id: number;

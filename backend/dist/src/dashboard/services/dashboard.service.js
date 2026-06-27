@@ -39,7 +39,6 @@ let DashboardService = class DashboardService {
                             },
                         },
                     },
-                    deletedAt: null,
                 },
             }),
             this.prisma.competition.count({

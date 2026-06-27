@@ -11,24 +11,24 @@ export declare class UsersService {
             userRoles?: ({
                 role: {
                     id: number;
-                    createdAt: Date;
-                    updatedAt: Date;
                     name: string;
                     description: string | null;
+                    createdAt: Date;
+                    updatedAt: Date;
                 };
             } & {
-                userId: number;
                 roleId: number;
+                userId: number;
             })[] | undefined;
             id?: number | undefined;
+            createdAt?: Date | undefined;
+            updatedAt?: Date | undefined;
             studentCode?: string | undefined;
-            fullName?: string | undefined;
             email?: string | undefined;
+            fullName?: string | undefined;
             phone?: string | null | undefined;
             password?: string | undefined;
             avatarUrl?: string | null | undefined;
-            createdAt?: Date | undefined;
-            updatedAt?: Date | undefined;
             deletedAt?: Date | null | undefined;
         }[];
         meta: {
@@ -42,24 +42,24 @@ export declare class UsersService {
         userRoles?: ({
             role: {
                 id: number;
-                createdAt: Date;
-                updatedAt: Date;
                 name: string;
                 description: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
-            userId: number;
             roleId: number;
+            userId: number;
         })[] | undefined;
         id?: number | undefined;
+        createdAt?: Date | undefined;
+        updatedAt?: Date | undefined;
         studentCode?: string | undefined;
-        fullName?: string | undefined;
         email?: string | undefined;
+        fullName?: string | undefined;
         phone?: string | null | undefined;
         password?: string | undefined;
         avatarUrl?: string | null | undefined;
-        createdAt?: Date | undefined;
-        updatedAt?: Date | undefined;
         deletedAt?: Date | null | undefined;
     }>;
     create(dto: CreateUserDto): Promise<{
@@ -67,24 +67,24 @@ export declare class UsersService {
         userRoles?: ({
             role: {
                 id: number;
-                createdAt: Date;
-                updatedAt: Date;
                 name: string;
                 description: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
-            userId: number;
             roleId: number;
+            userId: number;
         })[] | undefined;
         id?: number | undefined;
+        createdAt?: Date | undefined;
+        updatedAt?: Date | undefined;
         studentCode?: string | undefined;
-        fullName?: string | undefined;
         email?: string | undefined;
+        fullName?: string | undefined;
         phone?: string | null | undefined;
         password?: string | undefined;
         avatarUrl?: string | null | undefined;
-        createdAt?: Date | undefined;
-        updatedAt?: Date | undefined;
         deletedAt?: Date | null | undefined;
     }>;
     update(id: number, dto: UpdateUserDto): Promise<{
@@ -92,24 +92,24 @@ export declare class UsersService {
         userRoles?: ({
             role: {
                 id: number;
-                createdAt: Date;
-                updatedAt: Date;
                 name: string;
                 description: string | null;
+                createdAt: Date;
+                updatedAt: Date;
             };
         } & {
-            userId: number;
             roleId: number;
+            userId: number;
         })[] | undefined;
         id?: number | undefined;
+        createdAt?: Date | undefined;
+        updatedAt?: Date | undefined;
         studentCode?: string | undefined;
-        fullName?: string | undefined;
         email?: string | undefined;
+        fullName?: string | undefined;
         phone?: string | null | undefined;
         password?: string | undefined;
         avatarUrl?: string | null | undefined;
-        createdAt?: Date | undefined;
-        updatedAt?: Date | undefined;
         deletedAt?: Date | null | undefined;
     }>;
     delete(id: number): Promise<{

@@ -10,7 +10,6 @@ exports.RolesModule = void 0;
 const common_1 = require("@nestjs/common");
 const roles_controller_1 = require("./controllers/roles.controller");
 const roles_service_1 = require("./services/roles.service");
-const roles_repository_1 = require("./repositories/roles.repository");
 const prisma_module_1 = require("../prisma/prisma.module");
 let RolesModule = class RolesModule {
 };
@@ -19,8 +18,8 @@ exports.RolesModule = RolesModule = __decorate([
     (0, common_1.Module)({
         imports: [prisma_module_1.PrismaModule],
         controllers: [roles_controller_1.RolesController],
-        providers: [roles_service_1.RolesService, roles_repository_1.RolesRepository],
-        exports: [roles_service_1.RolesService, roles_repository_1.RolesRepository],
+        providers: [roles_service_1.RolesService],
+        exports: [roles_service_1.RolesService],
     })
 ], RolesModule);
 //# sourceMappingURL=roles.module.js.map

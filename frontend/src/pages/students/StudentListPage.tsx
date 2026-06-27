@@ -108,7 +108,7 @@ export const StudentListPage = () => {
       fullName: record.fullName,
       email: record.email,
       phone: record.phone,
-      roleIds: record.userRoles?.map((ur) => ur.roleId) || [],
+      roleId: record.userRoles?.[0]?.roleId || undefined,
       password: '', // Kept empty for edit
     });
     setIsModalOpen(true);
@@ -137,7 +137,7 @@ export const StudentListPage = () => {
         fullName: values.fullName,
         email: values.email,
         phone: values.phone || null,
-        roleIds: values.roleIds,
+        roleIds: [values.roleId],
       };
 
       if (values.password) {
@@ -430,11 +430,11 @@ export const StudentListPage = () => {
           </Form.Item>
 
           <Form.Item
-            name="roleIds"
+            name="roleId"
             label="Vai Trò Phân Quyền"
-            rules={[{ required: true, message: 'Vui lòng chọn ít nhất một vai trò' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
           >
-            <Select mode="multiple" placeholder="Chọn vai trò...">
+            <Select placeholder="Chọn vai trò...">
               {roles.map((role) => (
                 <Option key={role.id} value={role.id}>
                   {ROLE_LABEL_MAP[role.name] || role.name}

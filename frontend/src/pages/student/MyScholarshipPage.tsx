@@ -43,7 +43,7 @@ export const MyScholarshipPage = () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const semesterList = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         if (semesterList.length > 0) {
           setSelectedSemester(semesterList[0].id);
@@ -119,60 +119,65 @@ export const MyScholarshipPage = () => {
         </div>
       ) : candidate ? (
         <div className="max-w-2xl mx-auto space-y-6">
-          {candidate.isEligible && candidate.scholarshipTier !== 'NONE' && tierInfo ? (
-            // Premium Gradient Certificate Card
-            <Card className="border border-slate-100 rounded-2xl shadow-xl overflow-hidden bg-white p-0 relative">
-              {/* Decorative Gradient Top border */}
-              <div className={`h-3 bg-gradient-to-r ${tierInfo.gradient}`} />
-              
-              <div className="p-8 text-center space-y-6">
-                <div className={`mx-auto w-20 h-20 rounded-full bg-gradient-to-tr ${tierInfo.gradient} flex items-center justify-center text-white text-4xl shadow-md`}>
-                  <TrophyOutlined />
-                </div>
+          {candidate.isEligible && candidate.scholarshipTier !== 'NONE' && tierInfo ? (() => {
+            const scoreObj = (candidate as any).user?.semesterScores?.[0];
+            const rawGpa = scoreObj?.gpa ?? 0;
+            const rawConduct = scoreObj?.conductScore ?? 0;
+            return (
+              // Premium Gradient Certificate Card
+              <Card className="border border-slate-100 rounded-2xl shadow-xl overflow-hidden bg-white p-0 relative">
+                {/* Decorative Gradient Top border */}
+                <div className={`h-3 bg-gradient-to-r ${tierInfo.gradient}`} />
+                
+                <div className="p-8 text-center space-y-6">
+                  <div className={`mx-auto w-20 h-20 rounded-full bg-gradient-to-tr ${tierInfo.gradient} flex items-center justify-center text-white text-4xl shadow-md`}>
+                    <TrophyOutlined />
+                  </div>
 
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Chúc mừng sinh viên</span>
-                  <h2 className="text-xl font-bold text-slate-800">{(candidate as any).user?.fullName || 'Sinh Viên'}</h2>
-                  <span className="text-xs font-semibold text-slate-400 font-mono">MSSV: {candidate.studentCode}</span>
-                </div>
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest block">Chúc mừng sinh viên</span>
+                    <h2 className="text-xl font-bold text-slate-800">{(candidate as any).user?.fullName || 'Sinh Viên'}</h2>
+                    <span className="text-xs font-semibold text-slate-400 font-mono">MSSV: {(candidate as any).user?.studentCode || candidate.studentCode}</span>
+                  </div>
 
-                <div className="py-5 px-6 border-y border-dashed border-slate-100 space-y-1.5">
-                  <h1 className={`text-2xl font-black bg-gradient-to-r ${tierInfo.gradient} bg-clip-text text-transparent uppercase`}>
-                    {tierInfo.label}
-                  </h1>
-                  <p className="text-[11px] italic font-semibold text-slate-400 uppercase tracking-wider">
-                    {tierInfo.subLabel}
+                  <div className="py-5 px-6 border-y border-dashed border-slate-100 space-y-1.5">
+                    <h1 className={`text-2xl font-black bg-gradient-to-r ${tierInfo.gradient} bg-clip-text text-transparent uppercase`}>
+                      {tierInfo.label}
+                    </h1>
+                    <p className="text-[11px] italic font-semibold text-slate-400 uppercase tracking-wider">
+                      {tierInfo.subLabel}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-center py-2">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-semibold block mb-1">GPA Gốc</span>
+                      <strong className="text-base text-slate-700">{rawGpa.toFixed(2)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-semibold block mb-1">GPA Quy Đổi</span>
+                      <strong className="text-base text-slate-700">{candidate.extendedGpa.toFixed(2)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-semibold block mb-1">Điểm Rèn Luyện</span>
+                      <strong className="text-base text-slate-700">{rawConduct}</strong>
+                    </div>
+                  </div>
+
+                  <Alert
+                    message={<span className="font-semibold text-xs">{candidate.note || 'Bạn đã đạt điều kiện nhận học bổng'}</span>}
+                    type="success"
+                    showIcon
+                    className="border-emerald-100 rounded-xl bg-emerald-50 text-left text-emerald-800"
+                  />
+
+                  <p className="text-[10px] text-slate-400">
+                    * Quyết định cấp học bổng khuyến khích học tập dựa trên kết quả cuối cùng tại hội đồng xét tuyển trường.
                   </p>
                 </div>
-
-                <div className="grid grid-cols-3 gap-4 text-center py-2">
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block mb-1">GPA Gốc</span>
-                    <strong className="text-base text-slate-700">{candidate.gpa.toFixed(2)}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block mb-1">GPA Quy Đổi</span>
-                    <strong className="text-base text-slate-700">{candidate.extendedGpa.toFixed(2)}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold block mb-1">Điểm Rèn Luyện</span>
-                    <strong className="text-base text-slate-700">{candidate.conductScore}</strong>
-                  </div>
-                </div>
-
-                <Alert
-                  message={<span className="font-semibold text-xs">{candidate.note || 'Bạn đã đạt điều kiện nhận học bổng'}</span>}
-                  type="success"
-                  showIcon
-                  className="border-emerald-100 rounded-xl bg-emerald-50 text-left text-emerald-800"
-                />
-
-                <p className="text-[10px] text-slate-400">
-                  * Quyết định cấp học bổng khuyến khích học tập dựa trên kết quả cuối cùng tại hội đồng xét tuyển trường.
-                </p>
-              </div>
-            </Card>
-          ) : (
+              </Card>
+            );
+          })() : (
             // Ineligible / NONE tier status card
             <Card className="border border-slate-100 rounded-2xl shadow-sm bg-white overflow-hidden p-6 space-y-6">
               <div className="flex items-center gap-4">

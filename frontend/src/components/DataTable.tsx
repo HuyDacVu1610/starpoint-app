@@ -50,7 +50,7 @@ export function DataTable<T extends object>({
             : false
         }
         scroll={{ x: 'max-content', ...rest.scroll }}
-        className="border border-slate-100 rounded-xl overflow-hidden shadow-sm bg-white"
+        className="border border-slate-100 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-zinc-900"
         rowClassName={() => 'hover:bg-slate-50/50 transition-colors'}
         {...rest}
       />

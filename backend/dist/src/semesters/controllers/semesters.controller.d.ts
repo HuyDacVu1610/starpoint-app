@@ -3,6 +3,7 @@ import { ScoresService } from '../../scores/services/scores.service';
 import { CreateSemesterDto } from '../dto/create-semester.dto';
 import { UpdateSemesterDto } from '../dto/update-semester.dto';
 import { PaginationQueryDto } from '../../shared/common/dto/pagination-query.dto';
+import { AchievementRank, AchievementCategory } from '@prisma/client';
 export declare class SemestersController {
     private readonly semestersService;
     private readonly scoresService;
@@ -51,6 +52,9 @@ export declare class SemestersController {
     updateStudentScore(semesterId: number, studentCode: string, dto: {
         gpa?: number;
         conductScore?: number;
+        competitionId?: number;
+        rank?: AchievementRank;
+        category?: AchievementCategory;
     }): Promise<{
         id: number;
         createdAt: Date;

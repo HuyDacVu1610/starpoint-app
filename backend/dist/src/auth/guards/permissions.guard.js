@@ -32,7 +32,7 @@ let PermissionsGuard = class PermissionsGuard {
             throw new common_1.ForbiddenException('Yêu cầu bị từ chối: Người dùng chưa đăng nhập');
         }
         const dbUser = await this.prisma.user.findFirst({
-            where: { id: Number(user.id), deletedAt: null },
+            where: { id: Number(user.id) },
             include: {
                 userRoles: {
                     include: {

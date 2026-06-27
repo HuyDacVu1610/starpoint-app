@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from './mail.service';
-import * as bcrypt from 'bcrypt';
+import { hash } from '../../shared/common/utils/crypto.util';
 import { ForgotPasswordRequestDto } from '../dto/forgot-password-request.dto';
 import { VerifyResetCodeDto } from '../dto/verify-reset-code.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
@@ -21,7 +21,6 @@ export class PasswordResetService {
     const user = await this.prisma.user.findFirst({
       where: {
         studentCode: dto.studentCode,
-        deletedAt: null,
       },
     });
 
@@ -67,7 +66,6 @@ export class PasswordResetService {
     const user = await this.prisma.user.findFirst({
       where: {
         studentCode: dto.studentCode,
-        deletedAt: null,
       },
     });
 
@@ -100,7 +98,6 @@ export class PasswordResetService {
     const user = await this.prisma.user.findFirst({
       where: {
         studentCode: dto.studentCode,
-        deletedAt: null,
       },
     });
 
@@ -124,7 +121,7 @@ export class PasswordResetService {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    const hashedPassword = await hash(dto.newPassword);
 
     // Update user password and invalidate the code
     await this.prisma.$transaction([

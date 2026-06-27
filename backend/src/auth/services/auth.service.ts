@@ -8,7 +8,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
+import { hash, compare } from '../../shared/common/utils/crypto.util';
 import { LoginDto } from '../dto/login.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 
@@ -49,7 +49,7 @@ export class AuthService {
       throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    const isPasswordValid = await compare(dto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác');
     }
@@ -208,7 +208,7 @@ export class AuthService {
       throw new UnauthorizedException('Người dùng không hợp lệ');
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await compare(
       dto.currentPassword,
       user.password,
     );
@@ -216,7 +216,7 @@ export class AuthService {
       throw new BadRequestException('Mật khẩu hiện tại không đúng');
     }
 
-    const newHashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    const newHashedPassword = await hash(dto.newPassword);
     await this.prisma.user.update({
       where: { id: userId },
       data: { password: newHashedPassword },

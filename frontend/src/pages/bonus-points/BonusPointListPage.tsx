@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button, Card, Modal, Form, Input, InputNumber, Select, Alert, Tooltip, App, Row, Col } from 'antd';
-import { SearchOutlined, EditOutlined, FileExcelOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { SearchOutlined, EditOutlined, FileExcelOutlined, PlusOutlined } from '@ant-design/icons';
 import { scoresService } from '../../services/scores.service';
 import type { Score } from '../../services/scores.service';
 import { semestersService } from '../../services/semesters.service';
@@ -11,6 +11,8 @@ import DataTable from '../../components/DataTable';
 import FileUploader from '../../components/FileUploader';
 import GradeTag from '../../components/GradeTag';
 import BonusPointBadge from '../../components/BonusPointBadge';
+import { competitionsService } from '../../services/competitions.service';
+import type { Competition } from '../../services/competitions.service';
 
 const { Option } = Select;
 
@@ -19,10 +21,10 @@ export const BonusPointListPage = () => {
   const { hasPermission } = useAuth();
   const [data, setData] = useState<Score[]>([]);
   const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [calculateLoading, setCalculateLoading] = useState(false);
   
   // Selected student for quick patch
   const [selectedScore, setSelectedScore] = useState<Score | null>(null);
@@ -44,7 +46,7 @@ export const BonusPointListPage = () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const semesterList = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         
         // Auto select current or first semester if none selected
@@ -54,6 +56,18 @@ export const BonusPointListPage = () => {
       }
     } catch (err) {
       console.error('Error fetching semesters:', err);
+    }
+  };
+
+  const fetchCompetitions = async (semesterId: number) => {
+    try {
+      const res = await competitionsService.list({ semesterId, limit: 100 });
+      if (res.success && res.data) {
+        const compList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
+        setCompetitions(compList);
+      }
+    } catch (err) {
+      console.error('Error fetching competitions:', err);
     }
   };
 
@@ -85,11 +99,21 @@ export const BonusPointListPage = () => {
 
   useEffect(() => {
     fetchScores();
+    if (selectedSemester) {
+      fetchCompetitions(selectedSemester);
+    }
   }, [search, selectedSemester]);
+
+  const handleOpenAdd = () => {
+    setSelectedScore(null);
+    editForm.resetFields();
+    setIsEditModalOpen(true);
+  };
 
   const handleOpenEdit = (record: Score) => {
     setSelectedScore(record);
     editForm.setFieldsValue({
+      studentCode: record.user?.studentCode || '',
       gpa: record.gpa,
       conductScore: record.conductScore,
     });
@@ -97,13 +121,36 @@ export const BonusPointListPage = () => {
   };
 
   const handleEditSubmit = async () => {
-    if (!selectedScore) return;
     try {
       const values = await editForm.validateFields();
+      if (!selectedSemester) {
+        message.error('Vui lòng chọn học kỳ');
+        return;
+      }
+
+      const studentCode = selectedScore ? (selectedScore.user?.studentCode || selectedScore.studentCode) : values.studentCode;
+
+      const compId = values.competitionId || null;
+      let rank = null;
+      let category = null;
+
+      if (compId) {
+        rank = values.rank || null;
+      } else if (values.category) {
+        category = values.category;
+        rank = 'NONE';
+      }
+
       const res = await scoresService.updateManualScore(
-        selectedScore.semesterId,
-        selectedScore.studentCode,
-        values
+        selectedSemester,
+        studentCode,
+        {
+          gpa: values.gpa,
+          conductScore: values.conductScore,
+          competitionId: compId,
+          rank: rank,
+          category: category,
+        }
       );
 
       if (res.success) {
@@ -160,40 +207,12 @@ export const BonusPointListPage = () => {
     }
   };
 
-  const handleCalculateScores = async () => {
-    if (!selectedSemester) {
-      message.warning('Vui lòng chọn học kỳ');
-      return;
-    }
-    Modal.confirm({
-      title: 'Xác nhận tính điểm thưởng học kỳ?',
-      content: 'Hệ thống sẽ quét và cập nhật lại điểm cộng thưởng lớn nhất (max bonus) cũng như điểm GPA sau quy đổi cho toàn bộ sinh viên trong học kỳ này.',
-      okText: 'Tính điểm',
-      cancelText: 'Huỷ',
-      okButtonProps: { className: 'bg-indigo-600 hover:bg-indigo-700' },
-      onOk: async () => {
-        setCalculateLoading(true);
-        try {
-          const res = await scoresService.calculate(selectedSemester);
-          if (res.success) {
-            message.success(res.message || 'Tính điểm thưởng thành công!');
-            fetchScores();
-          } else {
-            message.error(res.message || 'Lỗi tính toán điểm thưởng');
-          }
-        } catch (err: any) {
-          message.error(err.response?.data?.message || 'Có lỗi xảy ra khi tính điểm');
-        } finally {
-          setCalculateLoading(false);
-        }
-      }
-    });
-  };
+
 
   const columns = [
     {
       title: 'Mã Sinh Viên',
-      dataIndex: 'studentCode',
+      dataIndex: ['user', 'studentCode'],
       key: 'studentCode',
       className: 'font-semibold text-slate-700',
     },
@@ -206,20 +225,20 @@ export const BonusPointListPage = () => {
       title: 'GPA Học Kỳ',
       dataIndex: 'gpa',
       key: 'gpa',
-      render: (val: number) => val.toFixed(2),
+      render: (val: number) => (val !== undefined && val !== null ? val.toFixed(2) : '0.00'),
     },
     {
       title: 'Điểm Cộng Thêm',
-      dataIndex: 'bonusPoint',
-      key: 'bonusPoint',
+      dataIndex: 'maxBonusPoint',
+      key: 'maxBonusPoint',
       render: (val: number) => <BonusPointBadge points={val} />,
     },
     {
       title: 'GPA Sau Quy Đổi',
       dataIndex: 'extendedGpa',
       key: 'extendedGpa',
-      className: 'font-extrabold text-indigo-600',
-      render: (val: number) => val.toFixed(2),
+      className: 'font-extrabold text-indigo-600 dark:text-indigo-400',
+      render: (val: number) => (val !== undefined && val !== null ? val.toFixed(2) : '0.00'),
     },
     {
       title: 'Xếp Loại GPA',
@@ -269,13 +288,14 @@ export const BonusPointListPage = () => {
           canManage && (
             <div className="flex gap-2 w-full sm:w-auto">
               <Button
-                icon={<ThunderboltOutlined />}
-                loading={calculateLoading}
-                onClick={handleCalculateScores}
-                className="bg-indigo-600 hover:bg-indigo-700 border-none text-white rounded-lg shadow-sm font-semibold flex items-center gap-1.5"
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleOpenAdd}
+                className="bg-blue-600 hover:bg-blue-700 border-none rounded-lg shadow-sm flex items-center gap-1.5 font-semibold text-white"
               >
-                Tính Điểm Thưởng
+                Thêm Điểm Thủ Công
               </Button>
+
               <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
@@ -293,7 +313,7 @@ export const BonusPointListPage = () => {
         }
       />
 
-      <Card className="border border-slate-100 rounded-xl shadow-sm bg-white/80 backdrop-blur-md">
+      <Card className="border border-slate-100 dark:border-zinc-800 rounded-xl shadow-sm bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={10}>
             <Input
@@ -330,8 +350,8 @@ export const BonusPointListPage = () => {
           rowClassName={(record: Score) => {
             const isEligible = record.extendedGpa >= 2.5 && record.conductScore >= 70;
             return isEligible 
-              ? 'bg-emerald-50/30 hover:bg-emerald-100/40 transition-colors font-medium' 
-              : 'hover:bg-slate-50/50 transition-colors';
+              ? 'bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-100/40 dark:hover:bg-emerald-900/30 transition-colors font-medium text-emerald-800 dark:text-emerald-300' 
+              : 'hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors';
           }}
         />
       </Card>
@@ -340,10 +360,12 @@ export const BonusPointListPage = () => {
       <Modal
         title={
           <div className="flex items-center gap-2">
-            <span className="text-slate-800 font-extrabold text-base">Cập Nhật Điểm Sinh Viên</span>
+            <span className="text-slate-800 font-extrabold text-base">
+              {selectedScore ? 'Cập Nhật Điểm Sinh Viên' : 'Thêm Điểm Sinh Viên Mới'}
+            </span>
             {selectedScore && (
-              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
-                {selectedScore.studentCode}
+              <span className="text-xs bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-mono">
+                {selectedScore.user?.studentCode || selectedScore.studentCode}
               </span>
             )}
           </div>
@@ -351,7 +373,7 @@ export const BonusPointListPage = () => {
         open={isEditModalOpen}
         onOk={handleEditSubmit}
         onCancel={() => setIsEditModalOpen(false)}
-        okText="Lưu thay đổi"
+        okText={selectedScore ? 'Lưu thay đổi' : 'Thêm mới'}
         cancelText="Huỷ"
         okButtonProps={{ className: 'bg-indigo-600 hover:bg-indigo-700' }}
         destroyOnClose
@@ -362,6 +384,18 @@ export const BonusPointListPage = () => {
           </div>
         )}
         <Form form={editForm} layout="vertical">
+          {!selectedScore && (
+            <Form.Item
+              name="studentCode"
+              label="Mã Sinh Viên / MSSV"
+              rules={[
+                { required: true, message: 'Vui lòng nhập mã sinh viên' },
+                { pattern: /^[A-Z0-9_-]+$/i, message: 'Mã sinh viên chỉ được chứa chữ cái, số, gạch ngang' },
+              ]}
+            >
+              <Input placeholder="Ví dụ: SV001..." />
+            </Form.Item>
+          )}
           <Form.Item
             name="gpa"
             label="Điểm GPA Học Kỳ (Thang 4)"
@@ -394,6 +428,55 @@ export const BonusPointListPage = () => {
             ]}
           >
             <InputNumber step={1} min={0} max={100} className="w-full" placeholder="Ví dụ: 85" />
+          </Form.Item>
+
+          <Form.Item
+            name="competitionId"
+            label="Đạt Giải Cuộc Thi (Tùy chọn)"
+            extra="Liên kết thành tích cuộc thi trong học kỳ này để tự động tính điểm cộng rèn luyện."
+          >
+            <Select placeholder="Chọn cuộc thi..." allowClear>
+              {competitions.map((comp) => (
+                <Option key={comp.id} value={comp.id}>
+                  {comp.name} ({comp.level === 'CENTRAL' ? 'Cấp T.Ư' : 'Cấp Trường'})
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item noStyle dependencies={['competitionId']}>
+            {({ getFieldValue }) => {
+              const compId = getFieldValue('competitionId');
+              if (compId) {
+                return (
+                  <Form.Item
+                    name="rank"
+                    label="Hạng Giải Thưởng"
+                    rules={[{ required: true, message: 'Vui lòng chọn hạng giải thưởng khi đã liên kết cuộc thi' }]}
+                  >
+                    <Select placeholder="Chọn hạng giải..." allowClear>
+                      <Option value="FIRST">Giải Nhất / HCV / Cúp Vàng</Option>
+                      <Option value="SECOND">Giải Nhì / HCB / Cúp Bạc</Option>
+                      <Option value="THIRD">Giải Ba / HCĐ / Cúp Đồng</Option>
+                      <Option value="NONE">Tham Gia / Khác</Option>
+                    </Select>
+                  </Form.Item>
+                );
+              } else {
+                return (
+                  <Form.Item
+                    name="category"
+                    label="Loại Hoạt Động / Thành Tích (Tùy chọn)"
+                    extra="Chọn loại hoạt động ngoài cuộc thi để cộng điểm thưởng rèn luyện mặc định (+0.1)."
+                  >
+                    <Select placeholder="Chọn loại hoạt động..." allowClear>
+                      <Option value="ORGANIZATION_PARTICIPATION">Tham gia Ban tự quản / BCH / CLB / Ban phát thanh</Option>
+                      <Option value="SPECIAL_ACHIEVEMENT">Thành tích đặc biệt khác</Option>
+                    </Select>
+                  </Form.Item>
+                );
+              }
+            }}
           </Form.Item>
         </Form>
       </Modal>
@@ -460,7 +543,8 @@ export const BonusPointListPage = () => {
             <h4 className="font-semibold text-slate-600 mb-1">Quy tắc định dạng file Excel nhập điểm:</h4>
             <ul className="list-disc pl-4 space-y-0.5">
               <li>File phải có tiêu đề ở dòng đầu tiên.</li>
-              <li>Chứa các cột bắt buộc: <strong className="text-slate-600">Mã sinh viên (MSSV)</strong>, <strong className="text-slate-600">Điểm GPA</strong> (thang 4), <strong className="text-slate-600">Điểm rèn luyện</strong> (thang 100).</li>
+              <li>Chứa các cột bắt buộc: <strong className="text-slate-600 dark:text-slate-300">Mã sinh viên (MSSV)</strong>, <strong className="text-slate-600 dark:text-slate-300">Điểm GPA</strong> (thang 4), <strong className="text-slate-600 dark:text-slate-300">Điểm rèn luyện</strong> (thang 100).</li>
+              <li>Hỗ trợ 2 cột tùy chọn: <strong className="text-slate-600 dark:text-slate-300">Tên cuộc thi</strong> và <strong className="text-slate-600 dark:text-slate-300">Giải thưởng</strong> (Nhất, Nhì, Ba, Khuyến khích/Tham gia) để tự động nạp thành tích & tính điểm thưởng.</li>
               <li>Hệ thống tự động dò tìm các cột tương đương (ví dụ: "diem trung binh", "drl", "mssv").</li>
             </ul>
           </div>

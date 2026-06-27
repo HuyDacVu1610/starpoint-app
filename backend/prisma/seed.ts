@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import * as bcrypt from 'bcrypt';
+import { hash } from '../src/shared/common/utils/crypto.util';
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -71,7 +71,10 @@ async function main() {
   const adminPermissions = [
     'CREATE_USER', 'VIEW_USER', 'UPDATE_USER', 'DELETE_USER',
     'MANAGE_SEMESTER', 'MANAGE_COMPETITION',
-    'VIEW_ACHIEVEMENT', 'VIEW_BONUS', 'VIEW_SCHOLARSHIP', 'VIEW_DASHBOARD'
+    'VIEW_ACHIEVEMENT', 'MANAGE_ACHIEVEMENT',
+    'VIEW_BONUS', 'MANAGE_BONUS',
+    'VIEW_SCHOLARSHIP', 'MANAGE_SCHOLARSHIP',
+    'VIEW_DASHBOARD'
   ];
 
   const staffPermissions = [
@@ -108,7 +111,7 @@ async function main() {
 
   // 4. Seed Default Accounts
   console.log('Seeding default accounts (password: password123)...');
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await hash('password123');
 
   // Admin Account
   const adminUser = await prisma.user.upsert({

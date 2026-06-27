@@ -17,6 +17,14 @@ const common_1 = require("@nestjs/common");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const competitions_repository_1 = require("../repositories/competitions.repository");
 const semesters_service_1 = require("../../semesters/services/semesters.service");
+function formatDate(date) {
+    return date.toLocaleDateString('vi-VN', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+}
 let CompetitionsService = class CompetitionsService {
     competitionsRepository;
     semestersService;
@@ -44,15 +52,23 @@ let CompetitionsService = class CompetitionsService {
         return competition;
     }
     async create(dto) {
-        await this.semestersService.findById(dto.semesterId);
+        const semester = await this.semestersService.findById(dto.semesterId);
+        if (dto.eventDate < semester.startDate || dto.eventDate > semester.endDate) {
+            throw new common_1.BadRequestException(`Ngày tổ chức cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`);
+        }
         const result = await this.competitionsRepository.create(dto);
         await this.cacheManager.clear();
         return result;
     }
     async update(id, dto) {
-        await this.findById(id);
-        if (dto.semesterId !== undefined) {
-            await this.semestersService.findById(dto.semesterId);
+        const existing = await this.findById(id);
+        const semesterId = dto.semesterId !== undefined ? dto.semesterId : existing.semesterId;
+        const eventDate = dto.eventDate !== undefined ? dto.eventDate : existing.eventDate;
+        if (dto.semesterId !== undefined || dto.eventDate !== undefined) {
+            const semester = await this.semestersService.findById(semesterId);
+            if (eventDate < semester.startDate || eventDate > semester.endDate) {
+                throw new common_1.BadRequestException(`Ngày tổ chức cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`);
+            }
         }
         const result = await this.competitionsRepository.update(id, dto);
         await this.cacheManager.clear();

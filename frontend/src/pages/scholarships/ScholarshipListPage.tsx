@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Card, Select, Input, Tag, Modal, Form, Statistic, Row, Col, message } from 'antd';
-import { SearchOutlined, FileExcelOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Table, Button, Card, Select, Input, Tag, Row, Col, message } from 'antd';
+import { SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { scholarshipsService } from '../../services/scholarships.service';
 import type { ScholarshipCandidate } from '../../services/scholarships.service';
 import { semestersService } from '../../services/semesters.service';
 import type { Semester } from '../../services/semesters.service';
 import { PageHeader } from '../../components/PageHeader';
-import { useAuth } from '../../hooks/useAuth';
 import * as XLSX from 'xlsx';
 
 const { Option } = Select;
@@ -19,20 +18,11 @@ const TIER_MAP: Record<string, { label: string; color: string }> = {
 };
 
 export const ScholarshipListPage = () => {
-  const { hasPermission } = useAuth();
   const [data, setData] = useState<ScholarshipCandidate[]>([]);
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [loading, setLoading] = useState(false);
   
-  // Evaluation Modal State
-  const [isEvalModalOpen, setIsEvalModalOpen] = useState(false);
-  const [evalSemesterId, setEvalSemesterId] = useState<number | undefined>(undefined);
-  const [evalLoading, setEvalLoading] = useState(false);
-  const [evalStats, setEvalStats] = useState<{
-    evaluatedCount: number;
-    eligibleCount: number;
-    tierCounts: { EXCELLENT: number; GOOD: number; FAIR: number };
-  } | null>(null);
+
 
   // Filters State
   const [search, setSearch] = useState('');
@@ -40,13 +30,11 @@ export const ScholarshipListPage = () => {
   const [selectedTier, setSelectedTier] = useState<'EXCELLENT' | 'GOOD' | 'FAIR' | 'NONE' | undefined>(undefined);
   const [selectedEligible, setSelectedEligible] = useState<boolean | undefined>(undefined);
 
-  const canManage = hasPermission('MANAGE_SCHOLARSHIP');
-
   const fetchSemesters = async () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const semesterList = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         if (semesterList.length > 0 && !selectedSemester) {
           setSelectedSemester(semesterList[0].id);
@@ -89,31 +77,7 @@ export const ScholarshipListPage = () => {
     fetchCandidates();
   }, [search, selectedSemester, selectedTier, selectedEligible]);
 
-  const handleEvaluate = async () => {
-    if (!evalSemesterId) {
-      message.warning('Vui lòng chọn học kỳ xét học bổng');
-      return;
-    }
-    setEvalLoading(true);
-    setEvalStats(null);
-    try {
-      const res = await scholarshipsService.evaluate(evalSemesterId);
-      if (res.success && res.data) {
-        setEvalStats(res.data);
-        message.success('Đã hoàn thành đánh giá xét tuyển học bổng');
-        // Refresh table if same semester is evaluated
-        if (evalSemesterId === selectedSemester) {
-          fetchCandidates();
-        }
-      } else {
-        message.error(res.message || 'Lỗi xét học bổng');
-      }
-    } catch (err: any) {
-      message.error(err.response?.data?.message || 'Có lỗi xảy ra khi xử lý xét học bổng');
-    } finally {
-      setEvalLoading(false);
-    }
-  };
+
 
   const handleExportExcel = () => {
     if (data.length === 0) {
@@ -164,7 +128,7 @@ export const ScholarshipListPage = () => {
   const columns = [
     {
       title: 'Mã Sinh Viên',
-      dataIndex: 'studentCode',
+      dataIndex: ['user', 'studentCode'],
       key: 'studentCode',
       className: 'font-semibold text-slate-700',
     },
@@ -218,24 +182,9 @@ export const ScholarshipListPage = () => {
         title="Danh Sách Ứng Viên Học Bổng"
         subtitle="Quản lý, tổng hợp sinh viên đạt điều kiện học bổng khuyến khích học tập"
         breadcrumbs={[{ title: 'Quản trị' }, { title: 'Ứng viên học bổng' }]}
-        extra={
-          canManage && (
-            <Button
-              type="primary"
-              icon={<ThunderboltOutlined />}
-              onClick={() => {
-                setEvalStats(null);
-                setIsEvalModalOpen(true);
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 border-none rounded-lg shadow-sm font-semibold"
-            >
-              Chạy Xét Học Bổng
-            </Button>
-          )
-        }
       />
 
-      <Card className="border border-slate-100 rounded-xl shadow-sm bg-white/80 backdrop-blur-md">
+      <Card className="border border-slate-100 dark:border-zinc-800 rounded-xl shadow-sm bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={6}>
             <Input
@@ -312,75 +261,7 @@ export const ScholarshipListPage = () => {
         />
       </Card>
 
-      {/* Evaluate Scholarship Modal */}
-      <Modal
-        title="Đánh Giá Phê Duyệt Học Bổng Hàng Loạt"
-        open={isEvalModalOpen}
-        onOk={handleEvaluate}
-        onCancel={() => {
-          if (!evalLoading) setIsEvalModalOpen(false);
-        }}
-        okText="Chạy đánh giá"
-        cancelText="Đóng"
-        okButtonProps={{ className: 'bg-indigo-600 hover:bg-indigo-700', loading: evalLoading }}
-        destroyOnClose
-        width={550}
-      >
-        <div className="mt-4 space-y-5">
-          <Form layout="vertical">
-            <Form.Item label="Chọn học kỳ chạy xét duyệt" required>
-              <Select
-                placeholder="Chọn học kỳ..."
-                value={evalSemesterId}
-                onChange={setEvalSemesterId}
-                className="w-full"
-              >
-                {semesters.map((sem) => (
-                  <Option key={sem.id} value={sem.id}>
-                    {sem.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Form>
 
-          {evalStats && (
-            <Card className="bg-indigo-50/50 border border-indigo-100 rounded-xl">
-              <span className="text-xs font-bold text-indigo-600 uppercase block mb-3">Kết quả đánh giá</span>
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Statistic title="Tổng sinh viên được xét" value={evalStats.evaluatedCount} />
-                </Col>
-                <Col span={12}>
-                  <Statistic
-                    title="Đủ điều kiện nhận học bổng"
-                    value={evalStats.eligibleCount}
-                    valueStyle={{ color: '#10b981', fontWeight: 800 }}
-                  />
-                </Col>
-              </Row>
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <span className="text-[11px] text-slate-400 font-semibold block">Loại Xuất Sắc</span>
-                  <strong className="text-sm text-rose-600">{evalStats.tierCounts?.EXCELLENT || 0}</strong>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400 font-semibold block">Loại Giỏi</span>
-                  <strong className="text-sm text-amber-500">{evalStats.tierCounts?.GOOD || 0}</strong>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400 font-semibold block">Loại Khá</span>
-                  <strong className="text-sm text-blue-600">{evalStats.tierCounts?.FAIR || 0}</strong>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          <p className="text-[11px] text-slate-400 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-            * Quy trình chạy xét duyệt tự động quét qua toàn bộ điểm số rèn luyện và GPA của các sinh viên trong học kỳ đã chọn, sau đó áp dụng thang ma trận học bổng quy định để xếp loại trực tiếp.
-          </p>
-        </div>
-      </Modal>
     </div>
   );
 };

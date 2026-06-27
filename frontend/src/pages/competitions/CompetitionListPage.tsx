@@ -33,7 +33,7 @@ export const CompetitionListPage = () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const semesterList = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
       }
     } catch (err) {

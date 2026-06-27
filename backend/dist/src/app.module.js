@@ -27,8 +27,6 @@ const scores_module_1 = require("./scores/scores.module");
 const scholarships_module_1 = require("./scholarships/scholarships.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const audit_log_module_1 = require("./audit-log/audit-log.module");
-const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
 const audit_log_interceptor_1 = require("./shared/common/interceptors/audit-log.interceptor");
 let AppModule = class AppModule {
 };
@@ -65,9 +63,8 @@ exports.AppModule = AppModule = __decorate([
             dashboard_module_1.DashboardModule,
             audit_log_module_1.AuditLogModule,
         ],
-        controllers: [app_controller_1.AppController],
+        controllers: [],
         providers: [
-            app_service_1.AppService,
             {
                 provide: core_1.APP_INTERCEPTOR,
                 useClass: audit_log_interceptor_1.AuditLogInterceptor,

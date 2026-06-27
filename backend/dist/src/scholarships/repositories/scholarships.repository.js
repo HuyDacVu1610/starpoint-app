@@ -69,6 +69,15 @@ let ScholarshipsRepository = class ScholarshipsRepository {
                             fullName: true,
                             email: true,
                             avatarUrl: true,
+                            semesterScores: {
+                                where: {
+                                    semesterId: query.semesterId || undefined,
+                                },
+                                select: {
+                                    gpa: true,
+                                    conductScore: true,
+                                },
+                            },
                         },
                     },
                     semester: true,

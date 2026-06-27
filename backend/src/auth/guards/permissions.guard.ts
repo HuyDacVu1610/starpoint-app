@@ -49,7 +49,7 @@ export class PermissionsGuard implements CanActivate {
 
     // Query active permissions from the database
     const dbUser = await this.prisma.user.findFirst({
-      where: { id: Number(user.id), deletedAt: null },
+      where: { id: Number(user.id) },
       include: {
         userRoles: {
           include: {

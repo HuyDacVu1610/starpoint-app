@@ -5,14 +5,15 @@ interface BonusPointBadgeProps {
 }
 
 export const BonusPointBadge = ({ points }: BonusPointBadgeProps) => {
+  const safePoints = points || 0;
   let color = 'default';
   let className = 'font-bold px-2 py-0.5 rounded-full';
 
-  if (points >= 0.4) {
+  if (safePoints >= 0.4) {
     color = 'emerald';
-  } else if (points >= 0.2) {
+  } else if (safePoints >= 0.2) {
     color = 'blue';
-  } else if (points > 0) {
+  } else if (safePoints > 0) {
     color = 'purple';
   }
 
@@ -26,7 +27,7 @@ export const BonusPointBadge = ({ points }: BonusPointBadgeProps) => {
 
   return (
     <Tag color={colorMap[color]} className={className}>
-      +{points.toFixed(2)}
+      +{safePoints.toFixed(2)}
     </Tag>
   );
 };

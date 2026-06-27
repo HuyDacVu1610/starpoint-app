@@ -23,30 +23,30 @@ export declare class AchievementsController {
             user: {
                 id: number;
                 studentCode: string;
-                fullName: string;
                 email: string;
+                fullName: string;
                 avatarUrl: string | null;
             };
-            competition: {
-                id: number;
-                createdAt: Date;
-                updatedAt: Date;
-                name: string;
-                semesterId: number;
-                level: import("@prisma/client").$Enums.CompetitionLevel;
-                organizer: string | null;
-                eventDate: Date;
-            } | null;
             semester: {
                 id: number;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
                 endDate: Date;
             };
+            competition: {
+                id: number;
+                name: string;
+                createdAt: Date;
+                updatedAt: Date;
+                semesterId: number;
+                level: import("@prisma/client").$Enums.CompetitionLevel;
+                organizer: string | null;
+                eventDate: Date;
+            } | null;
             evidenceFile: {
                 id: number;
                 createdAt: Date;
@@ -78,30 +78,30 @@ export declare class AchievementsController {
             user: {
                 id: number;
                 studentCode: string;
-                fullName: string;
                 email: string;
+                fullName: string;
                 avatarUrl: string | null;
             };
-            competition: {
-                id: number;
-                createdAt: Date;
-                updatedAt: Date;
-                name: string;
-                semesterId: number;
-                level: import("@prisma/client").$Enums.CompetitionLevel;
-                organizer: string | null;
-                eventDate: Date;
-            } | null;
             semester: {
                 id: number;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
                 year: number;
                 term: number;
                 startDate: Date;
                 endDate: Date;
             };
+            competition: {
+                id: number;
+                name: string;
+                createdAt: Date;
+                updatedAt: Date;
+                semesterId: number;
+                level: import("@prisma/client").$Enums.CompetitionLevel;
+                organizer: string | null;
+                eventDate: Date;
+            } | null;
             evidenceFile: {
                 id: number;
                 createdAt: Date;
@@ -131,30 +131,30 @@ export declare class AchievementsController {
         user: {
             id: number;
             studentCode: string;
-            fullName: string;
             email: string;
+            fullName: string;
             avatarUrl: string | null;
         };
-        competition: {
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            semesterId: number;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         semester: {
             id: number;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
             year: number;
             term: number;
             startDate: Date;
             endDate: Date;
         };
+        competition: {
+            id: number;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -183,30 +183,30 @@ export declare class AchievementsController {
         user: {
             id: number;
             studentCode: string;
-            fullName: string;
             email: string;
+            fullName: string;
             avatarUrl: string | null;
         };
-        competition: {
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            semesterId: number;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         semester: {
             id: number;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
             year: number;
             term: number;
             startDate: Date;
             endDate: Date;
         };
+        competition: {
+            id: number;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -235,30 +235,30 @@ export declare class AchievementsController {
         user: {
             id: number;
             studentCode: string;
-            fullName: string;
             email: string;
+            fullName: string;
             avatarUrl: string | null;
         };
-        competition: {
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            semesterId: number;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         semester: {
             id: number;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
             year: number;
             term: number;
             startDate: Date;
             endDate: Date;
         };
+        competition: {
+            id: number;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;
@@ -302,30 +302,30 @@ export declare class AchievementsController {
         user: {
             id: number;
             studentCode: string;
-            fullName: string;
             email: string;
+            fullName: string;
             avatarUrl: string | null;
         };
-        competition: {
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            name: string;
-            semesterId: number;
-            level: import("@prisma/client").$Enums.CompetitionLevel;
-            organizer: string | null;
-            eventDate: Date;
-        } | null;
         semester: {
             id: number;
+            name: string;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
             year: number;
             term: number;
             startDate: Date;
             endDate: Date;
         };
+        competition: {
+            id: number;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            semesterId: number;
+            level: import("@prisma/client").$Enums.CompetitionLevel;
+            organizer: string | null;
+            eventDate: Date;
+        } | null;
         evidenceFile: {
             id: number;
             createdAt: Date;

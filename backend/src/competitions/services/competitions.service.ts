@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Inject,
+} from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { CompetitionsRepository } from '../repositories/competitions.repository';
@@ -6,6 +11,15 @@ import { SemestersService } from '../../semesters/services/semesters.service';
 import { CreateCompetitionDto } from '../dto/create-competition.dto';
 import { UpdateCompetitionDto } from '../dto/update-competition.dto';
 import { QueryCompetitionDto } from '../dto/query-competition.dto';
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
 
 @Injectable()
 export class CompetitionsService {
@@ -37,7 +51,14 @@ export class CompetitionsService {
 
   async create(dto: CreateCompetitionDto) {
     // Validate that the semester exists
-    await this.semestersService.findById(dto.semesterId);
+    const semester = await this.semestersService.findById(dto.semesterId);
+
+    // Validate that eventDate falls within the semester's range
+    if (dto.eventDate < semester.startDate || dto.eventDate > semester.endDate) {
+      throw new BadRequestException(
+        `Ngày tổ chức cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`,
+      );
+    }
 
     const result = await this.competitionsRepository.create(dto);
     await this.cacheManager.clear(); // Clear cache to invalidate list
@@ -45,11 +66,18 @@ export class CompetitionsService {
   }
 
   async update(id: number, dto: UpdateCompetitionDto) {
-    await this.findById(id);
+    const existing = await this.findById(id);
 
-    if (dto.semesterId !== undefined) {
-      // Validate that the semester exists
-      await this.semestersService.findById(dto.semesterId);
+    const semesterId = dto.semesterId !== undefined ? dto.semesterId : existing.semesterId;
+    const eventDate = dto.eventDate !== undefined ? dto.eventDate : existing.eventDate;
+
+    if (dto.semesterId !== undefined || dto.eventDate !== undefined) {
+      const semester = await this.semestersService.findById(semesterId);
+      if (eventDate < semester.startDate || eventDate > semester.endDate) {
+        throw new BadRequestException(
+          `Ngày tổ chức cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`,
+        );
+      }
     }
 
     const result = await this.competitionsRepository.update(id, dto);

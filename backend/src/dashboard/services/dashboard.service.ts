@@ -18,7 +18,7 @@ export class DashboardService {
     }
 
     const [totalStudents, totalCompetitions, totalAchievements, eligibleScholarships] = await Promise.all([
-      // Count total non-deleted student accounts
+      // Count total student accounts
       this.prisma.user.count({
         where: {
           userRoles: {
@@ -28,7 +28,6 @@ export class DashboardService {
               },
             },
           },
-          deletedAt: null,
         },
       }),
 

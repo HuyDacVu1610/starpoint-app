@@ -66,7 +66,7 @@ export const DashboardPage = () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const list = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(list);
         if (list.length > 0) {
           setSelectedSemester(list[0].id);

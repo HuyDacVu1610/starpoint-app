@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
 import { LogAction } from '../../shared/common/decorators/log-action.decorator';
+import { AchievementRank, AchievementCategory } from '@prisma/client';
 
 @Controller('semesters')
 @UseGuards(JwtAuthGuard)
@@ -72,7 +73,7 @@ export class SemestersController {
   async updateStudentScore(
     @Param('semesterId', ParseIntPipe) semesterId: number,
     @Param('studentCode') studentCode: string,
-    @Body() dto: { gpa?: number; conductScore?: number },
+    @Body() dto: { gpa?: number; conductScore?: number; competitionId?: number; rank?: AchievementRank; category?: AchievementCategory },
   ) {
     return this.scoresService.updateManualScore(semesterId, studentCode, dto);
   }

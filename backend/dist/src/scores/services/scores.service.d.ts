@@ -1,5 +1,5 @@
 import { ClientProxy } from '@nestjs/microservices';
-import { Prisma, Grade } from '@prisma/client';
+import { Prisma, Grade, AchievementRank, AchievementCategory } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScoresRepository } from '../repositories/scores.repository';
 import { QueryScoreDto } from '../dto/query-score.dto';
@@ -96,6 +96,9 @@ export declare class ScoresService {
     updateManualScore(semesterId: number, studentCode: string, dto: {
         gpa?: number;
         conductScore?: number;
+        competitionId?: number;
+        rank?: AchievementRank;
+        category?: AchievementCategory;
     }): Promise<{
         id: number;
         createdAt: Date;

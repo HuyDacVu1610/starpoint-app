@@ -18,8 +18,6 @@ import { ScoresModule } from './scores/scores.module';
 import { ScholarshipsModule } from './scholarships/scholarships.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuditLogInterceptor } from './shared/common/interceptors/audit-log.interceptor';
 
 @Module({
@@ -54,9 +52,8 @@ import { AuditLogInterceptor } from './shared/common/interceptors/audit-log.inte
     DashboardModule,
     AuditLogModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: AuditLogInterceptor,

@@ -28,7 +28,7 @@ export const MyBonusPointPage = () => {
     try {
       const res = await semestersService.list({ limit: 100 });
       if (res.success && res.data) {
-        const semesterList = Array.isArray(res.data) ? res.data : (res.data.items || []);
+        const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         if (semesterList.length > 0) {
           setSelectedSemester(semesterList[0].id);
@@ -137,7 +137,7 @@ export const MyBonusPointPage = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="text-4xl font-extrabold text-amber-500">
-                    +{score.bonusPoint.toFixed(2)}
+                    +{(score.maxBonusPoint ?? score.bonusPoint ?? 0).toFixed(2)}
                   </div>
                   <div className="text-xs text-slate-400 font-medium">
                     Cộng từ các hoạt động/cuộc thi đã được phê duyệt
@@ -216,7 +216,7 @@ export const MyBonusPointPage = () => {
                   </div>
                   <div className="flex justify-between pb-2.5 border-b border-slate-100">
                     <span>Điểm thưởng thành tích:</span>
-                    <strong className="text-emerald-600">+{score.bonusPoint.toFixed(2)}</strong>
+                    <strong className="text-emerald-600">+{(score.maxBonusPoint ?? score.bonusPoint ?? 0).toFixed(2)}</strong>
                   </div>
                   <div className="flex justify-between pb-2.5 border-b border-slate-100">
                     <span>Điểm quy đổi cuối cùng:</span>

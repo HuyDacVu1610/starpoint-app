@@ -1,7 +1,7 @@
-import { AuditLogRepository } from '../repositories/audit-log.repository';
+import { PrismaService } from '../../prisma/prisma.service';
 export declare class AuditLogService {
-    private readonly auditLogRepository;
-    constructor(auditLogRepository: AuditLogRepository);
+    private readonly prisma;
+    constructor(prisma: PrismaService);
     log(data: {
         userId?: number;
         action: string;

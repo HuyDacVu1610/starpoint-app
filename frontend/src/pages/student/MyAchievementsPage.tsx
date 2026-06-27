@@ -108,9 +108,15 @@ export const MyAchievementsPage = () => {
   useEffect(() => {
     if (selectedSemester && selectedCategory) {
       fetchCompetitions(selectedSemester, selectedCategory);
+      if (selectedCategory === 'ORGANIZATION_PARTICIPATION' || selectedCategory === 'SPECIAL_ACHIEVEMENT') {
+        form.setFieldValue('rank', 'NONE');
+      } else {
+        form.setFieldValue('rank', undefined);
+      }
     } else {
       setCompetitions([]);
       form.setFieldValue('competitionId', undefined);
+      form.setFieldValue('rank', undefined);
     }
   }, [selectedSemester, selectedCategory]);
 
@@ -159,7 +165,9 @@ export const MyAchievementsPage = () => {
       const payload = {
         semesterId: values.semesterId,
         category: values.category,
-        rank: values.rank,
+        rank: (values.category === 'ORGANIZATION_PARTICIPATION' || values.category === 'SPECIAL_ACHIEVEMENT')
+          ? 'NONE'
+          : values.rank,
         competitionId: values.competitionId || null,
         evidenceFileId: uploadedFileId || undefined,
         note: values.note,
@@ -376,18 +384,20 @@ export const MyAchievementsPage = () => {
             </Form.Item>
           )}
 
-          <Form.Item
-            name="rank"
-            label="Xếp Giải / Kết Quả Đạt Được"
-            rules={[{ required: true, message: 'Vui lòng chọn xếp giải' }]}
-          >
-            <Select placeholder="Chọn xếp giải">
-              <Option value="FIRST">Giải Nhất</Option>
-              <Option value="SECOND">Giải Nhì</Option>
-              <Option value="THIRD">Giải Ba</Option>
-              <Option value="NONE">Tham Gia / Khác / Khuyến Khích</Option>
-            </Select>
-          </Form.Item>
+          {selectedCategory && selectedCategory !== 'ORGANIZATION_PARTICIPATION' && selectedCategory !== 'SPECIAL_ACHIEVEMENT' && (
+            <Form.Item
+              name="rank"
+              label="Xếp Giải / Kết Quả Đạt Được"
+              rules={[{ required: true, message: 'Vui lòng chọn xếp giải' }]}
+            >
+              <Select placeholder="Chọn xếp giải">
+                <Option value="FIRST">Giải Nhất</Option>
+                <Option value="SECOND">Giải Nhì</Option>
+                <Option value="THIRD">Giải Ba</Option>
+                <Option value="NONE">Tham Gia / Khác / Khuyến Khích</Option>
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="note"

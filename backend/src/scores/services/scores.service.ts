@@ -6,12 +6,13 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Prisma, Grade } from '@prisma/client';
+import { Prisma, Grade, AchievementRank, AchievementCategory } from '@prisma/client';
 import * as xlsx from 'xlsx';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ScoresRepository } from '../repositories/scores.repository';
 import { QueryScoreDto } from '../dto/query-score.dto';
 import { ScholarshipsService } from '../../scholarships/services/scholarships.service';
+import { BONUS_POINT_MAP } from '../../achievements/constants/bonus-point-map';
 
 export function getGpaGrade(extendedGpa: number): Grade {
   if (extendedGpa >= 3.6) return Grade.EXCELLENT;
@@ -96,6 +97,8 @@ export class ScoresService {
     let studentCodeKey = '';
     let gpaKey = '';
     let conductScoreKey = '';
+    let competitionNameKey = '';
+    let achievementRankKey = '';
 
     for (const key of keys) {
       const normalized = key
@@ -126,6 +129,19 @@ export class ScoresService {
         normalized.includes('rl')
       ) {
         conductScoreKey = key;
+      } else if (
+        normalized.includes('competition') ||
+        normalized.includes('cuocthi') ||
+        normalized.includes('tencuocthi')
+      ) {
+        competitionNameKey = key;
+      } else if (
+        normalized.includes('rank') ||
+        normalized.includes('award') ||
+        normalized.includes('giaithuong') ||
+        normalized.includes('giai')
+      ) {
+        achievementRankKey = key;
       }
     }
 
@@ -173,6 +189,8 @@ export class ScoresService {
       studentCode: string;
       gpa: number;
       conductScore: number;
+      competitionName?: string;
+      achievementRank?: string;
       rowNum: number;
     }> = [];
 
@@ -181,6 +199,8 @@ export class ScoresService {
       const rawCode = row[studentCodeKey];
       const rawGpa = row[gpaKey];
       const rawConduct = row[conductScoreKey];
+      const rawComp = competitionNameKey ? row[competitionNameKey] : undefined;
+      const rawRank = achievementRankKey ? row[achievementRankKey] : undefined;
 
       // If checking duplicates already reported, still validate other bounds
       if (
@@ -199,6 +219,8 @@ export class ScoresService {
         .toUpperCase();
       const gpa = Number(rawGpa);
       const conductScore = Number(rawConduct);
+      const competitionName = rawComp ? String(rawComp).trim() : undefined;
+      const achievementRank = rawRank ? String(rawRank).trim() : undefined;
 
       if (isNaN(gpa) || gpa < 0 || gpa > 4) {
         validationErrors.push(
@@ -223,6 +245,8 @@ export class ScoresService {
         studentCode,
         gpa,
         conductScore,
+        competitionName,
+        achievementRank,
         rowNum,
       });
     });
@@ -236,7 +260,6 @@ export class ScoresService {
     const dbUsers = await this.prisma.user.findMany({
       where: {
         studentCode: { in: studentCodes },
-        deletedAt: null,
       },
       select: {
         id: true,
@@ -260,8 +283,96 @@ export class ScoresService {
 
     // 7. Perform updates in a single database transaction
     await this.prisma.$transaction(async (tx) => {
+      // 7.1 Fetch competitions map for the current semester
+      const compMap = new Map<string, any>();
+      const hasCompetitionData = validParsedRows.some((r) => r.competitionName && r.achievementRank);
+      if (hasCompetitionData) {
+        const semesterComps = await tx.competition.findMany({
+          where: { semesterId },
+        });
+        semesterComps.forEach((c) => {
+          const normName = c.name.toLowerCase().trim().replace(/\s+/g, ' ');
+          compMap.set(normName, c);
+        });
+      }
+
       for (const row of validParsedRows) {
         const userId = dbUserMap.get(row.studentCode)!;
+
+        // 7.2 Process optional competition achievement
+        if (row.competitionName && row.achievementRank) {
+          const normName = row.competitionName.toLowerCase().trim().replace(/\s+/g, ' ');
+          const comp = compMap.get(normName);
+          if (comp) {
+            // Parse rank from Vietnamese strings
+            const rankStr = row.achievementRank.toLowerCase();
+            let rank: AchievementRank = AchievementRank.NONE;
+
+            if (
+              rankStr.includes('nhất') ||
+              rankStr.includes('nhut') ||
+              rankStr.includes('hcv') ||
+              rankStr.includes('vàng') ||
+              rankStr.includes('first')
+            ) {
+              rank = AchievementRank.FIRST;
+            } else if (
+              rankStr.includes('nhì') ||
+              rankStr.includes('hcb') ||
+              rankStr.includes('bạc') ||
+              rankStr.includes('second')
+            ) {
+              rank = AchievementRank.SECOND;
+            } else if (
+              rankStr.includes('ba') ||
+              rankStr.includes('hcđ') ||
+              rankStr.includes('đồng') ||
+              rankStr.includes('third')
+            ) {
+              rank = AchievementRank.THIRD;
+            }
+
+            const category =
+              comp.level === 'CENTRAL'
+                ? AchievementCategory.CENTRAL_COMPETITION
+                : AchievementCategory.ACADEMY_COMPETITION;
+
+            const bonusPoint = BONUS_POINT_MAP[category][rank];
+
+            // Upsert achievement
+            const existingAch = await tx.achievement.findFirst({
+              where: {
+                userId,
+                semesterId,
+                competitionId: comp.id,
+              },
+            });
+
+            if (existingAch) {
+              await tx.achievement.update({
+                where: { id: existingAch.id },
+                data: {
+                  rank,
+                  bonusPoint,
+                  status: 'APPROVED',
+                },
+              });
+            } else {
+              await tx.achievement.create({
+                data: {
+                  userId,
+                  semesterId,
+                  competitionId: comp.id,
+                  category,
+                  rank,
+                  bonusPoint,
+                  status: 'APPROVED',
+                  note: 'Được tạo tự động khi import từ file Excel',
+                },
+              });
+            }
+          }
+        }
 
         // Query max approved achievement bonus points for this user in this semester
         const achievements = await tx.achievement.findMany({
@@ -328,11 +439,11 @@ export class ScoresService {
   async updateManualScore(
     semesterId: number,
     studentCode: string,
-    dto: { gpa?: number; conductScore?: number },
+    dto: { gpa?: number; conductScore?: number; competitionId?: number; rank?: AchievementRank; category?: AchievementCategory },
   ) {
     // 1. Verify user exists
     const user = await this.prisma.user.findFirst({
-      where: { studentCode: studentCode.toUpperCase(), deletedAt: null },
+      where: { studentCode: studentCode.toUpperCase() },
     });
     if (!user) {
       throw new NotFoundException(
@@ -345,18 +456,13 @@ export class ScoresService {
       user.id,
       semesterId,
     );
-    if (!existingScore) {
-      throw new NotFoundException(
-        `Không tìm thấy bản ghi điểm của sinh viên ${studentCode} trong học kỳ này. Vui lòng import Excel trước.`,
-      );
-    }
 
     // 3. Update parameters
-    const newGpa = dto.gpa !== undefined ? dto.gpa : existingScore.gpa;
+    const newGpa = dto.gpa !== undefined ? dto.gpa : (existingScore ? existingScore.gpa : 0.0);
     const newConductScore =
       dto.conductScore !== undefined
         ? dto.conductScore
-        : existingScore.conductScore;
+        : (existingScore ? existingScore.conductScore : 0.0);
 
     if (newGpa < 0 || newGpa > 4) {
       throw new BadRequestException('Điểm GPA phải nằm trong khoảng [0, 4]');
@@ -368,6 +474,63 @@ export class ScoresService {
     }
 
     const result = await this.prisma.$transaction(async (tx) => {
+      // 3.1. Delete all existing manual achievements for this student in this semester to avoid accumulation and allow updates
+      await tx.achievement.deleteMany({
+        where: {
+          userId: user.id,
+          semesterId,
+          note: 'Được tạo tự động khi cập nhật điểm thủ công',
+        },
+      });
+
+      // 3.2. If rank OR category is provided, create the new manual Achievement record
+      if (dto.rank || dto.category) {
+        let category: AchievementCategory;
+        let competitionId: number | null = null;
+        const rank = dto.rank || AchievementRank.NONE;
+
+        if (dto.competitionId) {
+          // Verify competition exists
+          const competition = await tx.competition.findUnique({
+            where: { id: dto.competitionId },
+          });
+          if (!competition) {
+            throw new NotFoundException(`Cuộc thi ID ${dto.competitionId} không tồn tại`);
+          }
+          if (competition.semesterId !== semesterId) {
+            throw new BadRequestException('Cuộc thi phải thuộc về học kỳ được chọn');
+          }
+
+          competitionId = dto.competitionId;
+          category =
+            competition.level === 'CENTRAL'
+              ? AchievementCategory.CENTRAL_COMPETITION
+              : AchievementCategory.ACADEMY_COMPETITION;
+        } else {
+          // If no competition is selected, rank MUST be NONE (participation/other)
+          if (rank !== AchievementRank.NONE) {
+            throw new BadRequestException('Các giải thưởng Nhất, Nhì, Ba yêu cầu phải chọn cuộc thi liên kết');
+          }
+          // Default or use provided category (ORGANIZATION_PARTICIPATION or SPECIAL_ACHIEVEMENT)
+          category = dto.category || AchievementCategory.ORGANIZATION_PARTICIPATION;
+        }
+
+        const bonusPoint = BONUS_POINT_MAP[category][rank];
+
+        await tx.achievement.create({
+          data: {
+            userId: user.id,
+            semesterId,
+            competitionId,
+            category,
+            rank,
+            bonusPoint,
+            status: 'APPROVED',
+            note: 'Được tạo tự động khi cập nhật điểm thủ công',
+          },
+        });
+      }
+
       // Re-query approved achievements in this semester
       const achievements = await tx.achievement.findMany({
         where: {
@@ -389,11 +552,21 @@ export class ScoresService {
       const gpaGrade = getGpaGrade(extendedGpa);
       const conductGrade = getConductGrade(newConductScore);
 
-      const updatedScore = await tx.studentSemesterScore.update({
+      const updatedScore = await tx.studentSemesterScore.upsert({
         where: {
           userId_semesterId: { userId: user.id, semesterId },
         },
-        data: {
+        update: {
+          gpa: newGpa,
+          maxBonusPoint,
+          extendedGpa,
+          conductScore: newConductScore,
+          gpaGrade,
+          conductGrade,
+        },
+        create: {
+          userId: user.id,
+          semesterId,
           gpa: newGpa,
           maxBonusPoint,
           extendedGpa,
