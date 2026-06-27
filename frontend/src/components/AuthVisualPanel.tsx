@@ -1,6 +1,6 @@
 import React from 'react';
-import { 
-  TrophyOutlined, 
+import {
+  TrophyOutlined,
   TrophyFilled,
   DotChartOutlined,
   StarOutlined,
@@ -42,7 +42,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ title, subtitl
           <span className="text-xl font-extrabold text-white">StarPointApp</span>
         </div>
 
-        <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg text-xs text-white font-bold self-start mt-6 shadow-lg">
+        <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg text-xs text-white font-bold self-start mt-6 shadow-lg animate-bounce" style={{ animationDuration: '4.5s' }}>
           <TrophyFilled className="text-yellow-400 text-base animate-pulse" />
           <div>
             <div className="text-[10px] text-slate-200/75 dark:text-slate-400/75 font-normal">Giải Nhất</div>
@@ -62,7 +62,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ title, subtitl
       {/* Floating elements inside canvas */}
       <div className="absolute inset-0 pointer-events-none">
         {/* GPA Badge */}
-        <div className="absolute top-[40%] left-[6%] animate-bounce px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg flex items-center gap-3 text-xs text-white font-bold shadow-lg" style={{ animationDuration: '4s' }}>
+        <div className="absolute top-[50%] left-[6%] animate-bounce px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg flex items-center gap-3 text-xs text-white font-bold shadow-lg" style={{ animationDuration: '4s' }}>
           <DotChartOutlined className="text-indigo-200 dark:text-indigo-400 text-base" />
           <div>
             <div className="text-[10px] text-slate-200/75 dark:text-slate-400/75 font-normal">GPA</div>
