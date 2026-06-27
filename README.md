@@ -26,7 +26,6 @@
 - [Tài khoản mặc định](#-tài-khoản-mặc-định)
 - [Kiểm thử](#-kiểm-thử)
 - [Hướng dẫn sử dụng](#-hướng-dẫn-sử-dụng)
-- [Đóng góp](#-đóng-góp)
 
 ---
 
@@ -390,10 +389,10 @@ Sau khi chạy seed, hệ thống tạo sẵn các tài khoản sau:
 
 | Vai trò | Mã số (Username) | Mật khẩu | Ghi chú |
 |---------|-------------------|-----------|---------|
-| **Admin** | `ADMIN001` | `admin123` | Toàn quyền quản trị hệ thống |
-| **Staff** | `STAFF001` | `staff123` | Quản lý nghiệp vụ |
-| **Student** | `SV001` | `student123` | Tài khoản sinh viên mẫu |
-| **Student** | `SV002` | `student123` | Tài khoản sinh viên mẫu |
+| **Admin** | `ADMIN001` | `password123` | Toàn quyền quản trị hệ thống |
+| **Staff** | `STAFF001` | `password123` | Quản lý nghiệp vụ |
+| **Student** | `SV001` | `password123` | Tài khoản sinh viên mẫu |
+| **Student** | `SV002` | `password123` | Tài khoản sinh viên mẫu |
 
 > ⚠️ **Lưu ý:** Hãy đổi mật khẩu mặc định ngay khi triển khai vào môi trường thực tế.
 
