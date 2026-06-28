@@ -181,7 +181,7 @@ export const BonusPointListPage = () => {
     try {
       const res = await scoresService.import(importSemesterId, importFile);
       if (res.success) {
-        message.success('Nhập dữ liệu điểm từ Excel thành công');
+        message.success(res.message || 'Nhập dữ liệu điểm từ Excel thành công');
         setIsImportModalOpen(false);
         setImportFile(null);
         fetchScores();

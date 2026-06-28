@@ -17,8 +17,9 @@ export function DataTable<T extends object>({
   searchPlaceholder = 'Tìm kiếm...',
   onSearch,
   searchValue,
-  pageSize = 10,
+  pageSize: initialPageSize = 10,
   loading,
+  pagination,
   ...rest
 }: DataTableProps<T>) {
   return (
@@ -39,20 +40,22 @@ export function DataTable<T extends object>({
         dataSource={dataSource}
         columns={columns}
         loading={loading}
+        {...rest}
         pagination={
-          rest.pagination !== false
+          pagination !== false
             ? {
-                pageSize,
                 showSizeChanger: true,
+                pageSizeOptions: ['10', '15', '20', '50', '100'],
                 className: 'pt-4',
-                ...rest.pagination,
+                defaultPageSize: pagination?.pageSize || initialPageSize,
+                ...pagination,
+                pageSize: undefined, // Keep it uncontrolled to allow size changes
               }
             : false
         }
         scroll={{ x: 'max-content', ...rest.scroll }}
         className="border border-slate-100 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-zinc-900"
         rowClassName={() => 'hover:bg-slate-50/50 transition-colors'}
-        {...rest}
       />
     </div>
   );

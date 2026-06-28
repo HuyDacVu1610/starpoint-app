@@ -256,7 +256,7 @@ export const ScholarshipListPage = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          pagination={{ pageSize: 15, showSizeChanger: true }}
+          pagination={{ defaultPageSize: 15, showSizeChanger: true }}
           scroll={{ x: 950 }}
         />
       </Card>

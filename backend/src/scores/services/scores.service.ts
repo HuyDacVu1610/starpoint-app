@@ -13,6 +13,7 @@ import { ScoresRepository } from '../repositories/scores.repository';
 import { QueryScoreDto } from '../dto/query-score.dto';
 import { ScholarshipsService } from '../../scholarships/services/scholarships.service';
 import { BONUS_POINT_MAP } from '../../achievements/constants/bonus-point-map';
+import { hash } from '../../shared/common/utils/crypto.util';
 
 export function getGpaGrade(extendedGpa: number): Grade {
   if (extendedGpa >= 3.6) return Grade.EXCELLENT;
@@ -99,9 +100,13 @@ export class ScoresService {
     let conductScoreKey = '';
     let competitionNameKey = '';
     let achievementRankKey = '';
+    let fullNameKey = '';
+    let emailKey = '';
 
     for (const key of keys) {
       const normalized = key
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .replace(/đ/g, 'd')
         .replace(/[^a-z0-9]/g, '');
@@ -142,6 +147,20 @@ export class ScoresService {
         normalized.includes('giai')
       ) {
         achievementRankKey = key;
+      } else if (
+        normalized.includes('fullname') ||
+        normalized.includes('hoten') ||
+        normalized.includes('hovaten') ||
+        normalized.includes('name') ||
+        normalized === 'ten'
+      ) {
+        fullNameKey = key;
+      } else if (
+        normalized.includes('email') ||
+        normalized.includes('gmail') ||
+        normalized === 'mail'
+      ) {
+        emailKey = key;
       }
     }
 
@@ -158,6 +177,7 @@ export class ScoresService {
 
     const validationErrors: string[] = [];
     const studentCodeCountMap = new Map<string, number[]>();
+    const emailRowsMap = new Map<string, number[]>();
 
     // 4. First Pass: Check for duplicates in the Excel file itself
     rows.forEach((row, index) => {
@@ -174,6 +194,19 @@ export class ScoresService {
           studentCodeCountMap.get(code)!.push(rowNum);
         }
       }
+
+      if (emailKey) {
+        const rawEmail = row[emailKey];
+        if (rawEmail !== undefined && rawEmail !== null) {
+          const email = String(rawEmail as any).trim().toLowerCase();
+          if (email) {
+            if (!emailRowsMap.has(email)) {
+              emailRowsMap.set(email, []);
+            }
+            emailRowsMap.get(email)!.push(rowNum);
+          }
+        }
+      }
     });
 
     for (const [code, rowsList] of studentCodeCountMap.entries()) {
@@ -184,9 +217,19 @@ export class ScoresService {
       }
     }
 
+    for (const [email, rowsList] of emailRowsMap.entries()) {
+      if (rowsList.length > 1) {
+        validationErrors.push(
+          `Email "${email}" bị trùng lặp trong file Excel tại các dòng: ${rowsList.join(', ')}`,
+        );
+      }
+    }
+
     // 5. Parse and validate row data
     const validParsedRows: Array<{
       studentCode: string;
+      fullName?: string;
+      email?: string;
       gpa: number;
       conductScore: number;
       competitionName?: string;
@@ -201,6 +244,8 @@ export class ScoresService {
       const rawConduct = row[conductScoreKey];
       const rawComp = competitionNameKey ? row[competitionNameKey] : undefined;
       const rawRank = achievementRankKey ? row[achievementRankKey] : undefined;
+      const rawFullName = fullNameKey ? row[fullNameKey] : undefined;
+      const rawEmail = emailKey ? row[emailKey] : undefined;
 
       // If checking duplicates already reported, still validate other bounds
       if (
@@ -221,6 +266,8 @@ export class ScoresService {
       const conductScore = Number(rawConduct);
       const competitionName = rawComp ? String(rawComp).trim() : undefined;
       const achievementRank = rawRank ? String(rawRank).trim() : undefined;
+      const fullName = rawFullName ? String(rawFullName).trim() : undefined;
+      const email = rawEmail ? String(rawEmail).trim() : undefined;
 
       if (isNaN(gpa) || gpa < 0 || gpa > 4) {
         validationErrors.push(
@@ -243,6 +290,8 @@ export class ScoresService {
 
       validParsedRows.push({
         studentCode,
+        fullName,
+        email,
         gpa,
         conductScore,
         competitionName,
@@ -255,7 +304,7 @@ export class ScoresService {
       throw new BadRequestException(validationErrors);
     }
 
-    // 6. Verify student codes exist in db
+    // 6. Verify student codes exist in db, or validate for auto-creation
     const studentCodes = validParsedRows.map((r) => r.studentCode);
     const dbUsers = await this.prisma.user.findMany({
       where: {
@@ -269,11 +318,75 @@ export class ScoresService {
 
     const dbUserMap = new Map(dbUsers.map((u) => [u.studentCode, u.id]));
 
+    // Query all emails in the system to verify uniqueness
+    const emailsToCheck = validParsedRows
+      .map((r) => r.email)
+      .filter((email): email is string => !!email);
+
+    const dbUsersByEmail = await this.prisma.user.findMany({
+      where: {
+        email: { in: emailsToCheck },
+      },
+      select: {
+        studentCode: true,
+        email: true,
+      },
+    });
+
+    const dbEmailMap = new Map(
+      dbUsersByEmail.map((u) => [u.email.toLowerCase(), u.studentCode]),
+    );
+
+    // Fetch semester competitions to validate names
+    const semesterComps = await this.prisma.competition.findMany({
+      where: { semesterId },
+    });
+    const compNamesSet = new Set(
+      semesterComps.map((c) => c.name.toLowerCase().trim().replace(/\s+/g, ' ')),
+    );
+
     validParsedRows.forEach((row) => {
-      if (!dbUserMap.has(row.studentCode)) {
+      // Validate competition and achievement rank consistency
+      if (row.competitionName && !row.achievementRank) {
         validationErrors.push(
-          `Dòng ${row.rowNum}: Sinh viên với mã "${row.studentCode}" không tồn tại trong hệ thống`,
+          `Dòng ${row.rowNum}: Điền tên cuộc thi "${row.competitionName}" nhưng chưa nhập hạng giải thưởng.`,
         );
+      } else if (!row.competitionName && row.achievementRank) {
+        validationErrors.push(
+          `Dòng ${row.rowNum}: Có hạng giải thưởng "${row.achievementRank}" nhưng chưa nhập tên cuộc thi.`,
+        );
+      }
+
+      // Validate competition exists if provided
+      if (row.competitionName) {
+        const normName = row.competitionName.toLowerCase().trim().replace(/\s+/g, ' ');
+        if (!compNamesSet.has(normName)) {
+          validationErrors.push(
+            `Dòng ${row.rowNum}: Cuộc thi "${row.competitionName}" không tồn tại trong học kỳ này trên hệ thống. Vui lòng tạo cuộc thi trước khi import.`,
+          );
+        }
+      }
+
+      const hasUser = dbUserMap.has(row.studentCode);
+      if (!hasUser) {
+        // Must have fullName and email to auto-create
+        if (!row.fullName || !row.email) {
+          validationErrors.push(
+            `Dòng ${row.rowNum}: Sinh viên với mã "${row.studentCode}" chưa tồn tại trong hệ thống. File Excel cần có cột "Họ tên" và "Email" để tự động tạo tài khoản.`,
+          );
+          return;
+        }
+
+        // Must not conflict with existing email
+        const emailLower = row.email.toLowerCase();
+        if (dbEmailMap.has(emailLower)) {
+          const existingStudentCode = dbEmailMap.get(emailLower)!;
+          if (existingStudentCode !== row.studentCode) {
+            validationErrors.push(
+              `Dòng ${row.rowNum}: Email "${row.email}" đã được đăng ký bởi sinh viên khác (mã "${existingStudentCode}").`,
+            );
+          }
+        }
       }
     });
 
@@ -281,8 +394,20 @@ export class ScoresService {
       throw new BadRequestException(validationErrors);
     }
 
+    let createdUsersCount = 0;
+    let createdScoresCount = 0;
+    let updatedScoresCount = 0;
+
     // 7. Perform updates in a single database transaction
     await this.prisma.$transaction(async (tx) => {
+      // Fetch STUDENT role
+      const studentRole = await tx.role.findUnique({
+        where: { name: 'STUDENT' },
+      });
+      if (!studentRole) {
+        throw new NotFoundException('Vai trò STUDENT không tồn tại trong hệ thống');
+      }
+
       // 7.1 Fetch competitions map for the current semester
       const compMap = new Map<string, any>();
       const hasCompetitionData = validParsedRows.some((r) => r.competitionName && r.achievementRank);
@@ -297,7 +422,28 @@ export class ScoresService {
       }
 
       for (const row of validParsedRows) {
-        const userId = dbUserMap.get(row.studentCode)!;
+        let userId = dbUserMap.get(row.studentCode);
+
+        // If user doesn't exist, auto-create
+        if (!userId) {
+          const passwordHash = await hash('password123');
+          const newUser = await tx.user.create({
+            data: {
+              studentCode: row.studentCode,
+              fullName: row.fullName!,
+              email: row.email!,
+              password: passwordHash,
+              userRoles: {
+                create: {
+                  roleId: studentRole.id,
+                },
+              },
+            },
+          });
+          userId = newUser.id;
+          dbUserMap.set(row.studentCode, userId); // Add to map
+          createdUsersCount++;
+        }
 
         // 7.2 Process optional competition achievement
         if (row.competitionName && row.achievementRank) {
@@ -395,6 +541,18 @@ export class ScoresService {
         const gpaGrade = getGpaGrade(extendedGpa);
         const conductGrade = getConductGrade(row.conductScore);
 
+        const existingScore = await tx.studentSemesterScore.findUnique({
+          where: {
+            userId_semesterId: { userId, semesterId },
+          },
+        });
+
+        if (existingScore) {
+          updatedScoresCount++;
+        } else {
+          createdScoresCount++;
+        }
+
         await tx.studentSemesterScore.upsert({
           where: {
             userId_semesterId: { userId, semesterId },
@@ -432,7 +590,7 @@ export class ScoresService {
 
     return {
       success: true,
-      message: `Đã import thành công bảng điểm cho ${validParsedRows.length} sinh viên`,
+      message: `Đã import thành công bảng điểm cho ${validParsedRows.length} sinh viên: Tạo mới ${createdUsersCount} tài khoản, nhập mới điểm cho ${createdScoresCount} sinh viên và cập nhật đè điểm cho ${updatedScoresCount} sinh viên.`,
     };
   }
 

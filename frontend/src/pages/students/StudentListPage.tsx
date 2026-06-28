@@ -360,7 +360,7 @@ export const StudentListPage = () => {
           columns={columns}
           rowKey="id"
           loading={loading}
-          pagination={{ pageSize: 10, showSizeChanger: true }}
+          pagination={{ defaultPageSize: 10, showSizeChanger: true }}
           scroll={{ x: 1200 }}
         />
       </Card>
