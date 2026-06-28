@@ -226,7 +226,7 @@ export const BonusPointListPage = () => {
       title: 'GPA Học Kỳ',
       dataIndex: 'gpa',
       key: 'gpa',
-      render: (val: number) => (val !== undefined && val !== null ? val.toFixed(2) : '0.00'),
+      render: (val: number | null) => (val !== undefined && val !== null ? val.toFixed(2) : '-'),
     },
     {
       title: 'Điểm Cộng Thêm',
@@ -239,25 +239,29 @@ export const BonusPointListPage = () => {
       dataIndex: 'extendedGpa',
       key: 'extendedGpa',
       className: 'font-extrabold text-indigo-600 dark:text-indigo-400',
-      render: (val: number) => (val !== undefined && val !== null ? val.toFixed(2) : '0.00'),
+      render: (val: number | null, record: Score) =>
+        record.gpa !== undefined && record.gpa !== null && val !== undefined && val !== null
+          ? val.toFixed(2)
+          : '-',
     },
     {
       title: 'Xếp Loại GPA',
       dataIndex: 'gpaGrade',
       key: 'gpaGrade',
-      render: (grade: string) => <GradeTag grade={grade} />,
+      render: (grade: string | null) => <GradeTag grade={grade} />,
     },
     {
       title: 'Điểm Rèn Luyện',
       dataIndex: 'conductScore',
       key: 'conductScore',
       className: 'font-semibold text-slate-700',
+      render: (val: number | null) => (val !== undefined && val !== null ? val : '-'),
     },
     {
       title: 'Xếp Loại RL',
       dataIndex: 'conductGrade',
       key: 'conductGrade',
-      render: (grade: string) => <GradeTag grade={grade} />,
+      render: (grade: string | null) => <GradeTag grade={grade} />,
     },
     ...(canManage
       ? [
@@ -349,7 +353,13 @@ export const BonusPointListPage = () => {
           loading={loading}
           pageSize={15}
           rowClassName={(record: Score) => {
-            const isEligible = record.extendedGpa >= 2.5 && record.conductScore >= 70;
+            const isEligible =
+              record.gpa !== null &&
+              record.gpa !== undefined &&
+              record.conductScore !== null &&
+              record.conductScore !== undefined &&
+              record.extendedGpa >= 2.5 &&
+              record.conductScore >= 70;
             return isEligible 
               ? 'bg-emerald-50/30 dark:bg-emerald-950/20 hover:bg-emerald-100/40 dark:hover:bg-emerald-900/30 transition-colors font-medium text-emerald-800 dark:text-emerald-300' 
               : 'hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors';
@@ -422,12 +432,11 @@ export const BonusPointListPage = () => {
           )}
           <Form.Item
             name="gpa"
-            label="Điểm GPA Học Kỳ (Thang 4)"
+            label="Điểm GPA Học Kỳ (Thang 4) (Tùy chọn)"
             rules={[
-              { required: true, message: 'Vui lòng nhập điểm GPA' },
               {
                 validator: (_, value) => {
-                  if (value === undefined || (value >= 0 && value <= 4)) return Promise.resolve();
+                  if (value === undefined || value === null || (value >= 0 && value <= 4)) return Promise.resolve();
                   return Promise.reject(new Error('GPA phải nằm trong khoảng [0.0, 4.0]'));
                 },
               },
@@ -438,12 +447,11 @@ export const BonusPointListPage = () => {
 
           <Form.Item
             name="conductScore"
-            label="Điểm Rèn Luyện (Thang 100)"
+            label="Điểm Rèn Luyện (Thang 100) (Tùy chọn)"
             rules={[
-              { required: true, message: 'Vui lòng nhập điểm rèn luyện' },
               {
                 validator: (_, value) => {
-                  if (value === undefined || (Number.isInteger(value) && value >= 0 && value <= 100)) {
+                  if (value === undefined || value === null || (Number.isInteger(value) && value >= 0 && value <= 100)) {
                     return Promise.resolve();
                   }
                   return Promise.reject(new Error('Điểm rèn luyện phải là số nguyên trong khoảng [0, 100]'));

@@ -6,9 +6,17 @@ import { ScholarshipsRepository } from '../repositories/scholarships.repository'
 import { QueryCandidateDto } from '../dto/query-candidate.dto';
 
 export function calculateScholarship(
-  gpaGrade: Grade,
-  conductGrade: Grade,
+  gpaGrade: Grade | null,
+  conductGrade: Grade | null,
 ): { isEligible: boolean; scholarshipTier: Grade | null; note: string } {
+  if (!gpaGrade || !conductGrade) {
+    return {
+      isEligible: false,
+      scholarshipTier: null,
+      note: 'Chưa có đầy đủ thông tin xếp loại GPA học tập hoặc xếp loại rèn luyện',
+    };
+  }
+
   const isGpaEligible =
     gpaGrade === Grade.EXCELLENT ||
     gpaGrade === Grade.GOOD ||

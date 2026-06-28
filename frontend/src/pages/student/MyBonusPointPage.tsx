@@ -66,8 +66,10 @@ export const MyBonusPointPage = () => {
     fetchMyScore();
   }, [selectedSemester]);
 
-  const renderGradeBadge = (gradeStr?: string) => {
-    if (!gradeStr) return null;
+  const renderGradeBadge = (gradeStr?: string | null) => {
+    if (!gradeStr) {
+      return <span className="text-slate-400 font-medium text-xs">Chưa xếp loại</span>;
+    }
     const gradeObj = GRADE_MAP[gradeStr] || { label: gradeStr, color: 'text-slate-600 bg-slate-50' };
     return (
       <span className={`px-3 py-1 text-xs font-bold rounded-full border ${gradeObj.color}`}>
@@ -116,7 +118,7 @@ export const MyBonusPointPage = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="text-4xl font-extrabold text-slate-800">
-                    {score.gpa.toFixed(2)}
+                    {score.gpa !== null && score.gpa !== undefined ? score.gpa.toFixed(2) : '-'}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-400">Xếp loại học tập:</span>
@@ -157,7 +159,7 @@ export const MyBonusPointPage = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="text-4xl font-black">
-                    {score.extendedGpa.toFixed(2)}
+                    {score.gpa !== null && score.gpa !== undefined ? score.extendedGpa.toFixed(2) : '-'}
                   </div>
                   <div className="text-xs text-indigo-100 font-medium">
                     Bằng GPA gốc + Điểm cộng mở rộng (Tối đa 4.0)
@@ -178,7 +180,7 @@ export const MyBonusPointPage = () => {
                   <Col xs={24} sm={8} className="text-center">
                     <Progress
                       type="dashboard"
-                      percent={score.conductScore}
+                      percent={score.conductScore ?? 0}
                       strokeColor={{
                         '0%': '#87d068',
                         '100%': '#108ee9',
@@ -189,7 +191,9 @@ export const MyBonusPointPage = () => {
                   <Col xs={24} sm={16} className="space-y-4">
                     <div>
                       <span className="text-xs text-slate-400 block mb-1">Điểm Rèn Luyện Đạt Được</span>
-                      <strong className="text-3xl text-slate-800 font-extrabold">{score.conductScore} / 100</strong>
+                      <strong className="text-3xl text-slate-800 font-extrabold">
+                        {score.conductScore !== null && score.conductScore !== undefined ? `${score.conductScore} / 100` : 'Chưa nhập'}
+                      </strong>
                     </div>
                     <div>
                       <span className="text-xs text-slate-400 block mb-1">Xếp Loại Rèn Luyện</span>

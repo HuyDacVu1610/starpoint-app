@@ -616,16 +616,16 @@ export class ScoresService {
     );
 
     // 3. Update parameters
-    const newGpa = dto.gpa !== undefined ? dto.gpa : (existingScore ? existingScore.gpa : 0.0);
+    const newGpa = dto.gpa !== undefined ? dto.gpa : (existingScore ? existingScore.gpa : null);
     const newConductScore =
       dto.conductScore !== undefined
         ? dto.conductScore
-        : (existingScore ? existingScore.conductScore : 0.0);
+        : (existingScore ? existingScore.conductScore : null);
 
-    if (newGpa < 0 || newGpa > 4) {
+    if (newGpa !== null && (newGpa < 0 || newGpa > 4)) {
       throw new BadRequestException('Điểm GPA phải nằm trong khoảng [0, 4]');
     }
-    if (newConductScore < 0 || newConductScore > 100) {
+    if (newConductScore !== null && (newConductScore < 0 || newConductScore > 100)) {
       throw new BadRequestException(
         'Điểm rèn luyện phải nằm trong khoảng [0, 100]',
       );
@@ -706,9 +706,9 @@ export class ScoresService {
           ? Math.max(...achievements.map((a) => a.bonusPoint))
           : 0.0;
 
-      const extendedGpa = Number((newGpa + maxBonusPoint).toFixed(2));
-      const gpaGrade = getGpaGrade(extendedGpa);
-      const conductGrade = getConductGrade(newConductScore);
+      const extendedGpa = Number(((newGpa ?? 0.0) + maxBonusPoint).toFixed(2));
+      const gpaGrade = newGpa !== null ? getGpaGrade(extendedGpa) : null;
+      const conductGrade = newConductScore !== null ? getConductGrade(newConductScore) : null;
 
       const updatedScore = await tx.studentSemesterScore.upsert({
         where: {
@@ -756,15 +756,11 @@ export class ScoresService {
     const prismaClient = tx || this.prisma;
 
     // Check if score record exists
-    const score = await prismaClient.studentSemesterScore.findUnique({
+    let score = await prismaClient.studentSemesterScore.findUnique({
       where: {
         userId_semesterId: { userId, semesterId },
       },
     });
-
-    if (!score) {
-      return;
-    }
 
     // Fetch approved achievements
     const achievements = await prismaClient.achievement.findMany({
@@ -783,19 +779,41 @@ export class ScoresService {
         ? Math.max(...achievements.map((a) => a.bonusPoint))
         : 0.0;
 
-    const extendedGpa = Number((score.gpa + maxBonusPoint).toFixed(2));
-    const gpaGrade = getGpaGrade(extendedGpa);
+    if (!score) {
+      if (achievements.length === 0) {
+        return;
+      }
 
-    await prismaClient.studentSemesterScore.update({
-      where: {
-        userId_semesterId: { userId, semesterId },
-      },
-      data: {
-        maxBonusPoint,
-        extendedGpa,
-        gpaGrade,
-      },
-    });
+      // Create a new record with null base GPA and conduct score, but calculate maxBonusPoint & extendedGpa
+      const extendedGpa = maxBonusPoint;
+      await prismaClient.studentSemesterScore.create({
+        data: {
+          userId,
+          semesterId,
+          gpa: null,
+          conductScore: null,
+          maxBonusPoint,
+          extendedGpa,
+          gpaGrade: null,
+          conductGrade: null,
+        },
+      });
+    } else {
+      const baseGpa = score.gpa ?? 0.0;
+      const extendedGpa = Number((baseGpa + maxBonusPoint).toFixed(2));
+      const gpaGrade = score.gpa !== null ? getGpaGrade(extendedGpa) : null;
+
+      await prismaClient.studentSemesterScore.update({
+        where: {
+          userId_semesterId: { userId, semesterId },
+        },
+        data: {
+          maxBonusPoint,
+          extendedGpa,
+          gpaGrade,
+        },
+      });
+    }
 
     // Recalculate scholarship candidate
     await this.scholarshipsService.reevaluateCandidate(

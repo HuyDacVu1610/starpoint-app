@@ -1,7 +1,7 @@
 import { Tag } from 'antd';
 
 interface GradeTagProps {
-  grade: string;
+  grade?: string | null;
 }
 
 const GRADE_CONFIG_MAP: Record<string, { label: string; color: string }> = {
@@ -22,7 +22,10 @@ const GRADE_CONFIG_MAP: Record<string, { label: string; color: string }> = {
 };
 
 export const GradeTag = ({ grade }: GradeTagProps) => {
-  const normalized = grade ? grade.toUpperCase() : 'NONE';
+  if (!grade) {
+    return <span className="text-slate-400 font-medium text-xs">Chưa xếp loại</span>;
+  }
+  const normalized = grade.toUpperCase();
   const config = GRADE_CONFIG_MAP[normalized] || { label: grade, color: 'default' };
 
   return (

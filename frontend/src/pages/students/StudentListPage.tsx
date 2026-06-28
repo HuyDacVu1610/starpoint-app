@@ -225,8 +225,8 @@ export const StudentListPage = () => {
       width: 100,
       render: (_: any, record: User) => {
         const scores = (record as any).semesterScores;
-        if (scores && scores.length > 0) {
-          return <span className="font-semibold text-slate-700">{scores[0].gpa?.toFixed(2)}</span>;
+        if (scores && scores.length > 0 && scores[0].gpa !== null && scores[0].gpa !== undefined) {
+          return <span className="font-semibold text-slate-700">{scores[0].gpa.toFixed(2)}</span>;
         }
         const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');
         return isStudent ? <span className="text-slate-400 font-medium text-xs">Chưa nhập</span> : <span className="text-slate-300">-</span>;
@@ -238,7 +238,7 @@ export const StudentListPage = () => {
       width: 100,
       render: (_: any, record: User) => {
         const scores = (record as any).semesterScores;
-        if (scores && scores.length > 0) {
+        if (scores && scores.length > 0 && scores[0].conductScore !== null && scores[0].conductScore !== undefined) {
           return <span className="font-semibold text-slate-700">{scores[0].conductScore}</span>;
         }
         const isStudent = record.userRoles?.some((ur) => ur.role.name === 'STUDENT');

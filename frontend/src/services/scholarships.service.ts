@@ -15,8 +15,8 @@ export interface ScholarshipCandidate {
   };
   semesterId: number;
   semester?: Semester;
-  gpa: number;
-  conductScore: number;
+  gpa: number | null;
+  conductScore: number | null;
   extendedGpa: number;
   isEligible: boolean;
   scholarshipTier: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'NONE';

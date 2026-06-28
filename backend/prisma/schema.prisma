@@ -186,12 +186,12 @@ model StudentSemesterScore {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   semesterId    Int
   semester      Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
-  gpa           Float
+  gpa           Float?
   maxBonusPoint Float    @default(0)
   extendedGpa   Float
-  conductScore  Float
-  conductGrade  Grade
-  gpaGrade      Grade
+  conductScore  Float?
+  conductGrade  Grade?
+  gpaGrade      Grade?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -206,8 +206,8 @@ model ScholarshipCandidate {
   semesterId      Int
   semester        Semester @relation(fields: [semesterId], references: [id], onDelete: Restrict)
   extendedGpa     Float
-  conductGrade    Grade
-  gpaGrade        Grade
+  conductGrade    Grade?
+  gpaGrade        Grade?
   isEligible      Boolean
   scholarshipTier Grade?
   note            String?

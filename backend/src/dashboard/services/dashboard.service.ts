@@ -92,10 +92,12 @@ export class DashboardService {
     }));
 
     // Format grade data
-    const gradeData = gpaGradeDistribution.map((item) => ({
-      grade: item.gpaGrade,
-      count: item._count.id,
-    }));
+    const gradeData = gpaGradeDistribution
+      .filter((item) => item.gpaGrade !== null)
+      .map((item) => ({
+        grade: item.gpaGrade,
+        count: item._count.id,
+      }));
 
     const result = {
       categoryData,

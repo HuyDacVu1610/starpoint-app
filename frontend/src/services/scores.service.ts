@@ -15,8 +15,10 @@ export interface Score {
   };
   semesterId: number;
   semester?: Semester;
-  gpa: number;
-  conductScore: number;
+  gpa: number | null;
+  conductScore: number | null;
+  gpaGrade?: string | null;
+  conductGrade?: string | null;
   bonusPoint: number;
   maxBonusPoint?: number;
   extendedGpa: number;

@@ -124,8 +124,8 @@ export class ScholarshipsRepository {
     semesterId: number,
     data: {
       extendedGpa: number;
-      conductGrade: Grade;
-      gpaGrade: Grade;
+      conductGrade: Grade | null;
+      gpaGrade: Grade | null;
       isEligible: boolean;
       scholarshipTier: Grade | null;
       note?: string | null;

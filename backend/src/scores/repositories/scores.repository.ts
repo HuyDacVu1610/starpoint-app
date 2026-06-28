@@ -109,12 +109,12 @@ export class ScoresRepository {
     userId: number,
     semesterId: number,
     data: {
-      gpa: number;
+      gpa: number | null;
       maxBonusPoint: number;
       extendedGpa: number;
-      conductScore: number;
-      conductGrade: Grade;
-      gpaGrade: Grade;
+      conductScore: number | null;
+      conductGrade: Grade | null;
+      gpaGrade: Grade | null;
     },
   ) {
     return this.prisma.studentSemesterScore.upsert({

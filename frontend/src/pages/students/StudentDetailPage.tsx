@@ -225,10 +225,10 @@ export const StudentDetailPage = () => {
       key: 'semesterName',
     },
     {
-      title: 'GPA gốc',
+      title: 'GPA Học Tập',
       dataIndex: 'gpa',
       key: 'gpa',
-      render: (val: number) => val.toFixed(2),
+      render: (val: number | null) => (val !== null && val !== undefined ? val.toFixed(2) : '-'),
     },
     {
       title: 'Điểm Cộng Thưởng',
@@ -247,18 +247,19 @@ export const StudentDetailPage = () => {
       title: 'Xếp Loại GPA',
       dataIndex: 'gpaGrade',
       key: 'gpaGrade',
-      render: (grade: string) => <GradeTag grade={grade} />,
+      render: (grade: string | null) => <GradeTag grade={grade} />,
     },
     {
       title: 'Điểm Rèn Luyện',
       dataIndex: 'conductScore',
       key: 'conductScore',
+      render: (val: number | null) => (val !== null && val !== undefined ? val : '-'),
     },
     {
       title: 'Xếp Loại RL',
       dataIndex: 'conductGrade',
       key: 'conductGrade',
-      render: (grade: string) => <GradeTag grade={grade} />,
+      render: (grade: string | null) => <GradeTag grade={grade} />,
     },
   ];
 
