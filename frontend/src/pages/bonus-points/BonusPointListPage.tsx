@@ -36,12 +36,15 @@ export const BonusPointListPage = () => {
   const [importLoading, setImportLoading] = useState(false);
   const [importErrors, setImportErrors] = useState<string[]>([]);
 
+  const [activeSemester, setActiveSemester] = useState<Semester | null>(null);
+
   // Search & Filter
   const [search, setSearch] = useState('');
   const [selectedSemester, setSelectedSemester] = useState<number | undefined>(undefined);
 
   const [editForm] = Form.useForm();
   const canManage = hasPermission('MANAGE_BONUS');
+  const isEditable = activeSemester && selectedSemester === activeSemester.id;
 
   const fetchSemesters = async () => {
     try {
@@ -50,9 +53,24 @@ export const BonusPointListPage = () => {
         const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         
-        // Auto select current or first semester if none selected
         if (semesterList.length > 0 && !selectedSemester) {
-          setSelectedSemester(semesterList[0].id);
+          // Try to default to the active semester
+          try {
+            const activeRes = await semestersService.getActiveSemester();
+            if (activeRes.success && activeRes.data) {
+              setActiveSemester(activeRes.data);
+              const activeId = activeRes.data.id;
+              // Only use active semester if it exists in the list
+              if (semesterList.find((s: any) => s.id === activeId)) {
+                setSelectedSemester(activeId);
+                return;
+              }
+            }
+          } catch {
+            // Ignore - fall through to default
+          }
+          // Fallback: pick the most recent semester (last item since sorted by startDate ASC)
+          setSelectedSemester(semesterList[semesterList.length - 1].id);
         }
       }
     } catch (err) {
@@ -263,7 +281,7 @@ export const BonusPointListPage = () => {
       key: 'conductGrade',
       render: (grade: string | null) => <GradeTag grade={grade} />,
     },
-    ...(canManage
+    ...(canManage && isEditable
       ? [
           {
             title: 'Hành Động',
@@ -290,7 +308,7 @@ export const BonusPointListPage = () => {
         subtitle="Tra cứu bảng điểm, điểm rèn luyện, tính điểm cộng mở rộng gpa học tập"
         breadcrumbs={[{ title: 'Quản trị' }, { title: 'Quản lý điểm số' }]}
         extra={
-          canManage && (
+          canManage && isEditable && (
             <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 type="primary"
@@ -307,6 +325,9 @@ export const BonusPointListPage = () => {
                 onClick={() => {
                   setImportErrors([]);
                   setImportFile(null);
+                  if (activeSemester) {
+                    setImportSemesterId(activeSemester.id);
+                  }
                   setIsImportModalOpen(true);
                 }}
                 className="bg-emerald-600 hover:bg-emerald-700 border-none rounded-lg shadow-sm flex items-center gap-1.5 font-semibold"
@@ -319,6 +340,18 @@ export const BonusPointListPage = () => {
       />
 
       <Card className="border border-slate-100 dark:border-zinc-800 rounded-xl shadow-sm bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
+        {!isEditable && activeSemester && (
+          <Alert
+            message={
+              <span>
+                Bạn đang xem dữ liệu của <strong>{semesters.find(s => s.id === selectedSemester)?.name}</strong>. Chỉ có thể cập nhật, nhập điểm cho học kỳ hiện tại (<strong>{activeSemester.name}</strong>).
+              </span>
+            }
+            type="warning"
+            showIcon
+            className="mb-6 rounded-lg"
+          />
+        )}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={10}>
             <Input
@@ -529,12 +562,13 @@ export const BonusPointListPage = () => {
       >
         <div className="mt-4 space-y-4">
           <Form layout="vertical">
-            <Form.Item label="Chọn học kỳ nạp điểm" required>
+            <Form.Item label="Chọn học kỳ nạp điểm" required extra={activeSemester ? `Bắt buộc chọn học kỳ hiện tại: ${activeSemester.name}` : undefined}>
               <Select
                 placeholder="Chọn học kỳ..."
                 value={importSemesterId}
                 onChange={setImportSemesterId}
                 className="w-full"
+                disabled
               >
                 {semesters.map((sem) => (
                   <Option key={sem.id} value={sem.id}>

@@ -23,6 +23,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const res = exception.getResponse() as string | Record<string, unknown>;
+      if (status === 400) {
+        console.warn('--- 400 Bad Request Exception ---');
+        console.warn('Response:', JSON.stringify(res, null, 2));
+        console.warn('---------------------------------');
+      }
       if (typeof res === 'string') {
         message = res;
         errors = [res];

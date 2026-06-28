@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Card, Modal, Form, Select, Upload, Tag, App, Input } from 'antd';
+import { Table, Button, Card, Modal, Form, Select, Upload, Tag, App, Input, Alert } from 'antd';
 import { PlusOutlined, DeleteOutlined, InboxOutlined, FileTextOutlined } from '@ant-design/icons';
 import { achievementsService } from '../../services/achievements.service';
 import type { Achievement } from '../../services/achievements.service';
@@ -42,6 +42,8 @@ export const MyAchievementsPage = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadedFileId, setUploadedFileId] = useState<number | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string>('');
+  const [activeSemester, setActiveSemester] = useState<Semester | null>(null);
+  const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
 
   const [form] = Form.useForm();
   const selectedSemester = Form.useWatch('semesterId', form);
@@ -76,6 +78,17 @@ export const MyAchievementsPage = () => {
     }
   };
 
+  const fetchActiveSemester = async () => {
+    try {
+      const res = await semestersService.getActiveSemester();
+      if (res.success && res.data) {
+        setActiveSemester(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching active semester:', err);
+    }
+  };
+
   const fetchCompetitions = async (semesterId: number, category: string) => {
     if (category !== 'CENTRAL_COMPETITION' && category !== 'ACADEMY_COMPETITION') {
       setCompetitions([]);
@@ -102,7 +115,19 @@ export const MyAchievementsPage = () => {
   useEffect(() => {
     fetchMyAchievements();
     fetchSemesters();
+    fetchActiveSemester();
   }, []);
+
+  useEffect(() => {
+    if (activeSemester) {
+      const now = new Date();
+      const endDate = new Date(activeSemester.endDate);
+      const deadline = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      setIsDeadlinePassed(now > deadline);
+    } else {
+      setIsDeadlinePassed(false);
+    }
+  }, [activeSemester]);
 
   // Fetch competitions reactively when semester or category changes
   useEffect(() => {
@@ -120,10 +145,19 @@ export const MyAchievementsPage = () => {
     }
   }, [selectedSemester, selectedCategory]);
 
-  const handleOpenAdd = () => {
+  const handleOpenAdd = async () => {
     form.resetFields();
     setUploadedFileId(null);
     setUploadedFileName('');
+    try {
+      const res = await semestersService.getActiveSemester();
+      if (res.success && res.data) {
+        setActiveSemester(res.data);
+        form.setFieldValue('semesterId', res.data.id);
+      }
+    } catch (err) {
+      console.error('Error fetching active semester on open:', err);
+    }
     setIsModalOpen(true);
   };
 
@@ -182,6 +216,17 @@ export const MyAchievementsPage = () => {
         message.error(res.message || 'Lỗi gửi minh chứng');
       }
     } catch (err: any) {
+      if (err.errorFields) {
+        const isCompetitionMissing = err.errorFields.some(
+          (field: any) => field.name.includes('competitionId')
+        );
+        if (isCompetitionMissing) {
+          message.error('Chưa nhập cuộc thi');
+        } else {
+          message.error('Vui lòng điền đầy đủ các thông tin bắt buộc');
+        }
+        return;
+      }
       const responseData = err.response?.data;
       if (responseData) {
         if (responseData.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
@@ -337,10 +382,23 @@ export const MyAchievementsPage = () => {
         onCancel={() => setIsModalOpen(false)}
         okText="Gửi duyệt"
         cancelText="Huỷ"
-        okButtonProps={{ className: 'bg-indigo-600 hover:bg-indigo-700', loading: uploading }}
+        okButtonProps={{ 
+          className: 'bg-indigo-600 hover:bg-indigo-700', 
+          loading: uploading,
+          disabled: isDeadlinePassed
+        }}
         destroyOnClose
         width={600}
       >
+        {isDeadlinePassed && (
+          <Alert
+            message="Hạn nộp minh chứng cho học kỳ này đã kết thúc"
+            description="Hệ thống chỉ chấp nhận nộp minh chứng trước khi kết thúc học kỳ 7 ngày."
+            type="error"
+            showIcon
+            className="mt-2 mb-4"
+          />
+        )}
         <Form form={form} layout="vertical" className="mt-4">
           <div className="grid grid-cols-2 gap-4">
             <Form.Item
@@ -348,7 +406,7 @@ export const MyAchievementsPage = () => {
               label="Học Kỳ"
               rules={[{ required: true, message: 'Vui lòng chọn học kỳ' }]}
             >
-              <Select placeholder="Chọn học kỳ">
+              <Select placeholder="Chọn học kỳ" disabled>
                 {semesters.map((sem) => (
                   <Option key={sem.id} value={sem.id}>
                     {sem.name}

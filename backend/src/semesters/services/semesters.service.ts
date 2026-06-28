@@ -39,6 +39,14 @@ export class SemestersService {
     return semester;
   }
 
+  async findCurrentActiveSemester() {
+    const semester = await this.semestersRepository.findActiveSemester();
+    if (!semester) {
+      throw new NotFoundException('Không tìm thấy học kỳ hiện tại');
+    }
+    return semester;
+  }
+
   async create(dto: CreateSemesterDto) {
     if (dto.startDate >= dto.endDate) {
       throw new BadRequestException('Ngày bắt đầu phải trước ngày kết thúc');

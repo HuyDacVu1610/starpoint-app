@@ -69,6 +69,24 @@ export class ScoresService {
       throw new NotFoundException(`Học kỳ id ${semesterId} không tồn tại`);
     }
 
+    // 1.1 Verify active semester
+    const now = new Date();
+    let activeSemester = await this.prisma.semester.findFirst({
+      where: {
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+    });
+    if (!activeSemester) {
+      activeSemester = await this.prisma.semester.findFirst({
+        orderBy: { endDate: 'desc' },
+      });
+    }
+
+    if (!activeSemester || semesterId !== activeSemester.id) {
+      throw new BadRequestException('Chỉ được phép nhập điểm từ Excel cho học kỳ hiện tại');
+    }
+
     // 2. Parse Excel
     let workbook: xlsx.WorkBook;
     try {
@@ -599,6 +617,24 @@ export class ScoresService {
     studentCode: string,
     dto: { gpa?: number; conductScore?: number; competitionId?: number; rank?: AchievementRank; category?: AchievementCategory },
   ) {
+    // 0. Verify active semester
+    const now = new Date();
+    let activeSemester = await this.prisma.semester.findFirst({
+      where: {
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+    });
+    if (!activeSemester) {
+      activeSemester = await this.prisma.semester.findFirst({
+        orderBy: { endDate: 'desc' },
+      });
+    }
+
+    if (!activeSemester || semesterId !== activeSemester.id) {
+      throw new BadRequestException('Chỉ được phép cập nhật điểm thủ công cho học kỳ hiện tại');
+    }
+
     // 1. Verify user exists
     const user = await this.prisma.user.findFirst({
       where: { studentCode: studentCode.toUpperCase() },

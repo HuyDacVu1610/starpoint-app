@@ -31,7 +31,21 @@ export const MyBonusPointPage = () => {
         const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         if (semesterList.length > 0) {
-          setSelectedSemester(semesterList[0].id);
+          // Try to default to the active semester
+          try {
+            const activeRes = await semestersService.getActiveSemester();
+            if (activeRes.success && activeRes.data) {
+              const activeId = activeRes.data.id;
+              if (semesterList.find((s: any) => s.id === activeId)) {
+                setSelectedSemester(activeId);
+                return;
+              }
+            }
+          } catch {
+            // Ignore - fall through to default
+          }
+          // Fallback: pick the most recent semester (last item since sorted by startDate ASC)
+          setSelectedSemester(semesterList[semesterList.length - 1].id);
         }
       }
     } catch (err) {

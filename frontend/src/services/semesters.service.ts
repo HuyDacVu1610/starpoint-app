@@ -32,6 +32,11 @@ export const semestersService = {
     return res.data;
   },
 
+  getActiveSemester: async () => {
+    const res = await api.get('/semesters/active/current');
+    return res.data;
+  },
+
   delete: async (id: number) => {
     const res = await api.delete(`/semesters/${id}`);
     return res.data;

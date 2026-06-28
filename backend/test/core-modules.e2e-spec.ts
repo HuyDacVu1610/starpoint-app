@@ -50,6 +50,12 @@ describe('Core Modules (e2e)', () => {
     });
 
     for (const sem of existingSemesters) {
+      await prisma.studentSemesterScore.deleteMany({
+        where: { semesterId: sem.id },
+      });
+      await prisma.scholarshipCandidate.deleteMany({
+        where: { semesterId: sem.id },
+      });
       await prisma.achievement.deleteMany({
         where: { semesterId: sem.id },
       });
@@ -101,8 +107,8 @@ describe('Core Modules (e2e)', () => {
           name: 'Học kỳ 1 Năm học 2026-2027',
           year: 2026,
           term: 1,
-          startDate: '2026-09-01T00:00:00.000Z',
-          endDate: '2027-01-15T00:00:00.000Z',
+          startDate: '2026-05-01T00:00:00.000Z',
+          endDate: '2026-12-31T00:00:00.000Z',
         })
         .expect(HttpStatus.CREATED);
 

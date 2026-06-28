@@ -18,7 +18,7 @@ export const CompetitionListPage = () => {
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [activeSemester, setActiveSemester] = useState<Semester | null>(null);
   
   // Filters state
   const [search, setSearch] = useState('');
@@ -35,6 +35,12 @@ export const CompetitionListPage = () => {
       if (res.success && res.data) {
         const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
+      }
+
+      // Fetch active semester
+      const activeRes = await semestersService.getActiveSemester();
+      if (activeRes.success && activeRes.data) {
+        setActiveSemester(activeRes.data);
       }
     } catch (err) {
       console.error('Error fetching semesters:', err);
@@ -71,9 +77,27 @@ export const CompetitionListPage = () => {
     fetchCompetitions();
   }, [search, selectedSemester, selectedLevel]);
 
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+  // Watch semesterId value to restrict DatePicker range
+  const watchedSemesterId = Form.useWatch('semesterId', form);
+  const selectedSemesterObj = semesters.find(s => s.id === watchedSemesterId);
+
+  const disabledDate = (current: any) => {
+    if (!selectedSemesterObj) return false;
+    const start = dayjs(selectedSemesterObj.startDate).startOf('day');
+    const end = dayjs(selectedSemesterObj.endDate).endOf('day');
+    return current && (current.isBefore(start) || current.isAfter(end));
+  };
+
   const handleOpenAdd = () => {
     form.resetFields();
     setEditingId(null);
+    if (activeSemester) {
+      form.setFieldsValue({
+        semesterId: activeSemester.id,
+      });
+    }
     setIsModalOpen(true);
   };
 
@@ -309,8 +333,9 @@ export const CompetitionListPage = () => {
             name="semesterId"
             label="Học Kỳ"
             rules={[{ required: true, message: 'Vui lòng chọn học kỳ' }]}
+            extra={!editingId && activeSemester ? `Bắt buộc chọn học kỳ hiện tại: ${activeSemester.name}` : undefined}
           >
-            <Select placeholder="Chọn học kỳ tổ chức">
+            <Select placeholder="Chọn học kỳ tổ chức" disabled={!editingId}>
               {semesters.map((sem) => (
                 <Option key={sem.id} value={sem.id}>
                   {sem.name}
@@ -335,8 +360,9 @@ export const CompetitionListPage = () => {
               name="eventDate"
               label="Ngày Tổ Chức"
               rules={[{ required: true, message: 'Vui lòng chọn ngày tổ chức' }]}
+              extra={selectedSemesterObj ? `Phải nằm trong khoảng ${dayjs(selectedSemesterObj.startDate).format('DD/MM/YYYY')} - ${dayjs(selectedSemesterObj.endDate).format('DD/MM/YYYY')}` : undefined}
             >
-              <DatePicker className="w-full" format="DD/MM/YYYY" />
+              <DatePicker className="w-full" format="DD/MM/YYYY" disabledDate={disabledDate} />
             </Form.Item>
           </div>
 

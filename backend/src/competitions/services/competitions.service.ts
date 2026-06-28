@@ -53,6 +53,12 @@ export class CompetitionsService {
     // Validate that the semester exists
     const semester = await this.semestersService.findById(dto.semesterId);
 
+    // Validate that the semester is the active semester
+    const activeSemester = await this.semestersService.findCurrentActiveSemester();
+    if (!activeSemester || semester.id !== activeSemester.id) {
+      throw new BadRequestException('Chỉ được phép tạo cuộc thi cho học kỳ hiện tại');
+    }
+
     // Validate that eventDate falls within the semester's range
     if (dto.eventDate < semester.startDate || dto.eventDate > semester.endDate) {
       throw new BadRequestException(

@@ -54,6 +54,22 @@ export class SemestersRepository {
     });
   }
 
+  async findActiveSemester() {
+    const now = new Date();
+    let current = await this.prisma.semester.findFirst({
+      where: {
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+    });
+    if (!current) {
+      current = await this.prisma.semester.findFirst({
+        orderBy: { endDate: 'desc' },
+      });
+    }
+    return current;
+  }
+
   async create(data: Prisma.SemesterCreateInput) {
     return this.prisma.semester.create({
       data,

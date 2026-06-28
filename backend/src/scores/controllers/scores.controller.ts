@@ -15,6 +15,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ScoresService } from '../services/scores.service';
 import { QueryScoreDto } from '../dto/query-score.dto';
+import { ImportScoreDto } from '../dto/import-score.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { RequirePermissions } from '../../shared/common/decorators/permissions.decorator';
@@ -60,13 +61,13 @@ export class ScoresController {
   @UseInterceptors(FileInterceptor('file'))
   @LogAction('IMPORT', 'SCORE')
   async importScores(
-    @Body('semesterId', ParseIntPipe) semesterId: number,
+    @Body() dto: ImportScoreDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
       throw new BadRequestException('Vui lòng tải lên file Excel');
     }
-    return this.scoresService.importScores(semesterId, file.buffer);
+    return this.scoresService.importScores(dto.semesterId, file.buffer);
   }
 
   @Post('calculate/:semesterId')

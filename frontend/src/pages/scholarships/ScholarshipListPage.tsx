@@ -37,7 +37,19 @@ export const ScholarshipListPage = () => {
         const semesterList = Array.isArray(res.data) ? res.data : (res.data.data || res.data.items || []);
         setSemesters(semesterList);
         if (semesterList.length > 0 && !selectedSemester) {
-          setSelectedSemester(semesterList[0].id);
+          try {
+            const activeRes = await semestersService.getActiveSemester();
+            if (activeRes.success && activeRes.data) {
+              const activeId = activeRes.data.id;
+              if (semesterList.find((s: any) => s.id === activeId)) {
+                setSelectedSemester(activeId);
+                return;
+              }
+            }
+          } catch {
+            // fall through
+          }
+          setSelectedSemester(semesterList[semesterList.length - 1].id);
         }
       }
     } catch (err) {

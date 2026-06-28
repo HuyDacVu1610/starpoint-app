@@ -74,6 +74,23 @@ export class AchievementsService {
     // Validate that the user (student) exists
     await this.usersService.findById(targetUserId);
 
+    // If user is a student, restrict submission to the current active semester and deadline
+    if (isStudent) {
+      const activeSemester = await this.semestersService.findCurrentActiveSemester();
+      if (dto.semesterId !== activeSemester.id) {
+        throw new BadRequestException('Chỉ được phép nộp minh chứng cho học kỳ hiện tại.');
+      }
+
+      // Calculate submission deadline: 7 days before semester endDate
+      const now = new Date();
+      const deadline = new Date(activeSemester.endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      if (now > deadline) {
+        throw new BadRequestException(
+          'Hạn nộp minh chứng cho học kỳ này đã kết thúc (Hạn nộp là trước khi kết thúc học kỳ 7 ngày).'
+        );
+      }
+    }
+
     // Validate semester exists
     await this.semestersService.findById(dto.semesterId);
 

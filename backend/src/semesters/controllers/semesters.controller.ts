@@ -34,6 +34,11 @@ export class SemestersController {
     return this.semestersService.findAll(query);
   }
 
+  @Get('active/current')
+  async findCurrentActive() {
+    return this.semestersService.findCurrentActiveSemester();
+  }
+
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.semestersService.findById(id);
