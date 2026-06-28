@@ -58,6 +58,11 @@ export const scoresService = {
     return res.data;
   },
 
+  delete: async (id: number) => {
+    const res = await api.delete(`/scores/${id}`);
+    return res.data;
+  },
+
   calculate: async (semesterId: number) => {
     const res = await api.post(`/scores/calculate/${semesterId}`);
     return res.data;

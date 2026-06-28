@@ -1,7 +1,6 @@
 import React from 'react';
 import {
-  TrophyOutlined,
-  TrophyFilled,
+  StarFilled,
   DotChartOutlined,
   StarOutlined,
   InfoCircleOutlined,
@@ -37,13 +36,13 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ title, subtitl
       <div className="z-10 flex flex-col space-y-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white flex items-center justify-center text-xl shadow-md">
-            <TrophyOutlined />
+            <StarOutlined />
           </div>
           <span className="text-xl font-extrabold text-white">StarPointApp</span>
         </div>
 
         <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg text-xs text-white font-bold self-start mt-6 shadow-lg animate-bounce" style={{ animationDuration: '4.5s' }}>
-          <TrophyFilled className="text-yellow-400 text-base animate-pulse" />
+          <StarFilled className="text-yellow-400 text-base animate-pulse" />
           <div>
             <div className="text-[10px] text-slate-200/75 dark:text-slate-400/75 font-normal">Giải Nhất</div>
             <div className="text-yellow-300 font-extrabold">+0.4 GPA</div>
@@ -72,7 +71,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ title, subtitl
 
         {/* Programming Contest Badge */}
         <div className="absolute top-[32%] right-[10%] animate-bounce px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg flex items-center gap-3 text-xs text-white font-bold shadow-lg" style={{ animationDuration: '5s' }}>
-          <TrophyOutlined className="text-cyan-300 dark:text-cyan-400 text-base" />
+          <StarOutlined className="text-cyan-300 dark:text-cyan-400 text-base" />
           <div>
             <div className="text-[10px] text-slate-200/75 dark:text-slate-400/75 font-normal">Cuộc thi lập trình</div>
             <div>Top 3</div>

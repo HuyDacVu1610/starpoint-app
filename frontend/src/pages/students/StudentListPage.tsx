@@ -299,7 +299,6 @@ export const StudentListPage = () => {
             <span>
               <Popconfirm
                 title="Xác nhận xoá tài khoản này?"
-                description="Hành động này sẽ thực hiện xoá mềm (soft delete) tài khoản người dùng."
                 onConfirm={() => handleConfirmDelete(record.id)}
                 okText="Xoá"
                 cancelText="Huỷ"

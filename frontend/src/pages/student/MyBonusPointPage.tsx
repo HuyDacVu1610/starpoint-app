@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Select, Row, Col, Result, Spin, message, Progress } from 'antd';
-import { TrophyOutlined, PercentageOutlined, StarOutlined } from '@ant-design/icons';
+import { PercentageOutlined, StarOutlined } from '@ant-design/icons';
 import { scoresService } from '../../services/scores.service';
 import type { Score } from '../../services/scores.service';
 import { semestersService } from '../../services/semesters.service';
@@ -148,7 +148,7 @@ export const MyBonusPointPage = () => {
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-semibold text-slate-400">Điểm Cộng Thành Tích</span>
                   <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-                    <TrophyOutlined className="text-lg" />
+                    <StarOutlined className="text-lg" />
                   </div>
                 </div>
                 <div className="space-y-2">

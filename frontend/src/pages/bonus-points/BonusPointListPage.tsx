@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button, Card, Modal, Form, Input, InputNumber, Select, Alert, Tooltip, App, Row, Col } from 'antd';
-import { SearchOutlined, EditOutlined, FileExcelOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Modal, Form, Input, InputNumber, Select, Alert, Tooltip, App, Row, Col, Popconfirm, Space } from 'antd';
+import { SearchOutlined, EditOutlined, FileExcelOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { scoresService } from '../../services/scores.service';
 import type { Score } from '../../services/scores.service';
 import { semestersService } from '../../services/semesters.service';
@@ -148,39 +148,38 @@ export const BonusPointListPage = () => {
       }
 
       const studentCode = selectedScore ? (selectedScore.user?.studentCode || selectedScore.studentCode) : values.studentCode;
-
-      const compId = values.competitionId || null;
-      let rank = null;
-      let category = null;
-
-      if (compId) {
-        rank = values.rank || null;
-      } else if (values.category) {
-        category = values.category;
-        rank = 'NONE';
-      }
-
       const res = await scoresService.updateManualScore(
         selectedSemester,
         studentCode,
         {
           gpa: values.gpa,
           conductScore: values.conductScore,
-          competitionId: compId,
-          rank: rank,
-          category: category,
         }
       );
 
       if (res.success) {
-        message.success('Cập nhật điểm thành công');
+        message.success(selectedScore ? 'Cập nhật điểm thành công' : 'Thêm điểm thành công');
         setIsEditModalOpen(false);
         fetchScores();
       } else {
-        message.error(res.message || 'Lỗi cập nhật điểm số');
+        message.error(res.message || 'Đã có lỗi xảy ra');
       }
     } catch (err: any) {
       message.error(err.response?.data?.message || 'Có lỗi xảy ra');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await scoresService.delete(id);
+      if (res.success) {
+        message.success('Xoá điểm sinh viên thành công');
+        fetchScores();
+      } else {
+        message.error(res.message || 'Không thể xoá điểm sinh viên');
+      }
+    } catch (err: any) {
+      message.error(err.response?.data?.message || 'Có lỗi xảy ra khi xoá điểm');
     }
   };
 
@@ -286,15 +285,31 @@ export const BonusPointListPage = () => {
           {
             title: 'Hành Động',
             key: 'action',
-            width: 100,
+            width: 120,
             render: (_: any, record: Score) => (
-              <Tooltip title="Cập nhật nhanh điểm số">
-                <Button
-                  type="text"
-                  icon={<EditOutlined className="text-indigo-500 hover:scale-115 transition-transform text-base" />}
-                  onClick={() => handleOpenEdit(record)}
-                />
-              </Tooltip>
+              <Space size="small">
+                <Tooltip title="Cập nhật nhanh điểm số">
+                  <Button
+                    type="text"
+                    icon={<EditOutlined className="text-indigo-500 hover:scale-115 transition-transform text-base" />}
+                    onClick={() => handleOpenEdit(record)}
+                  />
+                </Tooltip>
+                <Popconfirm
+                  title="Xác nhận xoá điểm sinh viên?"
+                  description="Điểm GPA và điểm rèn luyện của sinh viên trong học kỳ này sẽ bị xoá."
+                  onConfirm={() => handleDelete(record.id)}
+                  okText="Xoá"
+                  cancelText="Huỷ"
+                  okButtonProps={{ danger: true }}
+                >
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined className="hover:scale-115 transition-transform text-base" />}
+                  />
+                </Popconfirm>
+              </Space>
             ),
           },
         ]

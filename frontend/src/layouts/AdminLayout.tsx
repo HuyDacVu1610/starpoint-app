@@ -7,7 +7,7 @@ import {
   DashboardOutlined,
   UserOutlined,
   CalendarOutlined,
-  TrophyOutlined,
+  StarOutlined,
   CalculatorOutlined,
   SafetyCertificateOutlined,
   LogoutOutlined,
@@ -136,7 +136,7 @@ export const AdminLayout = () => {
   if (hasPermission('VIEW_ACHIEVEMENT')) {
     menuItems.push({
       key: ROUTES.ADMIN_ACHIEVEMENTS,
-      icon: <TrophyOutlined />,
+      icon: <StarOutlined />,
       label: <Link to={ROUTES.ADMIN_ACHIEVEMENTS}>Duyệt Thành tích</Link>,
     });
   }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Card, Modal, Form, Input, Select, DatePicker, App, Space, Popconfirm, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, TrophyOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, StarOutlined } from '@ant-design/icons';
 import { competitionsService } from '../../services/competitions.service';
 import type { Competition } from '../../services/competitions.service';
 import { semestersService } from '../../services/semesters.service';
@@ -326,7 +326,7 @@ export const CompetitionListPage = () => {
             label="Tên Cuộc Thi"
             rules={[{ required: true, message: 'Vui lòng nhập tên cuộc thi' }]}
           >
-            <Input placeholder="Ví dụ: Olympic Tin học sinh viên toàn quốc" prefix={<TrophyOutlined />} />
+            <Input placeholder="Ví dụ: Olympic Tin học sinh viên toàn quốc" prefix={<StarOutlined />} />
           </Form.Item>
 
           <Form.Item

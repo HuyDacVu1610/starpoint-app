@@ -887,4 +887,36 @@ export class ScoresService {
       message: `Đã tính toán lại điểm thưởng cho ${scores.length} sinh viên`,
     };
   }
+
+  async deleteScore(id: number) {
+    const score = await this.prisma.studentSemesterScore.findUnique({
+      where: { id },
+    });
+    if (!score) {
+      throw new NotFoundException('Bản ghi điểm không tồn tại');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Delete manual achievements created automatically for this score
+      await tx.achievement.deleteMany({
+        where: {
+          userId: score.userId,
+          semesterId: score.semesterId,
+          note: {
+            in: [
+              'Được tạo tự động khi cập nhật điểm thủ công',
+              'Được tạo tự động khi import từ file Excel',
+            ],
+          },
+        },
+      });
+
+      // 2. Delete the score record itself
+      await tx.studentSemesterScore.delete({
+        where: { id },
+      });
+    });
+
+    return { success: true, message: 'Xóa điểm sinh viên thành công' };
+  }
 }

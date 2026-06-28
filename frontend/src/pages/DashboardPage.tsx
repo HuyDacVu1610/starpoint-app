@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, Row, Col, Select, Spin, App } from 'antd';
 import {
   UserOutlined,
-  TrophyOutlined,
+  StarOutlined,
   CalendarOutlined,
   FileProtectOutlined,
 } from '@ant-design/icons';
@@ -200,7 +200,7 @@ export const DashboardPage = () => {
               <StatCard
                 title="Thành Tích Đã Duyệt"
                 value={stats?.totalAchievements || 0}
-                icon={<TrophyOutlined />}
+                icon={<StarOutlined />}
                 colorClass="bg-amber-50 text-amber-600"
               />
             </Col>

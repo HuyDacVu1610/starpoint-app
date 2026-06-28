@@ -11,6 +11,7 @@ import {
   BadRequestException,
   Request as NestRequest,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ScoresService } from '../services/scores.service';
@@ -76,6 +77,14 @@ export class ScoresController {
   @LogAction('CALCULATE', 'SCORE')
   async calculateScores(@Param('semesterId', ParseIntPipe) semesterId: number) {
     return this.scoresService.calculateScoresForSemester(semesterId);
+  }
+
+  @Delete(':id')
+  @UseGuards(PermissionsGuard)
+  @RequirePermissions('MANAGE_BONUS')
+  @LogAction('DELETE', 'SCORE')
+  async deleteScore(@Param('id', ParseIntPipe) id: number) {
+    return this.scoresService.deleteScore(id);
   }
 }
 

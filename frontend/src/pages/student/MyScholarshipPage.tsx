@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Select, Result, Spin, Alert, Tag, message } from 'antd';
-import { TrophyOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { StarOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { scholarshipsService } from '../../services/scholarships.service';
 import type { ScholarshipCandidate } from '../../services/scholarships.service';
 import { semestersService } from '../../services/semesters.service';
@@ -143,7 +143,7 @@ export const MyScholarshipPage = () => {
                 
                 <div className="p-8 text-center space-y-6">
                   <div className={`mx-auto w-20 h-20 rounded-full bg-gradient-to-tr ${tierInfo.gradient} flex items-center justify-center text-white text-4xl shadow-md`}>
-                    <TrophyOutlined />
+                    <StarOutlined />
                   </div>
 
                   <div className="space-y-1">

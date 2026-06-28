@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Tabs, Descriptions, Spin, Tag, App, Button, Space } from 'antd';
-import { ArrowLeftOutlined, TrophyOutlined, FileProtectOutlined, CompassOutlined, FileTextOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, StarOutlined, FileProtectOutlined, CompassOutlined, FileTextOutlined } from '@ant-design/icons';
 import { PageHeader } from '../../components/PageHeader';
 import { usersService } from '../../services/users.service';
 import type { User } from '../../services/users.service';
@@ -308,7 +308,7 @@ export const StudentDetailPage = () => {
       key: 'achievements',
       label: (
         <span>
-          <TrophyOutlined /> Thành tích
+          <StarOutlined /> Thành tích
         </span>
       ),
       children: (

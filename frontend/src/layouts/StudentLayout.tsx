@@ -1,6 +1,6 @@
 import { Layout, Menu, Avatar, Dropdown, App, Button, Breadcrumb } from 'antd';
 import {
-  TrophyOutlined,
+  StarOutlined,
   CalculatorOutlined,
   SafetyCertificateOutlined,
   LogoutOutlined,
@@ -94,7 +94,7 @@ export const StudentLayout = () => {
   const menuItems = [
     {
       key: ROUTES.STUDENT_ACHIEVEMENTS,
-      icon: <TrophyOutlined className="text-base" />,
+      icon: <StarOutlined className="text-base" />,
       label: 'Thành tích của tôi',
     },
     {

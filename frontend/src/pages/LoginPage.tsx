@@ -2,7 +2,7 @@ import { Form, Input, Button, App } from 'antd';
 import {
   UserOutlined,
   LockOutlined,
-  TrophyOutlined,
+  StarOutlined,
   SunOutlined,
   MoonOutlined,
   ArrowRightOutlined
@@ -175,7 +175,7 @@ export const LoginPage = () => {
           {/* Logo Header */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#2563eb] flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20">
-              <TrophyOutlined />
+              <StarOutlined />
             </div>
             <span className="text-xl font-black text-slate-900 dark:text-white">StarPointApp</span>
           </div>
