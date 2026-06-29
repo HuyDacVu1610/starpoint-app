@@ -179,28 +179,116 @@ export class UsersService {
       throw new BadRequestException('File Excel trống');
     }
 
+    // 3. Find Column Headers
+    const firstRow = rows[0];
+    const keys = Object.keys(firstRow);
+
+    let studentCodeKey = '';
+    let fullNameKey = '';
+    let emailKey = '';
+    let phoneKey = '';
+    let roleNameKey = '';
+
+    for (const key of keys) {
+      const normalized = key
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9]/g, '');
+
+      if (
+        normalized.includes('studentcode') ||
+        normalized.includes('mssv') ||
+        normalized.includes('masinhvien') ||
+        normalized.includes('manguoidung') ||
+        normalized.includes('code') ||
+        normalized === 'sv' ||
+        normalized === 'masv'
+      ) {
+        studentCodeKey = key;
+      } else if (
+        normalized.includes('fullname') ||
+        normalized.includes('hoten') ||
+        normalized.includes('hovaten') ||
+        normalized.includes('name') ||
+        normalized === 'ten'
+      ) {
+        fullNameKey = key;
+      } else if (
+        normalized.includes('email') ||
+        normalized.includes('gmail') ||
+        normalized === 'mail'
+      ) {
+        emailKey = key;
+      } else if (
+        normalized.includes('sodienthoai') ||
+        normalized.includes('sdt') ||
+        normalized.includes('phone') ||
+        normalized.includes('dienthoai')
+      ) {
+        phoneKey = key;
+      } else if (
+        normalized.includes('vaitro') ||
+        normalized.includes('role') ||
+        normalized.includes('quyen')
+      ) {
+        roleNameKey = key;
+      }
+    }
+
+    const missingHeaders: string[] = [];
+    if (!studentCodeKey) missingHeaders.push('Mã sinh viên/Mã người dùng (MSSV)');
+    if (!fullNameKey) missingHeaders.push('Họ và tên');
+    if (!emailKey) missingHeaders.push('Email');
+    if (!roleNameKey) missingHeaders.push('Vai trò (Role)');
+
+    if (missingHeaders.length > 0) {
+      throw new BadRequestException(
+        `Không tìm thấy tiêu đề cột tương ứng trong file Excel: ${missingHeaders.join(', ')}`,
+      );
+    }
+
     const errors: string[] = [];
     const validRows: any[] = [];
     const seenStudentCodes = new Set<string>();
     const seenEmails = new Set<string>();
 
-    const getVal = (row: any, keys: string[]) => {
-      for (const k of keys) {
-        if (row[k] !== undefined && row[k] !== null) {
-          return String(row[k]).trim();
-        }
-      }
-      return undefined;
-    };
-
     // 1. Normalize and validate rows
     rows.forEach((row, index) => {
       const rowNum = index + 2;
-      const studentCode = getVal(row, ['Mã sinh viên', 'Mã người dùng', 'studentCode', 'Student Code']);
-      const fullName = getVal(row, ['Họ và tên', 'Họ tên', 'fullName', 'Full Name']);
-      const email = getVal(row, ['Email', 'email', 'Địa chỉ email']);
-      const phone = getVal(row, ['Số điện thoại', 'SĐT', 'phone', 'Phone']);
-      const roleName = getVal(row, ['Vai trò', 'Role', 'role']) || 'STUDENT';
+      const studentCode = row[studentCodeKey] ? String(row[studentCodeKey]).trim() : undefined;
+      const fullName = row[fullNameKey] ? String(row[fullNameKey]).trim() : undefined;
+      const email = row[emailKey] ? String(row[emailKey]).trim() : undefined;
+      const phone = phoneKey && row[phoneKey] ? String(row[phoneKey]).trim() : null;
+      let roleName = roleNameKey && row[roleNameKey] ? String(row[roleNameKey]).trim() : undefined;
+      if (roleName) {
+        const normalizedRole = roleName
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/đ/g, 'd')
+          .replace(/[^a-z0-9]/g, '');
+
+        if (
+          normalizedRole.includes('sinhvien') ||
+          normalizedRole === 'sv' ||
+          normalizedRole === 'student'
+        ) {
+          roleName = 'STUDENT';
+        } else if (
+          normalizedRole.includes('giaovu') ||
+          normalizedRole.includes('nhanvien') ||
+          normalizedRole === 'staff'
+        ) {
+          roleName = 'STAFF';
+        } else if (
+          normalizedRole.includes('quantri') ||
+          normalizedRole === 'admin'
+        ) {
+          roleName = 'ADMIN';
+        }
+      }
 
       const rowErrors: string[] = [];
 
@@ -217,6 +305,9 @@ export class UsersService {
         if (!emailRegex.test(email)) {
           rowErrors.push(`Dòng ${rowNum}: Email "${email}" không đúng định dạng`);
         }
+      }
+      if (!roleName) {
+        rowErrors.push(`Dòng ${rowNum}: Thiếu vai trò phân quyền`);
       }
 
       if (rowErrors.length > 0) {
@@ -246,7 +337,7 @@ export class UsersService {
         fullName,
         email,
         phone: phone || null,
-        roleName: roleName.toUpperCase(),
+        roleName: roleName!.toUpperCase(),
       });
     });
 
@@ -271,7 +362,7 @@ export class UsersService {
     // Validate roles
     validRows.forEach((row) => {
       const roleId = roleMap.get(row.roleName);
-      if (!roleId && row.roleName !== 'STUDENT') {
+      if (!roleId) {
         errors.push(`Dòng ${row.rowNum}: Vai trò "${row.roleName}" không tồn tại trên hệ thống`);
       }
     });

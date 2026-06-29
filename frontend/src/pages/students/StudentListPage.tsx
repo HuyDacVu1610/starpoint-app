@@ -537,8 +537,8 @@ export const StudentListPage = () => {
         <div className="mt-4 space-y-4">
           <p className="text-slate-500 text-xs leading-relaxed">
             Chọn một file Excel (.xlsx hoặc .xls) chứa thông tin người dùng cần thêm. File cần có các cột tối thiểu: 
-            <span className="font-semibold text-slate-700"> Mã sinh viên/Mã người dùng, Họ và tên, Email</span>. 
-            (Có thể thêm cột <span className="font-semibold text-slate-700">Số điện thoại, Vai trò</span>).
+            <span className="font-semibold text-slate-700"> Mã sinh viên/Mã người dùng, Họ và tên, Email, Vai trò</span>. 
+            (Có thể thêm cột <span className="font-semibold text-slate-700">Số điện thoại</span>).
           </p>
           
           <div className="border-2 border-dashed border-slate-200 dark:border-zinc-700 rounded-xl p-6 text-center hover:border-indigo-500 transition-colors">
