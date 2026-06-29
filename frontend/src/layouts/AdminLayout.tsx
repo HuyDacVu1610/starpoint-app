@@ -15,6 +15,7 @@ import {
   FlagOutlined,
   SunOutlined,
   MoonOutlined,
+  KeyOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,12 +25,14 @@ import { toggleTheme } from '../features/theme/themeSlice';
 import type { RootState } from '../store/store';
 import { ScrollToTop } from '../components/ScrollToTop';
 import { AppFooter } from '../components/AppFooter';
+import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
 const { Header, Sider, Content } = Layout;
 
 
 export const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const { modal } = App.useApp();
   const { user, logout, hasPermission } = useAuth();
   const location = useLocation();
@@ -90,6 +93,12 @@ export const AdminLayout = () => {
         },
         {
           type: 'divider',
+        },
+        {
+          key: 'changePassword',
+          icon: <KeyOutlined />,
+          label: 'Đổi mật khẩu',
+          onClick: () => setIsChangePasswordOpen(true),
         },
         {
           key: 'logout',
@@ -238,6 +247,11 @@ export const AdminLayout = () => {
         </Content>
         <AppFooter />
       </Layout>
+
+      <ChangePasswordModal 
+        open={isChangePasswordOpen} 
+        onCancel={() => setIsChangePasswordOpen(false)} 
+      />
     </Layout>
   );
 };

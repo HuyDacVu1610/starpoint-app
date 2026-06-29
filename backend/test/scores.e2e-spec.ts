@@ -8,6 +8,7 @@ import { AppModule } from './../src/app.module';
 import { GlobalExceptionFilter } from './../src/shared/common/filters/global-exception.filter';
 import { ResponseInterceptor } from './../src/shared/common/interceptors/response.interceptor';
 import { PrismaService } from './../src/prisma/prisma.service';
+import { hash } from './../src/shared/common/utils/crypto.util';
 import {
   AchievementCategory,
   AchievementRank,
@@ -77,6 +78,17 @@ describe('Scores Module (e2e)', () => {
       },
     });
     testSemesterId = sem.id;
+
+    // Reset passwords of STAFF001 and SV001 to 'password123' to ensure E2E tests can login
+    const passwordHash = await hash('password123');
+    await prisma.user.updateMany({
+      where: {
+        studentCode: { in: ['STAFF001', 'SV001'] },
+      },
+      data: {
+        password: passwordHash,
+      },
+    });
 
     // Login Staff
     let loginRes = await request(app.getHttpServer())
@@ -200,7 +212,7 @@ describe('Scores Module (e2e)', () => {
       expect(score1).toBeDefined();
       expect(score1!.gpa).toBe(3.8);
       expect(score1!.maxBonusPoint).toBe(0.4);
-      expect(score1!.extendedGpa).toBe(4.2); // Not capped at 4.00!
+      expect(score1!.extendedGpa).toBe(4.0); // Capped at 4.00!
       expect(score1!.gpaGrade).toBe('EXCELLENT');
 
       const score2 = await prisma.studentSemesterScore.findUnique({
@@ -298,7 +310,7 @@ describe('Scores Module (e2e)', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.gpa).toBe(3.7);
       expect(response.body.data.conductScore).toBe(89);
-      expect(response.body.data.extendedGpa).toBe(4.1); // 3.7 + 0.4
+      expect(response.body.data.extendedGpa).toBe(4.0); // Capped at 4.00!
       expect(response.body.data.conductGrade).toBe('GOOD'); // 89 is GOOD
     });
   });

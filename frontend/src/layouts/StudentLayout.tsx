@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Layout, Menu, Avatar, Dropdown, App, Button, Breadcrumb } from 'antd';
 import {
   StarOutlined,
@@ -7,6 +8,7 @@ import {
   LogoutOutlined,
   SunOutlined,
   MoonOutlined,
+  KeyOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,11 +18,13 @@ import { toggleTheme } from '../features/theme/themeSlice';
 import type { RootState } from '../store/store';
 import { ScrollToTop } from '../components/ScrollToTop';
 import { AppFooter } from '../components/AppFooter';
+import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
 const { Header, Content } = Layout;
 
 
 export const StudentLayout = () => {
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const { modal } = App.useApp();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -81,6 +85,12 @@ export const StudentLayout = () => {
         },
         {
           type: 'divider',
+        },
+        {
+          key: 'changePassword',
+          icon: <KeyOutlined />,
+          label: 'Đổi mật khẩu',
+          onClick: () => setIsChangePasswordOpen(true),
         },
         {
           key: 'logout',
@@ -205,6 +215,11 @@ export const StudentLayout = () => {
       </Content>
 
       <AppFooter />
+
+      <ChangePasswordModal 
+        open={isChangePasswordOpen} 
+        onCancel={() => setIsChangePasswordOpen(false)} 
+      />
     </Layout>
   );
 };

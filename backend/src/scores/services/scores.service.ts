@@ -551,7 +551,7 @@ export class ScoresService {
             ? Math.max(...achievements.map((a) => a.bonusPoint))
             : 0.0;
 
-        const extendedGpa = Number((row.gpa + maxBonusPoint).toFixed(2));
+        const extendedGpa = Math.min(4.0, Number((row.gpa + maxBonusPoint).toFixed(2)));
         const gpaGrade = getGpaGrade(extendedGpa);
         const conductGrade = getConductGrade(row.conductScore);
 
@@ -738,7 +738,7 @@ export class ScoresService {
           ? Math.max(...achievements.map((a) => a.bonusPoint))
           : 0.0;
 
-      const extendedGpa = Number(((newGpa ?? 0.0) + maxBonusPoint).toFixed(2));
+      const extendedGpa = Math.min(4.0, Number(((newGpa ?? 0.0) + maxBonusPoint).toFixed(2)));
       const gpaGrade = newGpa !== null ? getGpaGrade(extendedGpa) : null;
       const conductGrade = newConductScore !== null ? getConductGrade(newConductScore) : null;
 
@@ -832,7 +832,7 @@ export class ScoresService {
       });
     } else {
       const baseGpa = score.gpa ?? 0.0;
-      const extendedGpa = Number((baseGpa + maxBonusPoint).toFixed(2));
+      const extendedGpa = Math.min(4.0, Number((baseGpa + maxBonusPoint).toFixed(2)));
       const gpaGrade = score.gpa !== null ? getGpaGrade(extendedGpa) : null;
 
       await prismaClient.studentSemesterScore.update({
