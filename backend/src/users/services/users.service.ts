@@ -8,10 +8,15 @@ import { UsersRepository } from '../repositories/users.repository';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { QueryUserDto } from '../dto/query-user.dto';
+import { PrismaService } from '../../prisma/prisma.service';
+import * as xlsx from 'xlsx';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async findAll(query: QueryUserDto) {
     const { total, data } = await this.usersRepository.findAll(query);
@@ -151,6 +156,196 @@ export class UsersService {
     return {
       success: true,
       message: 'Xoá người dùng thành công',
+    };
+  }
+
+  async importUsers(fileBuffer: Buffer) {
+    let workbook: xlsx.WorkBook;
+    try {
+      workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    } catch (e) {
+      throw new BadRequestException('File Excel không hợp lệ hoặc bị hỏng');
+    }
+
+    const sheetName = workbook.SheetNames[0];
+    if (!sheetName) {
+      throw new BadRequestException('File Excel không chứa bất kỳ sheet nào');
+    }
+
+    const worksheet = workbook.Sheets[sheetName];
+    const rows = xlsx.utils.sheet_to_json<any>(worksheet);
+
+    if (rows.length === 0) {
+      throw new BadRequestException('File Excel trống');
+    }
+
+    const errors: string[] = [];
+    const validRows: any[] = [];
+    const seenStudentCodes = new Set<string>();
+    const seenEmails = new Set<string>();
+
+    const getVal = (row: any, keys: string[]) => {
+      for (const k of keys) {
+        if (row[k] !== undefined && row[k] !== null) {
+          return String(row[k]).trim();
+        }
+      }
+      return undefined;
+    };
+
+    // 1. Normalize and validate rows
+    rows.forEach((row, index) => {
+      const rowNum = index + 2;
+      const studentCode = getVal(row, ['Mã sinh viên', 'Mã người dùng', 'studentCode', 'Student Code']);
+      const fullName = getVal(row, ['Họ và tên', 'Họ tên', 'fullName', 'Full Name']);
+      const email = getVal(row, ['Email', 'email', 'Địa chỉ email']);
+      const phone = getVal(row, ['Số điện thoại', 'SĐT', 'phone', 'Phone']);
+      const roleName = getVal(row, ['Vai trò', 'Role', 'role']) || 'STUDENT';
+
+      const rowErrors: string[] = [];
+
+      if (!studentCode) {
+        rowErrors.push(`Dòng ${rowNum}: Thiếu mã số sinh viên/người dùng`);
+      }
+      if (!fullName) {
+        rowErrors.push(`Dòng ${rowNum}: Thiếu họ và tên`);
+      }
+      if (!email) {
+        rowErrors.push(`Dòng ${rowNum}: Thiếu email`);
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          rowErrors.push(`Dòng ${rowNum}: Email "${email}" không đúng định dạng`);
+        }
+      }
+
+      if (rowErrors.length > 0) {
+        errors.push(...rowErrors);
+        return;
+      }
+
+      const studentCodeUpper = studentCode!.toUpperCase();
+      const emailLower = email!.toLowerCase();
+
+      // Check duplicate within the file
+      if (seenStudentCodes.has(studentCodeUpper)) {
+        errors.push(`Dòng ${rowNum}: Mã sinh viên "${studentCode}" bị trùng lặp trong file`);
+        return;
+      }
+      if (seenEmails.has(emailLower)) {
+        errors.push(`Dòng ${rowNum}: Email "${email}" bị trùng lặp trong file`);
+        return;
+      }
+
+      seenStudentCodes.add(studentCodeUpper);
+      seenEmails.add(emailLower);
+
+      validRows.push({
+        rowNum,
+        studentCode,
+        fullName,
+        email,
+        phone: phone || null,
+        roleName: roleName.toUpperCase(),
+      });
+    });
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    // 2. Query Roles and Users for mapping/validation
+    const [dbRoles, dbUsers] = await Promise.all([
+      this.prisma.role.findMany(),
+      this.prisma.user.findMany({
+        include: {
+          userRoles: true,
+        },
+      }),
+    ]);
+
+    const roleMap = new Map(dbRoles.map((r) => [r.name.toUpperCase(), r.id]));
+    const dbUserMap = new Map(dbUsers.map((u) => [u.studentCode.toUpperCase(), u]));
+    const dbEmailMap = new Map(dbUsers.map((u) => [u.email.toLowerCase(), u]));
+
+    // Validate roles
+    validRows.forEach((row) => {
+      const roleId = roleMap.get(row.roleName);
+      if (!roleId && row.roleName !== 'STUDENT') {
+        errors.push(`Dòng ${row.rowNum}: Vai trò "${row.roleName}" không tồn tại trên hệ thống`);
+      }
+    });
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    // 3. Perform batch upsert inside a transaction
+    let createdCount = 0;
+    let updatedCount = 0;
+    const passwordHash = await hash('password123');
+
+    await this.prisma.$transaction(async (tx) => {
+      for (const row of validRows) {
+        const studentCodeUpper = row.studentCode.toUpperCase();
+        const emailLower = row.email.toLowerCase();
+
+        const existingUser = dbUserMap.get(studentCodeUpper);
+
+        if (existingUser) {
+          // If user exists, update details
+          const emailUser = dbEmailMap.get(emailLower);
+          if (emailUser && emailUser.id !== existingUser.id) {
+            throw new BadRequestException(
+              `Dòng ${row.rowNum}: Email "${row.email}" đã được đăng ký cho tài khoản khác (Mã: ${emailUser.studentCode})`,
+            );
+          }
+
+          const updateData: any = {
+            fullName: row.fullName,
+            email: row.email,
+          };
+          if (row.phone !== undefined) {
+            updateData.phone = row.phone;
+          }
+
+          await tx.user.update({
+            where: { id: existingUser.id },
+            data: updateData,
+          });
+          updatedCount++;
+        } else {
+          // If user is new, verify that email is not taken in the database
+          const emailUser = dbEmailMap.get(emailLower);
+          if (emailUser) {
+            throw new BadRequestException(
+              `Dòng ${row.rowNum}: Email "${row.email}" đã được đăng ký cho tài khoản khác (Mã: ${emailUser.studentCode})`,
+            );
+          }
+
+          const roleId = roleMap.get(row.roleName) || roleMap.get('STUDENT');
+          await tx.user.create({
+            data: {
+              studentCode: row.studentCode,
+              fullName: row.fullName,
+              email: row.email,
+              phone: row.phone,
+              password: passwordHash,
+              userRoles: {
+                create: {
+                  roleId: roleId!,
+                },
+              },
+            },
+          });
+          createdCount++;
+        }
+      }
+    });
+
+    return {
+      success: true,
+      message: `Đã nhập thành công danh sách người dùng: Tạo mới ${createdCount} tài khoản và cập nhật ${updatedCount} tài khoản.`,
     };
   }
 }

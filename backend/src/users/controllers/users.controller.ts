@@ -11,7 +11,11 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -61,6 +65,17 @@ export class UsersController {
   @LogAction('DELETE', 'USER')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.delete(id);
+  }
+
+  @Post('import')
+  @RequirePermissions('CREATE_USER')
+  @UseInterceptors(FileInterceptor('file'))
+  @LogAction('IMPORT', 'USER')
+  async importUsers(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Vui lòng tải lên file Excel');
+    }
+    return this.usersService.importUsers(file.buffer);
   }
 }
 

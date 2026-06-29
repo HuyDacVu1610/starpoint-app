@@ -23,6 +23,7 @@ import {
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import { usersService } from '../../services/users.service';
 import type { User, Role } from '../../services/users.service';
@@ -50,6 +51,9 @@ export const StudentListPage = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [form] = Form.useForm();
@@ -171,6 +175,53 @@ export const StudentListPage = () => {
       } else {
         message.error(err.message || 'Không thể kết nối đến máy chủ');
       }
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      message.error('Vui lòng chọn một file Excel');
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const res = await usersService.import(importFile);
+      if (res.success) {
+        message.success(res.message || 'Nhập danh sách người dùng thành công');
+        setIsImportModalOpen(false);
+        setImportFile(null);
+        fetchUsers();
+      } else {
+        message.error(res.message || 'Đã xảy ra lỗi khi nhập danh sách');
+      }
+    } catch (err: any) {
+      const responseData = err.response?.data;
+      if (responseData) {
+        if (responseData.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+          Modal.error({
+            title: 'Lỗi Nhập Dữ Liệu Excel',
+            content: (
+              <div className="max-h-60 overflow-y-auto mt-2">
+                <ul className="list-disc pl-4 space-y-1">
+                  {responseData.errors.map((e: string, i: number) => (
+                    <li key={i} className="text-red-600 text-xs">{e}</li>
+                  ))}
+                </ul>
+              </div>
+            ),
+            width: 500,
+          });
+        } else if (responseData.message) {
+          message.error(responseData.message);
+        } else {
+          message.error('Đã có lỗi xảy ra');
+        }
+      } else {
+        message.error(err.message || 'Không thể kết nối đến máy chủ');
+      }
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -326,19 +377,30 @@ export const StudentListPage = () => {
         subtitle="Quản lý tài khoản, mã sinh viên, thông tin lớp và vai trò phân quyền"
         breadcrumbs={[{ title: 'Quản trị' }, { title: 'Người dùng' }]}
         extra={
-          <Tooltip title={canCreate ? 'Thêm tài khoản người dùng mới' : 'Bạn không có quyền thực hiện hành động này'}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleOpenAdd}
-              disabled={!canCreate}
-              className={`border-none rounded-lg shadow-sm ${
-                canCreate ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-200 text-slate-400'
-              }`}
-            >
-              Thêm Người Dùng
-            </Button>
-          </Tooltip>
+          <Space>
+            {canCreate && (
+              <Button
+                icon={<UploadOutlined />}
+                onClick={() => setIsImportModalOpen(true)}
+                className="rounded-lg shadow-sm border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-600"
+              >
+                Nhập từ Excel
+              </Button>
+            )}
+            <Tooltip title={canCreate ? 'Thêm tài khoản người dùng mới' : 'Bạn không có quyền thực hiện hành động này'}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleOpenAdd}
+                disabled={!canCreate}
+                className={`border-none rounded-lg shadow-sm ${
+                  canCreate ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-200 text-slate-400'
+                }`}
+              >
+                Thêm Người Dùng
+              </Button>
+            </Tooltip>
+          </Space>
         }
       />
 
@@ -442,6 +504,67 @@ export const StudentListPage = () => {
             </Select>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title={
+          <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-100 font-extrabold text-base">
+            <UploadOutlined className="text-indigo-500" />
+            <span>Nhập Người Dùng Từ Excel</span>
+          </div>
+        }
+        open={isImportModalOpen}
+        onOk={handleImport}
+        onCancel={() => {
+          if (!importing) {
+            setIsImportModalOpen(false);
+            setImportFile(null);
+          }
+        }}
+        okText="Bắt đầu tải lên"
+        cancelText="Huỷ bỏ"
+        okButtonProps={{ 
+          className: 'bg-indigo-600 hover:bg-indigo-700 border-none rounded-lg font-semibold',
+          loading: importing 
+        }}
+        cancelButtonProps={{
+          className: 'rounded-lg hover:border-slate-300',
+          disabled: importing
+        }}
+        destroyOnClose
+        width={450}
+      >
+        <div className="mt-4 space-y-4">
+          <p className="text-slate-500 text-xs leading-relaxed">
+            Chọn một file Excel (.xlsx hoặc .xls) chứa thông tin người dùng cần thêm. File cần có các cột tối thiểu: 
+            <span className="font-semibold text-slate-700"> Mã sinh viên/Mã người dùng, Họ và tên, Email</span>. 
+            (Có thể thêm cột <span className="font-semibold text-slate-700">Số điện thoại, Vai trò</span>).
+          </p>
+          
+          <div className="border-2 border-dashed border-slate-200 dark:border-zinc-700 rounded-xl p-6 text-center hover:border-indigo-500 transition-colors">
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setImportFile(e.target.files[0]);
+                }
+              }}
+              className="hidden"
+              id="excel-import-file-input"
+              disabled={importing}
+            />
+            <label htmlFor="excel-import-file-input" className="cursor-pointer space-y-2 block">
+              <UploadOutlined className="text-slate-400 text-3xl" />
+              <div className="text-slate-600 dark:text-zinc-300 font-semibold text-sm">
+                {importFile ? importFile.name : 'Nhấn vào đây để chọn file Excel'}
+              </div>
+              <div className="text-slate-400 text-xs">
+                {importFile ? `${(importFile.size / 1024).toFixed(1)} KB` : 'Hỗ trợ định dạng .xlsx, .xls'}
+              </div>
+            </label>
+          </div>
+        </div>
       </Modal>
     </div>
   );
