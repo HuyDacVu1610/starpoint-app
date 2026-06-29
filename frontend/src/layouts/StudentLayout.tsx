@@ -118,10 +118,10 @@ export const StudentLayout = () => {
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-              SP
+              ĐT
             </div>
             <span className="font-extrabold text-slate-800 dark:text-zinc-100 text-lg tracking-tight select-none">
-              StarPoint<span className="text-indigo-600">App</span>
+              Quản Lý <span className="text-indigo-600">Điểm Thưởng</span>
             </span>
           </div>
           

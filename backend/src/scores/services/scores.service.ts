@@ -334,11 +334,11 @@ export class ScoresService {
       },
     });
 
-    const dbUserMap = new Map(dbUsers.map((u) => [u.studentCode, u.id]));
+    const dbUserMap = new Map(dbUsers.map((u) => [u.studentCode.toUpperCase(), u.id]));
 
-    // Query all emails in the system to verify uniqueness
+    // Query all emails in the system to verify uniqueness (including default emails for new students)
     const emailsToCheck = validParsedRows
-      .map((r) => r.email)
+      .map((r) => r.email || `${r.studentCode.toLowerCase()}@starpoint.edu.vn`)
       .filter((email): email is string => !!email);
 
     const dbUsersByEmail = await this.prisma.user.findMany({
@@ -352,7 +352,7 @@ export class ScoresService {
     });
 
     const dbEmailMap = new Map(
-      dbUsersByEmail.map((u) => [u.email.toLowerCase(), u.studentCode]),
+      dbUsersByEmail.map((u) => [u.email.toLowerCase(), u.studentCode.toUpperCase()]),
     );
 
     // Fetch semester competitions to validate names
@@ -387,21 +387,14 @@ export class ScoresService {
 
       const hasUser = dbUserMap.has(row.studentCode);
       if (!hasUser) {
-        // Must have fullName and email to auto-create
-        if (!row.fullName || !row.email) {
-          validationErrors.push(
-            `Dòng ${row.rowNum}: Sinh viên với mã "${row.studentCode}" chưa tồn tại trong hệ thống. File Excel cần có cột "Họ tên" và "Email" để tự động tạo tài khoản.`,
-          );
-          return;
-        }
-
         // Must not conflict with existing email
-        const emailLower = row.email.toLowerCase();
+        const email = row.email || `${row.studentCode.toLowerCase()}@starpoint.edu.vn`;
+        const emailLower = email.toLowerCase();
         if (dbEmailMap.has(emailLower)) {
           const existingStudentCode = dbEmailMap.get(emailLower)!;
           if (existingStudentCode !== row.studentCode) {
             validationErrors.push(
-              `Dòng ${row.rowNum}: Email "${row.email}" đã được đăng ký bởi sinh viên khác (mã "${existingStudentCode}").`,
+              `Dòng ${row.rowNum}: Email "${email}" đã được đăng ký bởi sinh viên khác (mã "${existingStudentCode}").`,
             );
           }
         }
@@ -445,11 +438,14 @@ export class ScoresService {
         // If user doesn't exist, auto-create
         if (!userId) {
           const passwordHash = await hash('password123');
+          const finalFullName = row.fullName || `Sinh viên ${row.studentCode}`;
+          const finalEmail = row.email || `${row.studentCode.toLowerCase()}@starpoint.edu.vn`;
+          
           const newUser = await tx.user.create({
             data: {
               studentCode: row.studentCode,
-              fullName: row.fullName!,
-              email: row.email!,
+              fullName: finalFullName,
+              email: finalEmail,
               password: passwordHash,
               userRoles: {
                 create: {

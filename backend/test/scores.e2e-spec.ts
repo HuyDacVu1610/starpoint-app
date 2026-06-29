@@ -211,6 +211,50 @@ describe('Scores Module (e2e)', () => {
       expect(score2).toBeDefined();
       expect(score2!.extendedGpa).toBe(3.65);
     });
+
+    it('should auto-create a student with default name and email if they do not exist in the system during Excel import', async () => {
+      // SV_NEW does not exist in the database.
+      // We do not provide Name or Email, so they should be auto-created using default values.
+      const buffer = createExcelBuffer([
+        { studentCode: 'SV_NEW', gpa: 3.2, conductScore: 88 },
+      ]);
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/scores/import')
+        .set('Authorization', `Bearer ${staffToken}`)
+        .field('semesterId', testSemesterId)
+        .attach('file', buffer, 'scores.xlsx')
+        .expect(HttpStatus.CREATED);
+
+      expect(response.body.success).toBe(true);
+
+      // Verify DB records
+      const prisma = app.get(PrismaService);
+      const newStudent = await prisma.user.findUnique({
+        where: { studentCode: 'SV_NEW' },
+        include: {
+          userRoles: {
+            include: {
+              role: true,
+            },
+          },
+        },
+      });
+      expect(newStudent).toBeDefined();
+      expect(newStudent!.fullName).toBe('Sinh viên SV_NEW');
+      expect(newStudent!.email).toBe('sv_new@starpoint.edu.vn');
+      expect(newStudent!.userRoles.length).toBe(1);
+      expect(newStudent!.userRoles[0].role.name).toBe('STUDENT');
+
+      const score = await prisma.studentSemesterScore.findUnique({
+        where: {
+          userId_semesterId: { userId: newStudent!.id, semesterId: testSemesterId },
+        },
+      });
+      expect(score).toBeDefined();
+      expect(score!.gpa).toBe(3.2);
+      expect(score!.conductScore).toBe(88);
+    });
   });
 
   describe('GET /api/v1/scores', () => {
@@ -221,7 +265,7 @@ describe('Scores Module (e2e)', () => {
         .expect(HttpStatus.OK);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.data.length).toBe(2);
+      expect(response.body.data.data.length).toBe(3);
     });
 
     it('should allow STUDENT to view their own scores at /my', async () => {

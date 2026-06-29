@@ -1,14 +1,14 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/StarPointApp-v1.0.0-blue?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/H%E1%BB%BB%20th%E1%BB%91ng%20Qu%E1%BA%A3n%20l%C3%BD%20%C4%90i%E1%BB%83m%20th%C6%B0%E1%BB%9Fng-v1.0.0-blue?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/badge/NestJS-v11-ea2845?style=for-the-badge&logo=nestjs" alt="NestJS" />
   <img src="https://img.shields.io/badge/React-v19-61dafb?style=for-the-badge&logo=react" alt="React" />
   <img src="https://img.shields.io/badge/Prisma-v7-2d3748?style=for-the-badge&logo=prisma" alt="Prisma" />
   <img src="https://img.shields.io/badge/Docker-Ready-2496ed?style=for-the-badge&logo=docker" alt="Docker" />
 </p>
 
-# 🏆 StarPointApp — Hệ thống Quản lý Điểm thưởng & Thành tích Sinh viên
+# 🏆 Hệ thống Quản lý Điểm thưởng & Thành tích Sinh viên
 
-**StarPointApp** là hệ thống quản lý điểm thưởng, thành tích thi đấu và xét duyệt học bổng dành cho sinh viên tại các cơ sở giáo dục đại học. Hệ thống hỗ trợ 3 vai trò người dùng: **Admin**, **Nhân viên (Staff)**, và **Sinh viên (Student)** — với quy trình phân quyền RBAC linh hoạt, giao diện hiện đại, hỗ trợ cả chế độ sáng (Light Mode) lẫn tối (Dark Mode).
+**Hệ thống Quản lý Điểm thưởng & Thành tích Sinh viên** là hệ thống quản lý điểm thưởng, thành tích thi đấu và xét duyệt học bổng dành cho sinh viên tại các cơ sở giáo dục đại học. Hệ thống hỗ trợ 3 vai trò người dùng: **Admin**, **Nhân viên (Staff)**, và **Sinh viên (Student)** — với quy trình phân quyền RBAC linh hoạt, giao diện hiện đại, hỗ trợ cả chế độ sáng (Light Mode) lẫn tối (Dark Mode).
 
 ---
 

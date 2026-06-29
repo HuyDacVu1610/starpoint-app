@@ -38,7 +38,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ title, subtitl
           <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white flex items-center justify-center text-xl shadow-md">
             <StarOutlined />
           </div>
-          <span className="text-xl font-extrabold text-white">StarPointApp</span>
+          <span className="text-xl font-extrabold text-white">Quản Lý Điểm Thưởng</span>
         </div>
 
         <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/[0.03] border border-white/15 backdrop-blur-lg text-xs text-white font-bold self-start mt-6 shadow-lg animate-bounce" style={{ animationDuration: '4.5s' }}>

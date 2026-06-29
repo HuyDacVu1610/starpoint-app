@@ -177,7 +177,7 @@ export const LoginPage = () => {
             <div className="w-10 h-10 rounded-xl bg-[#2563eb] flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20">
               <StarOutlined />
             </div>
-            <span className="text-xl font-black text-slate-900 dark:text-white">StarPointApp</span>
+            <span className="text-xl font-black text-slate-900 dark:text-white">Quản Lý Điểm Thưởng</span>
           </div>
 
           {/* Heading greeting */}
