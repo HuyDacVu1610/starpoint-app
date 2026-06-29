@@ -131,10 +131,14 @@ export const BonusPointListPage = () => {
 
   const handleOpenEdit = (record: Score) => {
     setSelectedScore(record);
+    const manualAch = (record.user as any)?.achievements?.[0];
     editForm.setFieldsValue({
       studentCode: record.user?.studentCode || '',
       gpa: record.gpa,
       conductScore: record.conductScore,
+      competitionId: manualAch?.competitionId || undefined,
+      rank: manualAch?.competitionId ? manualAch?.rank : undefined,
+      category: !manualAch?.competitionId ? (manualAch?.category || undefined) : undefined,
     });
     setIsEditModalOpen(true);
   };
@@ -154,6 +158,9 @@ export const BonusPointListPage = () => {
         {
           gpa: values.gpa,
           conductScore: values.conductScore,
+          competitionId: values.competitionId || null,
+          rank: values.competitionId ? (values.rank || null) : null,
+          category: !values.competitionId ? (values.category || null) : null,
         }
       );
 

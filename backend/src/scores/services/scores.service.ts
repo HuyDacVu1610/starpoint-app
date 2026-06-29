@@ -155,14 +155,24 @@ export class ScoresService {
       } else if (
         normalized.includes('competition') ||
         normalized.includes('cuocthi') ||
-        normalized.includes('tencuocthi')
+        normalized.includes('tencuocthi') ||
+        normalized.includes('hoatdong') ||
+        normalized.includes('tenhoatdong') ||
+        normalized.includes('sukien') ||
+        normalized.includes('tensukien')
       ) {
         competitionNameKey = key;
       } else if (
         normalized.includes('rank') ||
         normalized.includes('award') ||
         normalized.includes('giaithuong') ||
-        normalized.includes('giai')
+        normalized.includes('giai') ||
+        normalized.includes('xephang') ||
+        normalized.includes('hang') ||
+        normalized.includes('datgiai') ||
+        normalized.includes('thanhtich') ||
+        normalized.includes('danhhieu') ||
+        normalized.includes('khenthuong')
       ) {
         achievementRankKey = key;
       } else if (
@@ -465,29 +475,41 @@ export class ScoresService {
           const comp = compMap.get(normName);
           if (comp) {
             // Parse rank from Vietnamese strings
-            const rankStr = row.achievementRank.toLowerCase();
+            const rankStr = row.achievementRank
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .replace(/đ/g, 'd')
+              .replace(/[^a-z0-9]/g, '');
+
             let rank: AchievementRank = AchievementRank.NONE;
 
             if (
-              rankStr.includes('nhất') ||
+              rankStr.includes('nhat') ||
               rankStr.includes('nhut') ||
               rankStr.includes('hcv') ||
-              rankStr.includes('vàng') ||
-              rankStr.includes('first')
+              rankStr.includes('vang') ||
+              rankStr.includes('first') ||
+              rankStr === '1' ||
+              rankStr.includes('giai1')
             ) {
               rank = AchievementRank.FIRST;
             } else if (
-              rankStr.includes('nhì') ||
+              rankStr.includes('nhi') ||
               rankStr.includes('hcb') ||
-              rankStr.includes('bạc') ||
-              rankStr.includes('second')
+              rankStr.includes('bac') ||
+              rankStr.includes('second') ||
+              rankStr === '2' ||
+              rankStr.includes('giai2')
             ) {
               rank = AchievementRank.SECOND;
             } else if (
               rankStr.includes('ba') ||
-              rankStr.includes('hcđ') ||
-              rankStr.includes('đồng') ||
-              rankStr.includes('third')
+              rankStr.includes('hcd') ||
+              rankStr.includes('dong') ||
+              rankStr.includes('third') ||
+              rankStr === '3' ||
+              rankStr.includes('giai3')
             ) {
               rank = AchievementRank.THIRD;
             }
@@ -664,61 +686,68 @@ export class ScoresService {
     }
 
     const result = await this.prisma.$transaction(async (tx) => {
-      // 3.1. Delete all existing manual achievements for this student in this semester to avoid accumulation and allow updates
-      await tx.achievement.deleteMany({
-        where: {
-          userId: user.id,
-          semesterId,
-          note: 'Được tạo tự động khi cập nhật điểm thủ công',
-        },
-      });
+      const hasAchievementUpdate =
+        dto.competitionId !== undefined ||
+        dto.rank !== undefined ||
+        dto.category !== undefined;
 
-      // 3.2. If rank OR category is provided, create the new manual Achievement record
-      if (dto.rank || dto.category) {
-        let category: AchievementCategory;
-        let competitionId: number | null = null;
-        const rank = dto.rank || AchievementRank.NONE;
-
-        if (dto.competitionId) {
-          // Verify competition exists
-          const competition = await tx.competition.findUnique({
-            where: { id: dto.competitionId },
-          });
-          if (!competition) {
-            throw new NotFoundException(`Cuộc thi ID ${dto.competitionId} không tồn tại`);
-          }
-          if (competition.semesterId !== semesterId) {
-            throw new BadRequestException('Cuộc thi phải thuộc về học kỳ được chọn');
-          }
-
-          competitionId = dto.competitionId;
-          category =
-            competition.level === 'CENTRAL'
-              ? AchievementCategory.CENTRAL_COMPETITION
-              : AchievementCategory.ACADEMY_COMPETITION;
-        } else {
-          // If no competition is selected, rank MUST be NONE (participation/other)
-          if (rank !== AchievementRank.NONE) {
-            throw new BadRequestException('Các giải thưởng Nhất, Nhì, Ba yêu cầu phải chọn cuộc thi liên kết');
-          }
-          // Default or use provided category (ORGANIZATION_PARTICIPATION or SPECIAL_ACHIEVEMENT)
-          category = dto.category || AchievementCategory.ORGANIZATION_PARTICIPATION;
-        }
-
-        const bonusPoint = BONUS_POINT_MAP[category][rank];
-
-        await tx.achievement.create({
-          data: {
+      if (hasAchievementUpdate) {
+        // 3.1. Delete all existing manual achievements for this student in this semester to avoid accumulation and allow updates
+        await tx.achievement.deleteMany({
+          where: {
             userId: user.id,
             semesterId,
-            competitionId,
-            category,
-            rank,
-            bonusPoint,
-            status: 'APPROVED',
             note: 'Được tạo tự động khi cập nhật điểm thủ công',
           },
         });
+
+        // 3.2. If rank OR category is provided, create the new manual Achievement record
+        if (dto.rank || dto.category) {
+          let category: AchievementCategory;
+          let competitionId: number | null = null;
+          const rank = dto.rank || AchievementRank.NONE;
+
+          if (dto.competitionId) {
+            // Verify competition exists
+            const competition = await tx.competition.findUnique({
+              where: { id: dto.competitionId },
+            });
+            if (!competition) {
+              throw new NotFoundException(`Cuộc thi ID ${dto.competitionId} không tồn tại`);
+            }
+            if (competition.semesterId !== semesterId) {
+              throw new BadRequestException('Cuộc thi phải thuộc về học kỳ được chọn');
+            }
+
+            competitionId = dto.competitionId;
+            category =
+              competition.level === 'CENTRAL'
+                ? AchievementCategory.CENTRAL_COMPETITION
+                : AchievementCategory.ACADEMY_COMPETITION;
+          } else {
+            // If no competition is selected, rank MUST be NONE (participation/other)
+            if (rank !== AchievementRank.NONE) {
+              throw new BadRequestException('Các giải thưởng Nhất, Nhì, Ba yêu cầu phải chọn cuộc thi liên kết');
+            }
+            // Default or use provided category (ORGANIZATION_PARTICIPATION or SPECIAL_ACHIEVEMENT)
+            category = dto.category || AchievementCategory.ORGANIZATION_PARTICIPATION;
+          }
+
+          const bonusPoint = BONUS_POINT_MAP[category][rank];
+
+          await tx.achievement.create({
+            data: {
+              userId: user.id,
+              semesterId,
+              competitionId,
+              category,
+              rank,
+              bonusPoint,
+              status: 'APPROVED',
+              note: 'Được tạo tự động khi cập nhật điểm thủ công',
+            },
+          });
+        }
       }
 
       // Re-query approved achievements in this semester

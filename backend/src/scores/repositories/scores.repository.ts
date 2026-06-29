@@ -64,6 +64,11 @@ export class ScoresRepository {
               fullName: true,
               email: true,
               avatarUrl: true,
+              achievements: {
+                where: {
+                  note: 'Được tạo tự động khi cập nhật điểm thủ công',
+                },
+              },
             },
           },
           semester: true,
