@@ -108,6 +108,7 @@ export const CompetitionListPage = () => {
       level: record.level,
       organizer: record.organizer,
       eventDate: dayjs(record.eventDate),
+      endDate: dayjs(record.endDate),
       semesterId: record.semesterId,
     });
     setIsModalOpen(true);
@@ -135,6 +136,7 @@ export const CompetitionListPage = () => {
         level: values.level,
         organizer: values.organizer,
         eventDate: values.eventDate.toISOString(),
+        endDate: values.endDate.toISOString(),
         semesterId: values.semesterId,
       };
 
@@ -204,6 +206,36 @@ export const CompetitionListPage = () => {
       dataIndex: 'eventDate',
       key: 'eventDate',
       render: (date: string) => dayjs(date).format('DD/MM/YYYY'),
+    },
+    {
+      title: 'Ngày Kết Thúc',
+      dataIndex: 'endDate',
+      key: 'endDate',
+      render: (date: string) => dayjs(date).format('DD/MM/YYYY'),
+    },
+    {
+      title: 'Trạng Thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: 'UPCOMING' | 'ONGOING' | 'ENDED') => {
+        let text = 'Chưa diễn ra';
+        if (status === 'ONGOING') {
+          text = 'Đang diễn ra';
+        } else if (status === 'ENDED') {
+          text = 'Đã kết thúc';
+        }
+        return (
+          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+            status === 'ONGOING' 
+              ? 'bg-emerald-100 text-emerald-800 font-medium' 
+              : status === 'ENDED' 
+              ? 'bg-rose-100 text-rose-800 font-medium' 
+              : 'bg-slate-100 text-slate-800 font-medium'
+          }`}>
+            {text}
+          </span>
+        );
+      },
     },
     ...(canManage
       ? [
@@ -360,19 +392,42 @@ export const CompetitionListPage = () => {
               name="eventDate"
               label="Ngày Tổ Chức"
               rules={[{ required: true, message: 'Vui lòng chọn ngày tổ chức' }]}
-              extra={selectedSemesterObj ? `Phải nằm trong khoảng ${dayjs(selectedSemesterObj.startDate).format('DD/MM/YYYY')} - ${dayjs(selectedSemesterObj.endDate).format('DD/MM/YYYY')}` : undefined}
+              extra={selectedSemesterObj ? `Khoảng học kỳ: ${dayjs(selectedSemesterObj.startDate).format('DD/MM/YYYY')} - ${dayjs(selectedSemesterObj.endDate).format('DD/MM/YYYY')}` : undefined}
             >
               <DatePicker className="w-full" format="DD/MM/YYYY" disabledDate={disabledDate} />
             </Form.Item>
           </div>
 
-          <Form.Item
-            name="organizer"
-            label="Đơn Vị Tổ Chức"
-            rules={[{ required: true, message: 'Vui lòng nhập đơn vị tổ chức' }]}
-          >
-            <Input placeholder="Ví dụ: Hội Tin học Việt Nam / Khoa CNTT" />
-          </Form.Item>
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              name="endDate"
+              label="Ngày Kết Thúc"
+              dependencies={['eventDate']}
+              rules={[
+                { required: true, message: 'Vui lòng chọn ngày kết thúc' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const eventDate = getFieldValue('eventDate');
+                    if (!value || !eventDate || value.isAfter(eventDate) || value.isSame(eventDate, 'day')) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('Ngày kết thúc phải lớn hơn hoặc bằng ngày tổ chức'));
+                  },
+                }),
+              ]}
+              extra={selectedSemesterObj ? `Khoảng học kỳ: ${dayjs(selectedSemesterObj.startDate).format('DD/MM/YYYY')} - ${dayjs(selectedSemesterObj.endDate).format('DD/MM/YYYY')}` : undefined}
+            >
+              <DatePicker className="w-full" format="DD/MM/YYYY" disabledDate={disabledDate} />
+            </Form.Item>
+
+            <Form.Item
+              name="organizer"
+              label="Đơn Vị Tổ Chức"
+              rules={[{ required: true, message: 'Vui lòng nhập đơn vị tổ chức' }]}
+            >
+              <Input placeholder="Ví dụ: Hội Tin học Việt Nam / Khoa CNTT" />
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
     </div>

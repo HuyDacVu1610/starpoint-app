@@ -30,6 +30,11 @@ export class CreateCompetitionDto {
   @IsDate({ message: 'Ngày diễn ra cuộc thi không hợp lệ' })
   eventDate!: Date;
 
+  @IsNotEmpty({ message: 'Ngày kết thúc cuộc thi không được để trống' })
+  @Type(() => Date)
+  @IsDate({ message: 'Ngày kết thúc cuộc thi không hợp lệ' })
+  endDate!: Date;
+
   @IsNotEmpty({ message: 'Học kỳ không được để trống' })
   @Type(() => Number)
   @IsInt({ message: 'ID học kỳ phải là số nguyên' })

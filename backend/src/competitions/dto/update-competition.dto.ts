@@ -30,6 +30,11 @@ export class UpdateCompetitionDto {
   eventDate?: Date;
 
   @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'Ngày kết thúc cuộc thi không hợp lệ' })
+  endDate?: Date;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt({ message: 'ID học kỳ phải là số nguyên' })
   @Min(1, { message: 'ID học kỳ phải lớn hơn 0' })

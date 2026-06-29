@@ -113,6 +113,16 @@ export class AchievementsService {
           'Cuộc thi phải thuộc về học kỳ được chọn',
         );
       }
+
+      // Students are only allowed to submit evidence after the competition's end date
+      if (isStudent) {
+        const now = new Date();
+        if (now < new Date(comp.endDate)) {
+          throw new BadRequestException(
+            `Bạn chỉ được phép nộp minh chứng sau khi cuộc thi kết thúc (Ngày kết thúc: ${new Date(comp.endDate).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}).`,
+          );
+        }
+      }
     }
 
     // Validate evidenceFileId exists if provided
@@ -237,6 +247,16 @@ export class AchievementsService {
         throw new BadRequestException(
           'Cuộc thi phải thuộc về học kỳ được chọn',
         );
+      }
+
+      // Students are only allowed to submit evidence after the competition's end date
+      if (isStudent) {
+        const now = new Date();
+        if (now < new Date(comp.endDate)) {
+          throw new BadRequestException(
+            `Bạn chỉ được phép nộp minh chứng sau khi cuộc thi kết thúc (Ngày kết thúc: ${new Date(comp.endDate).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}).`,
+          );
+        }
       }
     }
 

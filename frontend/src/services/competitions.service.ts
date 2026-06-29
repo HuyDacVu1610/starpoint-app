@@ -7,6 +7,8 @@ export interface Competition {
   level: 'CENTRAL' | 'ACADEMY';
   organizer?: string;
   eventDate: string;
+  endDate: string;
+  status: 'UPCOMING' | 'ONGOING' | 'ENDED';
   semesterId: number;
   semester?: Semester;
   createdAt?: string;
@@ -30,14 +32,14 @@ export const competitionsService = {
     return res.data;
   },
 
-  create: async (data: Omit<Competition, 'id' | 'createdAt' | 'updatedAt' | 'semester'>) => {
+  create: async (data: Omit<Competition, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'semester'>) => {
     const res = await api.post('/competitions', data);
     return res.data;
   },
 
   update: async (
     id: number,
-    data: Partial<Omit<Competition, 'id' | 'createdAt' | 'updatedAt' | 'semester'>>,
+    data: Partial<Omit<Competition, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'semester'>>,
   ) => {
     const res = await api.patch(`/competitions/${id}`, data);
     return res.data;

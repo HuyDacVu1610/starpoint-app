@@ -1,0 +1,784 @@
+﻿  console.warn
+    --- 403 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy",
+      "error": "Forbidden",
+      "statusCode": 403
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: ForbiddenException: Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy
+        at PermissionsGuard.canActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\auth\guards\permissions.guard.ts:87:13)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at GuardsConsumer.tryActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\guards\guards-consumer.js:22:17)
+        at canActivateFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:138:33)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:42:31
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-proxy.js:9:17 {
+      response: {
+        message: 'Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy',
+        error: 'Forbidden',
+        statusCode: 403
+      },
+      status: 403,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 400 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Hß╗ìc kß╗│ cho n─âm hß╗ìc 2026 kß╗│ 1 ─æ├ú tß╗ôn tß║íi",
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: BadRequestException: Hß╗ìc kß╗│ cho n─âm hß╗ìc 2026 kß╗│ 1 ─æ├ú tß╗ôn tß║íi
+        at SemestersService.create (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\semesters\services\semesters.service.ts:60:13)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+      response: {
+        message: 'Hß╗ìc kß╗│ cho n─âm hß╗ìc 2026 kß╗│ 1 ─æ├ú tß╗ôn tß║íi',
+        error: 'Bad Request',
+        statusCode: 400
+      },
+      status: 400,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.error
+    Unhandled Exception: PrismaClientValidationError: 
+    Invalid `this.prisma.competition.create()` invocation in
+    C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\competitions\repositories\competitions.repository.ts:69:36
+    
+      66 }
+      67 
+      68 async create(data: Prisma.CompetitionUncheckedCreateInput) {
+    ΓåÆ 69   return this.prisma.competition.create({
+             data: {
+               name: "Olympic Tin Hß╗ìc 2026",
+               level: "CENTRAL",
+               organizer: "Hß╗Öi Tin Hß╗ìc VN",
+               eventDate: new Date("2026-06-15T00:00:00.000Z"),
+               endDate: new Date("2026-06-15T00:00:00.000Z"),
+               ~~~~~~~
+               semesterId: 18,
+           ?   id?: Int,
+           ?   createdAt?: DateTime,
+           ?   updatedAt?: DateTime,
+           ?   achievements?: AchievementUncheckedCreateNestedManyWithoutCompetitionInput
+             },
+             include: {
+               semester: true
+             }
+           })
+    
+    Unknown argument `endDate`. Did you mean `eventDate`? Available options are marked with ?.
+        at ar (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@prisma\client\src\runtime\core\errorRendering\throwValidationException.ts:46:9)
+        at zr.throwValidationException [as handleRequestError] (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:211:7)
+        at zr.handleAndLogRequestError (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:183:12)
+        at zr.request (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@prisma\client\src\runtime\RequestHandler.ts:152:12)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at a (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:963:24)
+        at CompetitionsService.create (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\competitions\services\competitions.service.ts:104:20) {
+      clientVersion: '7.8.0'
+    }
+
+    [0m [90m 50 |[39m       message [33m=[39m err[33m?[39m[33m.[39mmessage [33m||[39m [32m'An unexpected error occurred'[39m[33m;[39m
+     [90m 51 |[39m       errors [33m=[39m [message][33m;[39m
+    [31m[1m>[22m[39m[90m 52 |[39m       console[33m.[39merror([32m'Unhandled Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 53 |[39m     }
+     [90m 54 |[39m
+     [90m 55 |[39m     response[33m.[39mstatus(status)[33m.[39mjson({[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:52:15)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 403 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy",
+      "error": "Forbidden",
+      "statusCode": 403
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: ForbiddenException: Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy
+        at PermissionsGuard.canActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\auth\guards\permissions.guard.ts:87:13)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at GuardsConsumer.tryActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\guards\guards-consumer.js:22:17)
+        at canActivateFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:138:33)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:42:31
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-proxy.js:9:17 {
+      response: {
+        message: 'Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy',
+        error: 'Forbidden',
+        statusCode: 403
+      },
+      status: 403,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 400 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Chß╗ë ─æ╞░ß╗úc ph├⌐p nß╗Öp minh chß╗⌐ng cho hß╗ìc kß╗│ hiß╗çn tß║íi.",
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: BadRequestException: Chß╗ë ─æ╞░ß╗úc ph├⌐p nß╗Öp minh chß╗⌐ng cho hß╗ìc kß╗│ hiß╗çn tß║íi.
+        at AchievementsService.create (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\achievements\services\achievements.service.ts:81:15)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+      response: {
+        message: 'Chß╗ë ─æ╞░ß╗úc ph├⌐p nß╗Öp minh chß╗⌐ng cho hß╗ìc kß╗│ hiß╗çn tß║íi.',
+        error: 'Bad Request',
+        statusCode: 400
+      },
+      status: 400,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 403 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy",
+      "error": "Forbidden",
+      "statusCode": 403
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: ForbiddenException: Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy
+        at PermissionsGuard.canActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\auth\guards\permissions.guard.ts:87:13)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at GuardsConsumer.tryActivate (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\guards\guards-consumer.js:22:17)
+        at canActivateFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:138:33)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:42:31
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-proxy.js:9:17 {
+      response: {
+        message: 'Y├¬u cß║ºu bß╗ï tß╗½ chß╗æi: Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy',
+        error: 'Forbidden',
+        statusCode: 403
+      },
+      status: 403,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 400 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Validation failed (numeric string is expected)",
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: BadRequestException: Validation failed (numeric string is expected)
+        at ParseIntPipe.exceptionFactory (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:24:27)
+        at ParseIntPipe.transform (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:38:24)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\pipes\pipes-consumer.js:16:33
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at resolveParamValue (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:151:23)
+        at async Promise.all (index 2)
+        at pipesFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:154:13)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:37:30 {
+      response: {
+        message: 'Validation failed (numeric string is expected)',
+        error: 'Bad Request',
+        statusCode: 400
+      },
+      status: 400,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 400 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Validation failed (numeric string is expected)",
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: BadRequestException: Validation failed (numeric string is expected)
+        at ParseIntPipe.exceptionFactory (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:24:27)
+        at ParseIntPipe.transform (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:38:24)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\pipes\pipes-consumer.js:16:33
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at resolveParamValue (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:151:23)
+        at async Promise.all (index 1)
+        at pipesFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:154:13)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:37:30 {
+      response: {
+        message: 'Validation failed (numeric string is expected)',
+        error: 'Bad Request',
+        statusCode: 400
+      },
+      status: 400,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 400 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Validation failed (numeric string is expected)",
+      "error": "Bad Request",
+      "statusCode": 400
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: BadRequestException: Validation failed (numeric string is expected)
+        at ParseIntPipe.exceptionFactory (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:24:27)
+        at ParseIntPipe.transform (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\common\pipes\parse-int.pipe.js:38:24)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\pipes\pipes-consumer.js:16:33
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at resolveParamValue (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:151:23)
+        at async Promise.all (index 2)
+        at pipesFn (C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:154:13)
+        at C:\Users\03201\OneDrive\Desktop\starpoint-app\node_modules\@nestjs\core\router\router-execution-context.js:37:30 {
+      response: {
+        message: 'Validation failed (numeric string is expected)',
+        error: 'Bad Request',
+        statusCode: 400
+      },
+      status: 400,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    --- 404 Exception ---
+
+    [0m [90m 25 |[39m       [36mconst[39m res [33m=[39m exception[33m.[39mgetResponse() [36mas[39m string [33m|[39m [33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m[33m;[39m
+     [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+    [31m[1m>[22m[39m[90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:27:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Response: {
+      "message": "Hß╗ìc kß╗│ kh├┤ng tß╗ôn tß║íi",
+      "error": "Not Found",
+      "statusCode": 404
+    }
+
+    [0m [90m 26 |[39m       [36mif[39m (status [33m>=[39m [35m400[39m) {
+     [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:28:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    Exception: NotFoundException: Hß╗ìc kß╗│ kh├┤ng tß╗ôn tß║íi
+        at SemestersService.findById (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\semesters\services\semesters.service.ts:37:13)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at AchievementsService.create (C:\Users\03201\OneDrive\Desktop\starpoint-app\backend\src\achievements\services\achievements.service.ts:95:5) {
+      response: {
+        message: 'Hß╗ìc kß╗│ kh├┤ng tß╗ôn tß║íi',
+        error: 'Not Found',
+        statusCode: 404
+      },
+      status: 404,
+      options: {}
+    }
+
+    [0m [90m 27 |[39m         console[33m.[39mwarn([32m`--- ${status} Exception ---`[39m)[33m;[39m
+     [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:29:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+
+  console.warn
+    ---------------------------------
+
+    [0m [90m 28 |[39m         console[33m.[39mwarn([32m'Response:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+     [90m 29 |[39m         console[33m.[39mwarn([32m'Exception:'[39m[33m,[39m exception)[33m;[39m
+    [31m[1m>[22m[39m[90m 30 |[39m         console[33m.[39mwarn([32m'---------------------------------'[39m)[33m;[39m
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 31 |[39m       }
+     [90m 32 |[39m       [36mif[39m ([36mtypeof[39m res [33m===[39m [32m'string'[39m) {
+     [90m 33 |[39m         message [33m=[39m res[33m;[39m[0m
+
+      at GlobalExceptionFilter.catch (../src/shared/common/filters/global-exception.filter.ts:30:17)
+      at ExceptionsHandler.invokeCustomFilters (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:30:26)
+      at ExceptionsHandler.next (../../node_modules/@nestjs/core/exceptions/exceptions-handler.js:14:18)
+      at ../../node_modules/@nestjs/core/router/router-proxy.js:13:35
+

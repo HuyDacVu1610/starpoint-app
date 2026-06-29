@@ -29,6 +29,24 @@ export class CompetitionsService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
+  private enrichCompetition(competition: any) {
+    if (!competition) return null;
+    const eventDate = new Date(competition.eventDate);
+    const endDate = new Date(competition.endDate);
+    const status = this.getCompetitionStatus(eventDate, endDate);
+    return {
+      ...competition,
+      status,
+    };
+  }
+
+  private getCompetitionStatus(eventDate: Date, endDate: Date): 'UPCOMING' | 'ONGOING' | 'ENDED' {
+    const now = new Date();
+    if (now < eventDate) return 'UPCOMING';
+    if (now > endDate) return 'ENDED';
+    return 'ONGOING';
+  }
+
   async findAll(query: QueryCompetitionDto) {
     const cacheKey = `competitions:all:${JSON.stringify(query)}`;
     const cached = await this.cacheManager.get<any>(cacheKey);
@@ -37,8 +55,13 @@ export class CompetitionsService {
     }
 
     const result = await this.competitionsRepository.findAll(query);
-    await this.cacheManager.set(cacheKey, result, 600 * 1000); // 10 minutes in ms
-    return result;
+    const enrichedData = result.data.map((c) => this.enrichCompetition(c));
+    const finalResult = {
+      total: result.total,
+      data: enrichedData,
+    };
+    await this.cacheManager.set(cacheKey, finalResult, 600 * 1000); // 10 minutes in ms
+    return finalResult;
   }
 
   async findById(id: number) {
@@ -46,7 +69,7 @@ export class CompetitionsService {
     if (!competition) {
       throw new NotFoundException('Cuộc thi không tồn tại');
     }
-    return competition;
+    return this.enrichCompetition(competition);
   }
 
   async create(dto: CreateCompetitionDto) {
@@ -59,6 +82,11 @@ export class CompetitionsService {
       throw new BadRequestException('Chỉ được phép tạo cuộc thi cho học kỳ hiện tại');
     }
 
+    // Validate eventDate <= endDate
+    if (dto.endDate < dto.eventDate) {
+      throw new BadRequestException('Ngày kết thúc cuộc thi không được nhỏ hơn ngày tổ chức');
+    }
+
     // Validate that eventDate falls within the semester's range
     if (dto.eventDate < semester.startDate || dto.eventDate > semester.endDate) {
       throw new BadRequestException(
@@ -66,9 +94,16 @@ export class CompetitionsService {
       );
     }
 
+    // Validate that endDate falls within the semester's range
+    if (dto.endDate < semester.startDate || dto.endDate > semester.endDate) {
+      throw new BadRequestException(
+        `Ngày kết thúc cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`,
+      );
+    }
+
     const result = await this.competitionsRepository.create(dto);
     await this.cacheManager.clear(); // Clear cache to invalidate list
-    return result;
+    return this.enrichCompetition(result);
   }
 
   async update(id: number, dto: UpdateCompetitionDto) {
@@ -76,19 +111,30 @@ export class CompetitionsService {
 
     const semesterId = dto.semesterId !== undefined ? dto.semesterId : existing.semesterId;
     const eventDate = dto.eventDate !== undefined ? dto.eventDate : existing.eventDate;
+    const endDate = dto.endDate !== undefined ? dto.endDate : existing.endDate;
 
-    if (dto.semesterId !== undefined || dto.eventDate !== undefined) {
+    // Validate eventDate <= endDate
+    if (endDate < eventDate) {
+      throw new BadRequestException('Ngày kết thúc cuộc thi không được nhỏ hơn ngày tổ chức');
+    }
+
+    if (dto.semesterId !== undefined || dto.eventDate !== undefined || dto.endDate !== undefined) {
       const semester = await this.semestersService.findById(semesterId);
       if (eventDate < semester.startDate || eventDate > semester.endDate) {
         throw new BadRequestException(
           `Ngày tổ chức cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`,
         );
       }
+      if (endDate < semester.startDate || endDate > semester.endDate) {
+        throw new BadRequestException(
+          `Ngày kết thúc cuộc thi phải nằm trong khoảng thời gian của học kỳ (${formatDate(semester.startDate)} - ${formatDate(semester.endDate)})`,
+        );
+      }
     }
 
     const result = await this.competitionsRepository.update(id, dto);
     await this.cacheManager.clear(); // Clear cache to invalidate list
-    return result;
+    return this.enrichCompetition(result);
   }
 
   async delete(id: number) {

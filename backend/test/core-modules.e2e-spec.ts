@@ -168,7 +168,8 @@ describe('Core Modules (e2e)', () => {
           name: 'Olympic Tin Học 2026',
           level: CompetitionLevel.CENTRAL,
           organizer: 'Hội Tin Học VN',
-          eventDate: '2026-11-20T00:00:00.000Z',
+          eventDate: '2026-06-15T00:00:00.000Z',
+          endDate: '2026-06-15T00:00:00.000Z',
           semesterId: testSemesterId,
         })
         .expect(HttpStatus.CREATED);
@@ -185,7 +186,8 @@ describe('Core Modules (e2e)', () => {
         .send({
           name: 'Staff Comp',
           level: CompetitionLevel.ACADEMY,
-          eventDate: '2026-11-20T00:00:00.000Z',
+          eventDate: '2026-06-15T00:00:00.000Z',
+          endDate: '2026-06-15T00:00:00.000Z',
           semesterId: testSemesterId,
         })
         .expect(HttpStatus.FORBIDDEN);

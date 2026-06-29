@@ -443,11 +443,15 @@ export const MyAchievementsPage = () => {
                 }
                 disabled={competitions.length === 0}
               >
-                {competitions.map((comp) => (
-                  <Option key={comp.id} value={comp.id}>
-                    {comp.name} ({comp.organizer})
-                  </Option>
-                ))}
+                {competitions.map((comp) => {
+                  const isEnded = comp.status === 'ENDED';
+                  const statusText = comp.status === 'ONGOING' ? 'Đang diễn ra' : comp.status === 'UPCOMING' ? 'Chưa diễn ra' : 'Đã kết thúc';
+                  return (
+                    <Option key={comp.id} value={comp.id} disabled={!isEnded}>
+                      {comp.name} ({comp.organizer}) - {statusText} {!isEnded ? '(Chưa kết thúc - Chưa được nộp)' : ''}
+                    </Option>
+                  );
+                })}
               </Select>
             </Form.Item>
           )}
