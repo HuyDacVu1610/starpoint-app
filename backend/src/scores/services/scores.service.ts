@@ -530,6 +530,8 @@ export class ScoresService {
               },
             });
 
+            console.log(`[IMPORT DEBUG] Student: ${row.studentCode}, Comp: ${comp.name}, Rank: ${rank}, Bonus Point: ${bonusPoint}`);
+
             if (existingAch) {
               await tx.achievement.update({
                 where: { id: existingAch.id },
@@ -553,6 +555,8 @@ export class ScoresService {
                 },
               });
             }
+          } else {
+            console.log(`[IMPORT DEBUG] Competition "${row.competitionName}" not found in compMap.`);
           }
         }
 
@@ -574,6 +578,7 @@ export class ScoresService {
             : 0.0;
 
         const extendedGpa = Math.min(4.0, Number((row.gpa + maxBonusPoint).toFixed(2)));
+        console.log(`[IMPORT DEBUG] Student: ${row.studentCode}, GPA: ${row.gpa}, Max Bonus Point: ${maxBonusPoint}, Extended GPA: ${extendedGpa}`);
         const gpaGrade = getGpaGrade(extendedGpa);
         const conductGrade = getConductGrade(row.conductScore);
 
