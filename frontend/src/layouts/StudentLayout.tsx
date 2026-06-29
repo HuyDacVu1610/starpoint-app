@@ -1,6 +1,7 @@
 import { Layout, Menu, Avatar, Dropdown, App, Button, Breadcrumb } from 'antd';
 import {
   StarOutlined,
+  StarFilled,
   CalculatorOutlined,
   SafetyCertificateOutlined,
   LogoutOutlined,
@@ -117,8 +118,8 @@ export const StudentLayout = () => {
       >
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-              ĐT
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-sm shadow-indigo-500/30">
+              <StarFilled className="text-base" />
             </div>
             <span className="font-extrabold text-slate-800 dark:text-zinc-100 text-lg tracking-tight select-none">
               Quản Lý <span className="text-indigo-600">Điểm Thưởng</span>

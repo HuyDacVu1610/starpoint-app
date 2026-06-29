@@ -8,6 +8,7 @@ import {
   UserOutlined,
   CalendarOutlined,
   StarOutlined,
+  StarFilled,
   CalculatorOutlined,
   SafetyCertificateOutlined,
   LogoutOutlined,
@@ -174,8 +175,8 @@ export const AdminLayout = () => {
         }}
       >
         <div className="h-16 flex items-center justify-center px-4 gap-2 overflow-hidden" style={{ background: '#090d16', borderBottom: '1px solid #1e293b' }}>
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-            ĐT
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-sm shadow-indigo-500/30">
+            <StarFilled className="text-base" />
           </div>
           {!collapsed && (
             <span className="font-extrabold text-white text-lg tracking-tight select-none">
